@@ -1,0 +1,239 @@
+
+.tablesorter-scroller-table{height: 500px; overflow: scroll}
+
+th.tablesorter-headerUnSorted{
+    background-image: url(../../../images/table/green-unsorted.gif);
+    cursor: pointer;
+    font-weight: bold;
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-left: 20px;
+    border-right: 1px solid #dad9c7;
+    margin-left: -1px;
+}
+th.tablesorter-headerAsc {
+    background-image: url(../../../images/table/green-asc.gif);
+    background-color: rgba(132, 138, 130, 0.42);
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+th.tablesorter-headerDesc {
+    background-image: url(../../../images/table/green-desc.gif);
+    background-color: rgba(132, 138, 130, 0.42);
+    background-repeat: no-repeat;
+    background-position: center right;
+}
+tr.analyte
+{
+    display: none;
+}
+#tree-source li
+{
+    display: block;
+    margin-left: 5px;
+    font-size: 10px;
+}
+#regRequestAll td
+{
+    font-size: 15px;
+}
+#regRequestAll tr
+{
+    margin-top: 2px;
+}
+sup{
+    color:blue;
+}
+.panel-default > .panel-heading
+{
+    background: #5AADBB;
+    border-color:#448490;
+}
+.btn-primary
+{
+    background: #5AADBB;
+}
+.btn-primary:hover
+{
+    background:#448490;
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus
+{
+    border-radius: 10px 10px 0px 0px;
+    padding-top: 10px;
+}
+
+#book
+{
+    min-height: 50%;
+    margin-top: 15%;
+    text-align: center;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+
+    -moz-box-shadow: 0 0 20px 5px rgba(26,26,26,.1);
+    -webkit-box-shadow: 0 0 20px 5px rgba(26,26,26,.1);
+    -o-box-shadow: 0 0 20px 5px rgba(26,26,26,.1);
+    -ms-box-shadow: 0 0 20px 5px rgba(26,26,26,.1);
+}
+.book
+ {
+     height: 25%;
+     background: linear-gradient(to top,#E2E7E8 0%, #ffffee 50%, #E2E7E8 100% );
+     margin-top: 10%;
+     padding-top: 20%;
+     border-radius: 25px;
+     -moz-box-shadow: 0 0 10px 5px rgba(26,26,26,.1);
+     -webkit-box-shadow: 0 0 10px 5px rgba(26,26,26,.1);
+     -o-box-shadow: 0 0 10px 5px rgba(26,26,26,.1);
+     -ms-box-shadow: 0 0 10px 5px rgba(26,26,26,.1);
+ }
+.book:hover
+{
+    -moz-box-shadow: 0 0 10px 5px rgba(26,26,26,.1) inset;
+    -webkit-box-shadow: 0 0 10px 5px rgba(26,26,26,.1) inset;
+    -o-box-shadow: 0 0 10px 5px rgba(26,26,26,.1) inset;
+    -ms-box-shadow: 0 0 10px 5px rgba(26,26,26,.1) inset;
+}
+.pricePage .form-control
+ {
+     width: 25%;
+     padding: 0px 12px;
+     font-size: 1.3em;
+     margin-right: 3%;
+ }
+.pricePage span
+{
+    display: block;
+    float: left;
+    font-size: 1.3em;
+    margin-right: 3%;
+}
+.pricePage .form-control option
+{
+    font-size: 1em;
+}
+#registration h1, #edit h1
+{
+    font-size: 1.7em;
+    text-align: center;
+    margin-bottom: 5%;
+}
+#registration input[type=checkbox], #edit input[type=checkbox]
+{
+    margin-left: 10px;
+    width: 20px;
+    height: 20px;
+}
+#registration input, #edit input
+{
+    font-weight: bold;
+    font-size: 1em;
+    color: #444D75;
+}
+#registration #orderP, #orderP
+{
+    padding: 20px;
+}
+#registration .wizard > .content, #edit .wizard > .content
+{
+    overflow: auto;
+}
+#requests p, #edit p
+{
+    font-size: 1.1em;
+    font-weight: 600;
+}
+#table-filter ul
+{
+    width: 50%;
+    padding: 10px;
+    line-height: 20px;
+}
+#detal table
+{
+    margin-top: 30px;
+}
+#detal form input
+{
+    border-radius: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 35px;
+}
+#detal select
+{
+    height: 35px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 10px;
+}
+#detal button
+{
+    margin-right: 5px;
+    margin-left: 5px;
+    border-radius: 10px;
+    vertical-align: 0;
+    height: 35px;
+    font-size: inherit;
+    background: #3586C9;
+}
+#request table#a td
+{
+    padding-top: 10px;
+}
+#request table#b th
+{
+    font-size: 1.2em;
+    border-bottom: 2px solid #14B512;
+}
+#request table#b td
+{
+    border-right: 1px dotted #14B512;
+    border-left: 1px dotted #14B512;
+}
+#request table#b td:not(:first-child)
+{
+    text-align: center;
+}
+#stat form:first-child input
+{
+    margin-right: 10px;
+    margin-left: 5px;
+}
+#stat form:first-child select
+{
+    margin-right: 10px;
+    margin-left: 5px;
+}
+
+@font-face {
+    font-family: FontAwesome;
+    src: url(../fonts/fontawesome-webfont.eot),
+        url(../fonts/fontawesome-webfont.svg) format('svg'),
+        url(../fonts/fontawesome-webfont.ttf) format('truetype'),
+        url(../fonts/fontawesome-webfont.woff) format('woff'),
+        url(../fonts/fontawesome-webfont.woff2) format('woff2')
+}
+#user
+{
+    padding: 5%;
+}
+#userAdd tr, #userEdit tr
+{
+    text-align: center;
+}
+#userAdd input[type="checkbox"], #userEdit input[type="checkbox"] {
+    width: 40px;
+    height: 40px;
+}
+#infoBlock
+{
+    padding: 3%;
+}
+#infoBlock p
+{
+    font-size: 1.2em;
+    line-height: 30px;
+}

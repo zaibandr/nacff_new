@@ -1,0 +1,26 @@
+#procedure
+{
+    padding: 2%;
+    background: rgba(233, 237, 240, 0.42);
+}
+.procs
+{
+    padding: 20px;
+    background: rgba(0, 149, 255, 0.05);
+    margin-top: 20px;
+    border: 1px solid #F1FDFF;
+    border-radius: 15px;
+    box-shadow: 0 0 15px -5px #00717B;
+}
+.procs p
+{
+    font-size: 18px;
+}
+.procs table td
+{
+    padding-top: 10px;
+}
+.procs b
+{
+    color: #00989E;
+}

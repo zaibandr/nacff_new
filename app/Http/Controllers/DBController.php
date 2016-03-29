@@ -1,0 +1,506 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 1
+ * Date: 12.01.2016
+ * Time: 9:05
+ */
+
+namespace App\Http\Controllers;
+
+
+class DBController extends Controller
+{
+    public $db;
+    protected $host="192.168.0.14:RC";
+    protected $username="SYSDBA";
+    protected $password="cdrecord";
+    function __construct(){
+        $this->db = ibase_connect($this->host, $this->username, $this->password)
+        or die("Ошибка подключения к БД! ". ibase_error());
+    }
+    function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        ibase_close($this->db);
+    }
+
+    function queryDB($query){
+        $stmt = ibase_query($this->db,$query);
+        return $stmt;
+    }
+    function getResult($res){
+        $a = [];
+        while($row = ibase_fetch_assoc($res))
+            $a[] = $row;
+        return $a;
+    }
+    function getUser($l, $p)
+    {
+        $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid from users u ";
+        $query.="inner join userdept ud on ud.usernam = u.usernam ";
+        $query.="inner join departments d on ud.dept = d.id ";
+        $query.="inner join userroles ur on ur.usernam = u.usernam ";
+        $query.="where u.status='A' and u.usernam='".$l."' and u.password2 = '".$p."'";
+        $result = $this->queryDB($query);
+        $a =  $this->getResult($result);
+        return $a;
+    }
+    function getPanel(){
+        /*$query = "SELECT p.CODE, p.PANEL, m.ID, m.MATTYPE, g.id, g.contgroup from PANELS p ";
+        $query.= "inner join PRICES pr on pr.PANEL = p.CODE ";
+        $query.= "inner join PANEL_CONTAINERS pc on pc.PANEL=p.CODE ";
+        $query.= "inner join PRICELISTS pl on pl.ID = pr.PRICELISTID ";
+        $query.= "inner join DEPARTMENTS d on d.ID=pl.DEPT ";
+        $query.= "inner join MATTYPES m on m.ID=pc.MATTYPE_ID ";
+        $query.= "inner join CONTGROUPS g on g.ID=pc.CONTGROUPID ";*/
+        $query = "SELECT p.CODE, p.PANEL from panels p";
+        $stmt = ibase_query($this->db,$query);
+        $a['code'] = [];
+        while($row = ibase_fetch_row($stmt)){
+            //dd($row);
+            if(!in_array($row[0],$a['code'])) {
+                $a['code'][] = $row[0];
+                $a['panel'][] = $row[1];
+            }
+        }
+        //dd($a);
+        return $a;
+    }
+    function getMattype(){
+        $query = "SELECT  m.ID, m.MATTYPE from MATTYPES m";
+        $stmt = ibase_query($this->db,$query);
+        $a['id'] = [];
+        while($row = ibase_fetch_row($stmt)){
+            //dd($row);
+            if(!in_array($row[0],$a['id'])) {
+                $a['id'][] = $row[0];
+                $a['mattype'][] = $row[1];
+            }
+        }
+        //dd($a);
+        return $a;
+    }
+    function getPCont(){
+        $query = "SELECT  g.id, g.contgroup from CONTGROUPS g";
+        $stmt = ibase_query($this->db,$query);
+        $a['id'] = [];
+        while($row = ibase_fetch_row($stmt)){
+            //dd($row);
+            if(!in_array($row[0],$a['id'])) {
+                $a['id'][] = $row[0];
+                $a['contgroup'][] = $row[1];
+            }
+        }
+        //dd($a);
+        return $a;
+    }
+    function getTests(){
+        $query = "SELECT a.id, a.testcode, a.analyte, t.testname from analytes a inner join tests t on t.id=a.testcode";
+        $stmt = ibase_query($this->db,$query);
+        $a = [];
+        while($row = ibase_fetch_row($stmt)){
+            //dd($row);
+                $a[$row[3]]['testcode'] = $row[1];
+                $a[$row[3]]['id'][] = $row[0];
+                $a[$row[3]]['analyte'][] = $row[2];
+        }
+        //dd($a);
+        return $a;
+    }
+    function getPrices(){
+        $dept = \Input::get('price', \Session::get('dept'));
+        $query = "select p.COST, p.panel, coalesce(p.MEDAN, pn.panel), p.NACPH, p.COMMENTS from PRICES p ";
+        $query.= "inner join PRICELISTS pr on pr.id = p.PRICELISTID ";
+        $query.= "inner join panels pn on pn.code=p.panel ";
+        $query.= "where pr.status='A' and pr.dept=$dept";
+        $stmt = ibase_query($this->db,$query);
+        $a = [];
+        while($row = ibase_fetch_row($stmt)){
+            $a[] = $row;
+        }
+        return $a;
+    }
+    function getServices(){
+        $query = "select s.NAME, s.CODE, s.PRICE from SERVICES s ";
+        $query.= "inner join DEPARTMENTS d on d.id = s.DEPTID ";
+        if(\Input::has('dept'))
+            $query.= "where s.status='A' and s.price is not null and d.id='".\Input::get('dept')."'";
+        else
+            $query.= "where s.status='A' and s.price is not null and d.DEPTCODE='".\Session::get('clientcode')."'";
+        //dd($query);
+        $stmt = ibase_query($this->db,$query);
+        $a = $this->getResult($stmt);
+        return $a;
+    }
+    function getPatient(){
+        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid ";
+        $query .= "FROM PATIENT a ";
+        $query .= "inner join FOLDERS f on f.PID=a.PID ";
+        $query .= "inner join DEPARTMENTS d on d.ID = f.CLIENTID ";
+        $query .= "where d.DEPTCODE='".\Session::get('clientcode')."'";
+        $res = $this->queryDB($query);
+        //dd($this->getResult($res));
+        return $this->getResult($res);
+    }
+    function getPatientInfo($id){
+        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, f.logdate, s.statusname, f.folderno, f.apprsts ";
+        $query .= "FROM PATIENT a ";
+        $query .= "inner join FOLDERS f on f.PID=a.PID ";
+        $query .= "inner join statuses s on f.apprsts=s.status ";
+        $query .= "where f.apprsts!='R' and a.pid=$id";
+        $res = $this->queryDB($query);
+        //dd($this->getResult($res));
+        return $this->getResult($res);
+    }
+    function getTree(){
+        $query="select distinct p.PANEL, p.COST, pc.PCAT, pan.PANEL, pg.PGRP from PRICES p ";
+        $query .= "inner join PANEL_CATEGORIES pc on pc.ID=p.PCAT ";
+        $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
+        $query .= "inner join PRICELISTS pr on pr.id=p.PRICELISTID ";
+        $query .= "inner join DEPARTMENTS d on d.ID=pr.DEPT ";
+        $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
+        $query .= "inner join PANEL_CONTAINERS p_c on p_c.PANEL=pan.CODE ";
+        $query .= "inner join MATTYPES m on m.ID=p_c.MATTYPE_ID ";
+        $query .= "inner join CONTGROUPS c on c.ID=p_c.CONTGROUPID ";
+        $query .= "where d.";
+        $stmt = ibase_query($this->db,$query);
+        while($row = ibase_fetch_assoc($stmt)) {
+            $a[$row['PCAT']][$row['PGRP']][]['PANEL'] = $row['PANEL'];
+            $a[$row['PCAT']][$row['PGRP']][]['PANEL_01'] = $row['PANEL_01'];
+            $a[$row['PCAT']][$row['PGRP']][]['COST'] = $row['COST'];
+        }
+        return (json_encode($a, JSON_UNESCAPED_UNICODE ));
+    }
+    function getFolders(){
+        if (\Input::has('status'))
+            $apprsts = \Input::get('status');
+        else $apprsts = '';
+        if (\Input::has('positive'))
+            $positive = \Input::get('positive');
+        else $positive = '';
+        if (\Input::has('date_st'))
+            $date_st = \Input::get('date_st');
+        else $date_st = date('Y-m-d', strtotime("-3 days"));
+        if (\Input::has('date_en'))
+            $date_en = date('Y-m-d 23:59:59', strtotime(\Input::get('date_en')));
+        else $date_en = date('Y-m-d 23:59:59');
+        if(\Input::has('client') && \Input::get('client')!=='' && \Input::get('client')!=='all'){
+            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str,  f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cash, f.cito, f.discount, f.cost from folders f ";
+            $query.= "left join doctors doc on doc.id=f.doctor ";
+            $query.= "inner join departments d on d.id=f.clientid ";
+            $query.= "inner join statuses a on a.status=f.apprsts ";
+            $query.= "where f.apprsts!='R' and f.clientid=".\Input::get('client');
+        }
+
+    else{
+            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str, f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
+            $query.= "left join doctors doc on doc.id=f.doctor ";
+            $query.= "inner join departments d on d.id=f.clientid ";
+            $query.= "inner join statuses a on a.status=f.apprsts ";
+            $query.= "where d.deptcode='".\Session::get('clientcode')."' and f.apprsts!='R'";
+        }
+        $query.= " and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        if($positive!='')
+            $query.=" and f.status='".$positive."'";
+        if($apprsts!='')
+            $query.=" and f.apprsts='".$apprsts."'";
+        //dd($query);
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+
+    }
+
+    public function getMaterials()
+    {
+        $query = "select m.id, m.material from materials m where m.parent is not NULL";
+        return $this->getResult($this->queryDB($query));
+    }
+    public function getMatDept()
+    {
+        $query = "select m.MATERIAL, md.UNIT, md.UNITPACK, d.dept, m.parent ";
+        $query.= "from Materialdept md ";
+        $query.= "inner join MATERIALS m on m.ID=md.MATID ";
+        $query.= "inner join DEPARTMENTS d on d.ID=md.DEPTID ";
+        if(\Input::has('dept') && \Input::get('dept')!=='')
+            $query.= "where md.UNIT!=0 and md.UNITPACK!=0 and d.id =".\Input::get('dept');
+        else {
+            $query.= "where md.UNIT!=0 and md.UNITPACK!=0 and d.deptcode = '".\Session::get('clientcode')."'";
+        }
+        return $this->getResult($this->queryDB($query));
+    }
+    public function getDepts()
+    {
+        $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+    public function getDeptPrice()
+    {
+        $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A' and deptcode='".\Session::get('clientcode')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getRules($id='')
+    {
+        if($id=='')
+            $query = "select rulename, sql, per from rules where status='A' and deptid=".\Session::get('dept');
+        else
+            $query = "select rulename, sql, per from rules where status='A' and deptid=".$id;
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+    public function getRulesTwo($id='')
+    {
+        if($id=='')
+            $query = "select status, id, rulename, sql, per from rules where deptid=".\Session::get('dept');
+        else
+            $query = "select status, id, rulename, sql, per from rules where deptid=".$id;
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getDoctor($id='')
+    {
+        if($id=='')
+            $query = "select d.id, d.doctor from doctors inner JOIN folders f on f.doctor=d.id where f.clientid=".\Session::get('dept');
+        else
+            $query = "select d.id, d.doctor from doctors inner JOIN folders f on f.doctor=d.id where f.clientid=".$id;
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getPricelist()
+    {
+        $query = "select DISTINCT p.id, d.dept from pricelists p inner join departments d on p.dept=d.id where p.status='A' and d.deptcode='".\Session::get('clientcode')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getDraft($folderno)
+    {
+        $query = "SELECT a.FOLDERNO, a.LOGDATE, a.LOGUSER, a.PID, a.SURNAME, a.NAME, a.PATRONYMIC, a.DATE_BIRTH, d.DOCTOR, dep.dept, a.COST, a.DISCOUNT FROM FOLDERS a left join doctors d on d.id=a.doctor inner join departments dep on dep.id = a.clientid where folderno='".$folderno."'";
+        $stmt = $this->queryDB($query);
+        $rw = ibase_fetch_assoc($stmt);
+        return $rw;
+    }
+
+    public function getOrder($folderno)
+    {
+        $query = "SELECT distinct fc.CONTAINERNO, p.CODE, p.PANEL, m.MATTYPE, cg.CONTGROUP, s.CODE, s.NAME ";
+        $query.= "FROM folders f ";
+        $query.= "inner join orders o on o.FOLDERNO = f.FOLDERNO ";
+        $query.= "left join ordtask ot on ot.ORDERSID=o.ID ";
+        $query.= "left join foldercontainers fc on fc.ID=ot.CONTAINERID ";
+        $query.= "left join PANELS p on p.CODE=o.PANEL ";
+        $query.= "left join PANEL_CONTAINERS pc on pc.PANEL=p.CODE ";
+        $query.= "left join MATTYPES m on m.ID=pc.MATTYPE_ID ";
+        $query.= "left join CONTGROUPS cg on cg.ID=pc.CONTGROUPID ";
+        $query.= "left join SERVICES s on s.ID=o.SERVICEID and s.DEPTID=f.CLIENTID ";
+        $query.= "where o.apprsts!='R' and f.FOLDERNO='$folderno' ";
+        $res = $this->getResult($this->queryDB($query));
+        return $res;
+    }
+
+    public function getLabel($id)
+    {
+       $query = " select distinct fc.containerno, cg.contgroup, f.surname || coalesce(' ' || f.name, '') || coalesce(' ' || f.patronymic, '') ";
+       $query.= " from foldercontainers fc  ";
+       $query.= " inner join contgroups cg on cg.id = fc.containertypeid ";
+       $query.= " inner join folders f on f.folderno = fc.folderno ";
+       $query.= " inner join ordtask ot on ot.CONTAINERID=fc.ID";
+       $query.= " inner join orders o on o.id = ot.ORDERSID";
+       $query.= " where o.apprsts!='R' and fc.folderno='$id'";
+        //dd($query);
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getAct($id)
+    {
+        $query = " select distinct f.SURNAME, f.NAME, f.PATRONYMIC, d.DEPT, p.MEDAN, p.PANEL, p.DUE, fc.CONTAINERNO, cg.CONTGROUP, f.LOGDATE, f.DATE_BIRTH, f.COMMENTS, doc.DOCTOR, f.gender";
+        $query.= " from folders f";
+        $query.= " inner join foldercontainers fc on fc.FOLDERNO=f.FOLDERNO";
+        $query.= " inner join ordtask ot on ot.CONTAINERID=fc.ID";
+        $query.= " inner join orders o on o.id = ot.ORDERSID";
+        $query.= " inner join PRICES p on p.PANEL = o.PANEL and p.pricelistid=f.pricelistid";
+        $query.= " left join doctors doc on doc.id=f.doctor";
+        $query.= " inner join CONTGROUPS cg on cg.ID = fc.CONTAINERTYPEID";
+        $query.= " inner join DEPARTMENTS d on d.id = f.CLIENTID";
+        $query.= " where o.apprsts!='R' and f.folderno = '".$id."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getProc()
+    {
+        $query = "select distinct f.folderno, f.SURNAME, f.NAME, f.PATRONYMIC, s.CODE, s.NAME, p.CODE, p.PANEL, fc.CONTAINERNO, c.CONTGROUP, m.MATTYPE ";
+        $query.= "from FOLDERS f ";
+        $query.= "inner join ORDERS o on o.FOLDERNO=f.FOLDERNO ";
+        $query.= "left join SERVICES s on s.ID=o.SERVICEID and s.DEPTID=f.CLIENTID ";
+        $query.= "left join ORDTASK ord on ord.ORDERSID=o.ID ";
+        $query.= "left join FOLDERCONTAINERS fc on fc.ID=ord.CONTAINERID ";
+        $query.= "left join MATTYPES m on m.ID=fc.MATTYPEID ";
+        $query.= "left join CONTGROUPS c on c.ID=fc.CONTAINERTYPEID ";
+        $query.= "left join PANELS p on p.CODE=o.PANEL ";
+        $query.= "where o.STATUS!='R' and f.apprsts='D' and f.clientid=".\Session::get('dept');
+        $query.= "order by p.panel";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function editReg($id)
+    {
+        $query = "select f.surname, f.name, f.patronymic, f.pid, f.date_birth, f.clientid, f.address, f.passport_number,";
+        $query.= "f.passport_series, f.phone, f.email, f.gender, d.doctor, f.comments, f.pregnancy, f.pricelistid, f.discount, ";
+        $query.= "f.s_sms, f.s_email, f.prime, f.doc, f.cash, f.issued, f.cardno, f.backref, f.ais, f.org, f.str, f.cito, ";
+        $query.= "f.cost, f. nacph, f.price, rn1, rn2, rn3, f.doctor, f.height, f.weight, f.polis, f.antibiot, f.antibiotic, f.biostart, f.bioend";
+        $query.= " from folders f";
+        $query.= " left join doctors d on d.id = f.doctor";
+        $query.= " where f.folderno='$id'";
+        $res = $this->getResult($this->queryDB($query));
+        return $res;
+    }
+
+    public function editPanels($id)
+    {
+        $query  = "select p.CODE, p.PANEL, p.MATS, o.PRICE, o.NACPH, s.CODE, s.NAME ";
+        $query .= "from ORDERS o ";
+        $query .= "left join PANELS p on o.panel=p.code ";
+        $query .= "left join SERVICES s on o.SERVICEID=s.ID ";
+        $query .= "where o.apprsts!='R' and o.folderno = '$id'";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function detal()
+    {
+        if (\Input::has('date_st'))
+            $date_st = \Input::get('date_st');
+        else $date_st = date('Y-m-d', strtotime("-3 days"));
+        if (\Input::has('date_en'))
+            $date_en = \Input::get('date_en');
+        else $date_en = date('Y-m-d');
+        if (\Input::has('client'))
+            $client = \Input::get('client');
+        else $client = '';
+        $query = 'select f.logdate, d.dept, f.folderno, f.surname, f.name, f.patronymic, f.discount, p.code, p.panel, o.nacph, o.price, o.cost, s.name, s.code';
+        $query.= ' from folders f';
+        $query.= ' inner join departments d on d.id=f.clientid';
+        $query.= ' inner join orders o on f.folderno=o.folderno';
+        if(\Input::has('type') && \Input::get('type')=='s')
+            $query.= ' inner join services s on s.id=o.serviceid';
+        else
+            $query.= ' left join services s on s.id=o.serviceid';
+        if(\Input::has('type') && \Input::get('type')=='n')
+            $query.= ' inner join panels p on p.code=o.panel';
+        else
+            $query.= ' left join panels p on p.code=o.panel';
+        $query.= " where f.apprsts!='R' and f.apprsts!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        if($client!=='' && $client!=='all')
+            $query.= " and d.id=".$client;
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function getOrdtask($id)
+    {
+        $query = "SELECT distinct r.FINALRESULT,r.CHARLIMITS,r.UNIT,r.STATUS, p.PANEL, p.CODE, ord.APPRSTS, a.ANALYTE, s.STATUSCOLOR, s.STATUSNAME ";
+        $query.= "from ORDERS ord ";
+        $query.= "inner join ORDTASK o on ord.ID=o.ORDERSID ";
+        $query.= "left join RESULTS r on o.ID=r.ORDTASKID ";
+        $query.= "inner join PANELS p on p.CODE=ord.PANEL ";
+        $query.= "left join ANALYTES a on a.ID=r.ANALYTEID and a.testcode=r.testid ";
+        $query.= "inner join STATUSES s on s.STATUS=ord.APPRSTS ";
+        $query.= "where ord.apprsts!='R' and ord.FOLDERNO='$id' ";
+        $query.= "order by a.ANALYTE ";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function getStatistic($id)
+    {
+        if (\Input::has('date_st'))
+            $date_st = \Input::get('date_st');
+        else $date_st = date('Y-m-d', strtotime("-3 days"));
+        if (\Input::has('date_en'))
+            $date_en = \Input::get('date_en');
+        else $date_en = date('Y-m-d');
+        switch ($id){
+            case 0:
+                $query = "SELECT distinct p.CODE, p.PANEL, s.CODE, s.NAME, s.PRICE, a.COST, a.LOGDATE, a.FOLDERNO , a.NACPH, a.DISCOUNT, d.DEPT ";
+                $query.= "FROM ORDERS a ";
+                $query.= "inner join FOLDERS f on f.FOLDERNO=a.FOLDERNO ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "left join panels p on p.CODE=a.PANEL  ";
+                $query.= "left join SERVICES s on s.id = a.SERVICEID and s.DEPTID=d.id ";
+                $query.= "where ";
+                break;
+            case 1:
+                $query = "select distinct d.DEPT, f.PRIME ";
+                $query.= "from folders f ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "where ";
+                break;
+            case 2:
+                $query = "select distinct s.PRICE, o.PRICE, o.COST, o.NACPH, o.DISCOUNT, d.DEPT ";
+                $query.= "from folders f ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "inner join ORDERS o on o.FOLDERNO=f.FOLDERNO ";
+                $query.= "left join SERVICES s on s.id = o.SERVICEID and s.deptid=f.clientid ";
+                $query.= "where ";
+                break;
+            case 3:
+                $query = "select distinct s.PRICE, o.COST, dc.DOCTOR ";
+                $query.= "from folders f ";
+                $query.= "left join DOCTORS dc on f.DOCTOR=dc.ID ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "inner join ORDERS o on o.FOLDERNO=f.FOLDERNO ";
+                $query.= "left join SERVICES s on s.id = o.SERVICEID and s.deptid=d.id ";
+                $query.= "where ";
+                break;
+            case 4:
+                $query = "select distinct d.DEPT, f.LOGDATE ";
+                $query.= "from folders f ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "where ";
+                break;
+            case 5:
+                $query = "select distinct b.BACK ";
+                $query.= "from folders f ";
+                $query.= "left join BACKREF b on b.ID=f.BACKREF ";
+                $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
+                $query.= "where ";
+                break;
+        }
+        if(\Input::has('dept')){
+            if(\Input::get('dept')=='all')
+                $query.= "f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."' and d.deptcode='".\Session::get('clientcode')."'";
+            else
+                $query.= "f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."' and d.id='".\Input::get('dept')."'";
+            return $this->getResult($this->queryDB($query));
+        }
+    }
+
+    public function getBackref()
+    {
+        $query = "select id, back from backref";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function getUsers()
+    {
+        $query = "select u.usernam, ur.roleid, u.fullname, u.status, u.password3, d.dept from users u ";
+        $query.= "inner join userdept ud on ud.usernam=u.usernam ";
+        $query.= "inner join userroles ur on ur.usernam=u.usernam ";
+        $query.= "inner join departments d on ud.dept=d.id ";
+        $query.= "where d.deptcode='".\Session::get('clientcode')."'";
+        return $this->getResult($this->queryDB($query));
+    }
+}

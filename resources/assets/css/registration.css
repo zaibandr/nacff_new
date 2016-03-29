@@ -1,0 +1,53 @@
+#registration
+{
+    padding: 2%;
+    background: rgba(233, 237, 240, 0.42);
+}
+.wizard > .steps .current a, .wizard > .steps .current a:hover, .wizard > .steps .current a:active
+{
+    background: #00989e;
+}
+.wizard > .steps .disabled a, .wizard > .steps .disabled a:hover, .wizard > .steps .disabled a:active, .wizard > .steps .done a, .wizard > .steps .done a:hover, .wizard > .steps .done a:active
+{
+    background: rgba(73, 177, 194, 0.48);
+    color: white;
+}
+
+.wizard > .steps a, .wizard > .steps a:hover, .wizard > .steps a:active
+{
+    border-radius: 0;
+}
+.wizard > .actions a, .wizard > .actions a:hover, .wizard > .actions a:active
+{
+    border-radius: 0;
+}
+.wizard > .actions a
+{
+    background: rgba(73, 177, 194, 0.48);
+}
+.wizard > .actions a:hover, .wizard > .actions a:active
+{
+    background: #00989e;
+}
+#dt_catched
+{
+    font-size: 0.8em;
+    background: rgba(128, 128, 128, 0.11);
+    color: gray;
+}
+span#folderno
+{
+    padding: 1px 10px;
+    border: 1px #ABADB3 solid;
+    color: grey;
+    font-weight: bold;
+    background: rgba(128, 128, 128, 0.11);
+}
+.ui-menu .ui-menu-item
+{
+    border-bottom: 1px grey solid;
+}
+#orderP
+{
+    margin-top: 2%;
+}

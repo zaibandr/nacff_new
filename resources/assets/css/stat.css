@@ -1,0 +1,26 @@
+#stat
+{
+    padding: 2%;
+    background: rgba(233, 237, 240, 0.42);
+}
+.tablesorter-dropbox .header, .tablesorter-dropbox thead tr, .tablesorter-dropbox .tablesorter-headerRow
+{
+    background: none;
+    border: none;
+}
+.tablesorter-dropbox th, .tablesorter-dropbox thead td, .tablesorter-dropbox tfoot th, .tablesorter-dropbox tfoot td
+{
+    background: rgba(168, 218, 226, 0.33);
+    border-color: #49B1C2 #e7f2fb #49B1C2;
+    color: #6B6B6B;
+}
+.input-daterange {
+    width: 40%;
+    float: left;
+    margin-right: 1%;
+}
+form
+{
+    margin-bottom: 1%;
+    margin-top: 1%;
+}

@@ -1,0 +1,13 @@
+#user
+{
+    padding: 2%;
+    background: rgba(233, 237, 240, 0.42);
+}
+#userAdd tr, #userEdit tr
+{
+    text-align: center;
+}
+#userAdd input[type="checkbox"], #userEdit input[type="checkbox"] {
+    width: 40px;
+    height: 40px;
+}
