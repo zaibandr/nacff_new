@@ -138,7 +138,8 @@ class DBController extends Controller
         $query .= "FROM PATIENT a ";
         $query .= "inner join FOLDERS f on f.PID=a.PID ";
         $query .= "inner join DEPARTMENTS d on d.ID = f.CLIENTID ";
-        $query .= "where d.DEPTCODE='".\Session::get('clientcode')."'";
+        $query .= "inner join userdept u on u.dept = d.id ";
+        $query .= "where u.usernam='".\Session::get('login')."'";
         $res = $this->queryDB($query);
         //dd($this->getResult($res));
         return $this->getResult($res);
@@ -198,7 +199,8 @@ class DBController extends Controller
             $query.= "left join doctors doc on doc.id=f.doctor ";
             $query.= "inner join departments d on d.id=f.clientid ";
             $query.= "inner join statuses a on a.status=f.apprsts ";
-            $query.= "where d.deptcode='".\Session::get('clientcode')."' and f.apprsts!='R'";
+            $query.= "inner join userdept u on u.dept = d.id ";
+            $query.= "where u.usernam='".\Session::get('login')."' and f.apprsts!='R'";
         }
         $query.= " and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
         if($positive!='')
@@ -226,7 +228,8 @@ class DBController extends Controller
         if(\Input::has('dept') && \Input::get('dept')!=='')
             $query.= "where md.UNIT!=0 and md.UNITPACK!=0 and d.id =".\Input::get('dept');
         else {
-            $query.= "where md.UNIT!=0 and md.UNITPACK!=0 and d.deptcode = '".\Session::get('clientcode')."'";
+            $query.= "inner join userdept u on u.dept = d.id ";
+            $query.= "where md.UNIT!=0 and md.UNITPACK!=0 and u.usernam='".\Session::get('login')."'";
         }
         return $this->getResult($this->queryDB($query));
     }
@@ -404,9 +407,13 @@ class DBController extends Controller
             $query.= ' inner join panels p on p.code=o.panel';
         else
             $query.= ' left join panels p on p.code=o.panel';
-        $query.= " where f.apprsts!='R' and f.apprsts!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
         if($client!=='' && $client!=='all')
-            $query.= " and d.id=".$client;
+            $query.= " where d.id=".$client;
+        else {
+            $query.= " inner join userdept u on u.dept = d.id";
+            $query.= " where u.usernam='".\Session::get('login')."'";
+        }
+        $query.= " and f.apprsts!='R' and f.apprsts!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
         return $this->getResult($this->queryDB($query));
     }
 
@@ -440,13 +447,11 @@ class DBController extends Controller
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
                 $query.= "left join panels p on p.CODE=a.PANEL  ";
                 $query.= "left join SERVICES s on s.id = a.SERVICEID and s.DEPTID=d.id ";
-                $query.= "where ";
                 break;
             case 1:
                 $query = "select distinct d.DEPT, f.PRIME ";
                 $query.= "from folders f ";
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
-                $query.= "where ";
                 break;
             case 2:
                 $query = "select distinct s.PRICE, o.PRICE, o.COST, o.NACPH, o.DISCOUNT, d.DEPT ";
@@ -454,7 +459,6 @@ class DBController extends Controller
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
                 $query.= "inner join ORDERS o on o.FOLDERNO=f.FOLDERNO ";
                 $query.= "left join SERVICES s on s.id = o.SERVICEID and s.deptid=f.clientid ";
-                $query.= "where ";
                 break;
             case 3:
                 $query = "select distinct s.PRICE, o.COST, dc.DOCTOR ";
@@ -463,27 +467,25 @@ class DBController extends Controller
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
                 $query.= "inner join ORDERS o on o.FOLDERNO=f.FOLDERNO ";
                 $query.= "left join SERVICES s on s.id = o.SERVICEID and s.deptid=d.id ";
-                $query.= "where ";
                 break;
             case 4:
                 $query = "select distinct d.DEPT, f.LOGDATE ";
                 $query.= "from folders f ";
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
-                $query.= "where ";
                 break;
             case 5:
                 $query = "select distinct b.BACK ";
                 $query.= "from folders f ";
                 $query.= "left join BACKREF b on b.ID=f.BACKREF ";
                 $query.= "inner join DEPARTMENTS d on d.ID=f.CLIENTID ";
-                $query.= "where ";
                 break;
         }
         if(\Input::has('dept')){
-            if(\Input::get('dept')=='all')
-                $query.= "f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."' and d.deptcode='".\Session::get('clientcode')."'";
-            else
-                $query.= "f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."' and d.id='".\Input::get('dept')."'";
+            if(\Input::get('dept')=='all') {
+                $query.= "inner join userdept u on u.dept = d.id ";
+                $query .= "where f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '" . $date_st . "' and f.logdate <= '" . $date_en . "' and u.usernam='".\Session::get('login')."'";
+            } else
+                $query.= "where f.APPRSTS!='R' and f.APPRSTS!='D' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."' and d.id='".\Input::get('dept')."'";
             return $this->getResult($this->queryDB($query));
         }
     }
