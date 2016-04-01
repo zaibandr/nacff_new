@@ -117,7 +117,6 @@ class MainController extends DB
     //  Регистратура
     public function page45(){
         if(Input::has('save')) {
-
             if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
             //dd(Input::all());
             if (Input::has("surname")) {
@@ -192,7 +191,8 @@ class MainController extends DB
             if (Input::has("cash")) $cash = (int) Input::get("cash");
             if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
             $age = Func::age($dt_bday); $fullcost = $cost + $dis;
-            if (Input::has('pid') && Input::get('pid')!='')
+            $pid = Input::get('pid','');
+         /*   if (Input::has('pid') && Input::get('pid')!='')
             {
                 $pid = Input::get('pid');
                 $query = "update patient set surname='".$surname."' , name='".$name."' , patronymic='".$namepatr."' ";
@@ -214,7 +214,7 @@ class MainController extends DB
                     return 'Ошибка сохранения пациента';
                 $res = $this->getResult($stmt);
                 $pid = $res[0]['PID'];
-            }
+            }*/
             $query = "delete from pool rows 1 returning folderno ";
             $stmt = ibase_query($query);
             $res = ibase_fetch_assoc($stmt);

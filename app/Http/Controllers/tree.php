@@ -47,7 +47,7 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                         $mat1 .= "</select>";
                         $mats = sprintf($mat, $id, $mat1);
                     }
-                    $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row[0] . ']  ' . $row[3] . '  (' . $row[1] . ')' . $mats, 'id' => $id, 'code' => $row[1], 'cost' => $row[1], 'ncost'=>$row[2]];
+                    $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row[0] . ']  ' . $row[3] . '  (' . $row[1] . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $row[1], 'ncost'=>$row[2]];
                 }
             }
         } else {

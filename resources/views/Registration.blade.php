@@ -233,7 +233,7 @@
                                     <label for="Remail">Эл. почта</label>
                                     <input id="Remail" type="email" class="form-control" readonly>
                                     <label for="Rb_d">Дата рождения *</label>
-                                    <input id="Rb_d" type="date" class="form-control" readonly>
+                                    <input id="Rb_d" type="text" class="form-control" readonly>
                                     <label for="Raddress">Адрес</label>
                                     <input id="Raddress" type="text" class="form-control" readonly>
                                 </div>

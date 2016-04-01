@@ -44,6 +44,7 @@
                 } else $("#surname").val($('#userName').val());
                 dept = $('#price').val();
                 if(document.getElementById("steps-uid-0-p-0").className=='body current') {
+                    $('#discount').empty();
                     @if($web!=='')
                         deptid = $('#otd').val();
                     @else
@@ -55,8 +56,7 @@
                                 'd':{{Session::get('dept')}}
                             },
                             function (data) {
-                                //console.log(data);
-                                $('#discount').empty();
+                                console.log(data);
                                 $('#discount').append('<option value=""></option>');
                                 for (var i = 0; i < data.length; i++) {
                                     $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
@@ -92,7 +92,9 @@
                     $("#Rname").val($("#name").val());
                     $("#Rsurname").val($("#surname").val());
                     $("#Rb_d").val($("#b_d").val());
-                    $("#Rsex").val($("#sex").val());
+                    if($("#sex").val()=='F')
+                        $("#Rsex").val('Ж');
+                    else $("#Rsex").val('М');
                     $('input#discount').val($('#cost').val());
                     var pan = $("#tree-dest").text();
                         if(pan!='') {
@@ -107,9 +109,11 @@
                             tabl = "<tr><td></td><td style='text-align: right; color: darkred;'><b>Стоимость с учетом скидки</b></td><td><b>" + $('#cost').val() + "</b></td></tr>";
                             $("#orderP table").append(tabl);
                         }
-                    if($("#phone").val()!='')
+                    if($("#phone").val()!='') {
                         $("#Rphone").val($("#phone").val());
-                    else {
+                        $("label[for='Rphone']").show();
+                        $("#Rphone").show();
+                    } else {
                         $("label[for='Rphone']").hide();
                         $("#Rphone").hide();
                     }
@@ -275,7 +279,7 @@
                         $("label[for='Rprime']").hide();
                         $("#Rprime").hide();
                     }
-                    if($("select#discount option:selected").val()!='')
+                    if($("select#discount option:selected").val()!='' && $("select#discount option:selected"))
                         $("#Rdiscount").val($("select#discount option:selected").text());
                     else {
                         $("label[for='Rdiscount']").hide();
@@ -290,11 +294,13 @@
                     var privilege = $('select#discount option:selected').val();
                     rules.push(parseInt(privilege));
                     console.log(rules);
-                    if(rules) {
+                    if(rules.length>0) {
                         max = Math.max.apply(null, rules);
                     }
                     rules.pop();
-                    //console.log(max);
+                    if(isNaN(max))
+                        max=0;
+                    console.log(max);
                     if(max!=0) {
                         $('div#discount').text('Скидка на услуги: ' + max + '%');
                     }
