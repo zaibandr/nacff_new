@@ -134,7 +134,7 @@ class DBController extends Controller
         return $a;
     }
     function getPatient(){
-        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid ";
+        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid, d.dept ";
         $query .= "FROM PATIENT a ";
         $query .= "inner join FOLDERS f on f.PID=a.PID ";
         $query .= "inner join DEPARTMENTS d on d.ID = f.CLIENTID ";

@@ -39,7 +39,6 @@
                 var $tr = $ntr.cloneNode(true);
                 $tr.style.display='block';
                 $('#analyteTable').append($tr);
-                $('#analyteTable tr').removeAttr('class');
                 $('#analyteTable tr').removeAttr('style');
                 $ntr = $ntr.nextSibling;
             }

@@ -108,179 +108,74 @@
                             tabl = "<tr><td></td><td style='text-align: right; color: darkred;'><b>Стоимость с учетом скидки</b></td><td><b>" + $('#cost').val() + "</b></td></tr>";
                             $("#orderP table").append(tabl);
                         }
-                    if($("#phone").val()!='') {
-                        $("#Rphone").val($("#phone").val());
-                        $("label[for='Rphone']").show();
-                        $("#Rphone").show();
-                    } else {
-                        $("label[for='Rphone']").hide();
-                        $("#Rphone").hide();
-                    }
-                    if($("#namepatr").val()!='')
-                        $("#Rnamepatr").val($("#namepatr").val());
-                    else {
-                        $("label[for='Rnamepatr']").hide();
-                        $("#Rnamepatr").hide();
-                    }
-                    if($("#email").val()!='')
-                        $("#Remail").val($("#email").val());
-                    else {
-                        $("label[for='Remail']").hide();
-                        $("#Remail").hide();
-                    }
-                    if($("#n_p").val()!='')
-                        $("#Rn_p").val($("#n_p").val());
-                    else {
-                        $("label[for='Rn_p']").hide();
-                        $("#Rn_p").hide();
-                    }
-                    if($("#s_p").val()!='')
-                        $("#Rs_p").val($("#s_p").val());
-                    else {
-                        $("label[for='Rs_p']").hide();
-                        $("#Rs_p").hide();
-                    }
-                    if($(".doctor").val()!='')
+                    Rshow('phone');
+                    Rshow('namepatr');
+                    Rshow('email');
+                    Rshow('n_p');
+                    Rshow('s_p');
+                    Rshow('address');
+                    Rshow('weight');
+                    Rshow('height');
+                    Rshow('s_b');
+                    Rshow('diarez');
+                    Rshow('n_k');
+                    Rshow('AIS');
+                    Rshow('diagnoz');
+                    Rshow('org');
+                    Rshow('str');
+                    Rshow('polis');
+                    Rshow('cito');
+                    Rshow('prob');
+                    Rshow('antib_e');
+                    Rshow('antib_s');
+                    Rshow('comments');
+                    Rshow('issued');
+                    Rshow('docc');
+                    if($(".doctor").val()!='') {
                         $("#Rdoctor").val($(".doctor").val());
-                    else {
+                        $("label[for='Rdoctor']").show();
+                        $("#Rdoctor").show();
+                    } else {
                         $("label[for='Rdoctor']").hide();
                         $("#Rdoctor").hide();
                     }
-                    if($("#address").val()!='')
-                        $("#Raddress").val($("#address").val());
-                    else {
-                        $("label[for='Raddress']").hide();
-                        $("#Raddress").hide();
-                    }
-                    if($("#weight").val()!='')
-                        $("#Rweight").val($("#weight").val());
-                    else {
-                        $("label[for='Rweight']").hide();
-                        $("#Rweight").hide();
-                    }
-                    if($("#height").val()!='')
-                        $("#Rheight").val($("#height").val());
-                    else {
-                        $("label[for='Rheight']").hide();
-                        $("#Rheight").hide();
-                    }
-                    if($("#s_b").val()!='')
-                        $("#Rs_b").val($("#s_b").val());
-                    else {
-                        $("label[for='Rs_b']").hide();
-                        $("#Rs_b").hide();
-                    }
-                    if($("#f_c option:selected").val()!='')
+                    if($("#f_c option:selected").val()!='') {
                         $("#Rf_c").val($("#f_c option:selected").text());
-                    else {
+                        $("label[for='Rf_c']").show();
+                        $("#Rf_c").show();
+                    } else {
                         $("label[for='Rf_c']").hide();
                         $("#Rf_c").hide();
                     }
-                    if($("#diarez").val()!='')
-                        $("#Rdiarez").val($("#diarez").val());
-                    else {
-                        $("label[for='Rdiarez']").hide();
-                        $("#Rdiarez").hide();
-                    }
-                    if($("#n_k").val()!='')
-                        $("#Rn_k").val($("#n_k").val());
-                    else {
-                        $("label[for='Rn_k']").hide();
-                        $("#Rn_k").hide();
-                    }
-                    if($("#AIS").val()!='')
-                        $("#RAIS").val($("#AIS").val());
-                    else {
-                        $("label[for='RAIS']").hide();
-                        $("#RAIS").hide();
-                    }
-                    if($("#diagnoz").val()!='')
-                        $("#Rdiagnoz").val($("#diagnoz").val());
-                    else {
-                        $("label[for='Rdiagnoz']").hide();
-                        $("#Rdiagnoz").hide();
-                    }
-                    if($("#org").val()!='')
-                        $("#Rorg").val($("#org").val());
-                    else {
-                        $("label[for='Rorg']").hide();
-                        $("#Rorg").hide();
-                    }
-                    if($("#str").val()!='')
-                        $("#Rstr").val($("#str").val());
-                    else {
-                        $("label[for='Rstr']").hide();
-                        $("#Rstr").hide();
-                    }
-                    if($("#polis").val()!='')
-                        $("#Rpolis").val($("#polis").val());
-                    else {
-                        $("label[for='Rpolis']").hide();
-                        $("#Rpolis").hide();
-                    }
-                    if($("#cito").val()!='')
-                        $("#Rcito").val($("#cito").val());
-                    else {
-                        $("label[for='Rcito']").hide();
-                        $("#Rcito").hide();
-                    }
-                    if($("#prob").val()!='')
-                        $("#Rprob").val($("#prob").val());
-                    else {
-                        $("label[for='Rprob']").hide();
-                        $("#Rprob").hide();
-                    }
-                    if($("#antib_e").val()!='')
-                        $("#Rantib_e").val($("#antib_e").val());
-                    else {
-                        $("label[for='Rantib_e']").hide();
-                        $("#Rantib_e").hide();
-                    }
-                    if($("#antib_s").val()!='')
-                        $("#Rantib_s").val($("#antib_s").val());
-                    else {
-                        $("label[for='Rantib_s']").hide();
-                        $("#Rantib_s").hide();
-                    }
-                    if($("#comments").val()!='')
-                        $("#Rcomments").val($("#comments").val());
-                    else {
-                        $("label[for='Rcomments']").hide();
-                        $("#Rcomments").hide();
-                    }
-                    if($("#backref option:selected").val()!='')
+                    if($("#backref option:selected").val()!='') {
                         $("#Rbackref").val($("#backref option:selected").text());
-                    else {
+                        $("label[for='Rbackref']").show();
+                        $("#Rbackref").show()
+                    } else {
                         $("label[for='Rbackref']").hide();
                         $("#Rbackref").hide();
                     }
-                    if($("#issued").val()!='')
-                        $("#Rissued").val($("#issued").val());
-                    else {
-                        $("label[for='Rissued']").hide();
-                        $("#Rissued").hide();
-                    }
-                    if($("#cash option:selected").val()!='')
+                    if($("#cash option:selected").val()!='') {
                         $("#Rcash").val($("#cash option:selected").text());
-                    else {
+                        $("label[for='Rcash']").show();
+                        $("#Rcash").show();
+                    } else {
                         $("label[for='Rcash']").hide();
                         $("#Rcash").hide();
                     }
-                    if($("#docc").val()!='')
-                        $("#Rdocc").val($("#docc").val());
-                    else {
-                        $("label[for='Rdocc']").hide();
-                        $("#Rdocc").hide();
-                    }
-                    if($("#prime option:selected").val()!='')
+                    if($("#prime option:selected").val()!='') {
                         $("#Rprime").val($("#prime option:selected").text());
-                    else {
+                        $("label[for='Rprime']").hide();
+                        $("#Rprime").hide();
+                    } else {
                         $("label[for='Rprime']").hide();
                         $("#Rprime").hide();
                     }
-                    if($("select#discount option:selected").val()!='' && $("select#discount option:selected"))
+                    if($("select#discount option:selected").val()!='' && $("select#discount option:selected")) {
                         $("#Rdiscount").val($("select#discount option:selected").text());
-                    else {
+                        $("label[for='Rdiscount']").hide();
+                        $("#Rdiscount").hide();
+                    } else {
                         $("label[for='Rdiscount']").hide();
                         $("#Rdiscount").hide();
                     }
@@ -448,7 +343,7 @@
                     }
                 }).data("ui-autocomplete")._renderItem = function (ul, item) {
             return $( "<li>" )
-                    .append( "<a>" + item.name + "<br>Дата рождения" + item.bd + "</a>" )
+                    .append( "<a>" + item.name + "<br>Дата рождения" + item.bd + ", отделение регистрации:" + item.dept + "</a>" )
                     .appendTo( ul );
         };
 
@@ -649,5 +544,15 @@
             }
         });
     }
-
+    function Rshow(s){
+        rs = "R"+s;
+        if($("#"+s).val()!='') {
+            $("#"+rs).val($("#"+s).val());
+            $("label[for='"+rs+"']").show();
+            $("#"+rs).show();
+        } else {
+            $("label[for='"+rs+"']").hide();
+            $("#"+rs).hide();
+        }
+    }
 </script>
