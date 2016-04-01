@@ -117,6 +117,7 @@ class MainController extends DB
     //  Регистратура
     public function page45(){
         if(Input::has('save')) {
+            //dd(Input::all());
             if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
             //dd(Input::all());
             if (Input::has("surname")) {

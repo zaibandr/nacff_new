@@ -111,14 +111,14 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
             while ($row = ibase_fetch_row($stmt)) {
                 $row[3] = str_replace('  ',' ',$row[3]);
                 $mats = '';
-                $id = str_replace('.', '', $row[2]);
+                $id = str_replace('.', '', $row[0]);
                 if ($row[4] !== null) {
                     $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
                         "<table class='bio'>" .
                         "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
                         "</table>" .
                         "</span>";
-                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[2] . "' onchange='setBio( this.value , " . $id . " )' >";
+                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
                     $mat1 .= "<option value='70'></option>";
                     $arr = explode(";", $row[4]);
                     $string = "'" . $arr[0] . "'";

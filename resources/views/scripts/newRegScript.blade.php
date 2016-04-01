@@ -1,7 +1,8 @@
-<script src="{{asset('resources/assets/scripts/jquery-ui.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.steps.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
+<script src="{{asset('public/js/bootstrap-datepicker.js')}}"></script>
+<script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     var max=0;
     $(function ()
@@ -42,6 +43,7 @@
                 } else $("#surname").val($('#userName').val());
                 dept = $('#price').val();
                 if(document.getElementById("steps-uid-0-p-0").className=='body current') {
+                    $('#discount').empty();
                     @if($web!=='')
                         deptid = $('#otd').val();
                     @else
@@ -54,7 +56,6 @@
                             },
                             function (data) {
                                 //console.log(data);
-                                $('#discount').empty();
                                 $('#discount').append('<option value=""></option>');
                                 for (var i = 0; i < data.length; i++) {
                                     $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
@@ -92,6 +93,9 @@
                     $("#Rsurname").val($("#surname").val());
                     $("#Rb_d").val($("#b_d").val());
                     $("#Rsex").val($("#sex").val());
+                    if($("#sex").val()=='F')
+                        $("#Rsex").val('Ж');
+                    else $("#Rsex").val('М');
                     $('input#discount').val($('#cost').val());
                     var pan = $("#tree-dest").text();
                     if(pan!='') {
@@ -294,6 +298,8 @@
                     }
                     rules.pop();
                     //console.log(max);
+                    if(isNaN(max))
+                        max=0;
                     if(max!=0) {
                         $('div#discount').text('Скидка на услуги: ' + max + '%');
                     }
@@ -424,7 +430,7 @@
             },
             onFinished: function (event, currentIndex)
             {
-                submitRegForm('page0021?save=1')
+                submitRegForm('page0045?save=1')
                 //alert("Submitted!");
             }
         });
@@ -442,7 +448,7 @@
                 //console.log(ui);
                 $( "#userName" ).val( ui.item.name );
                 $( "#sex" ).val( ui.item.gender );
-                $( "#b_d" ).val( ui.item.bd );
+                $( "#b_d" ).val( ui.item.bd).datepicker('update');
                 $( "#address" ).val( ui.item.address );
                 $( "#pid" ).val( ui.item.pid );
                 var pas;

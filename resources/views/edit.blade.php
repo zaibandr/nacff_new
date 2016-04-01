@@ -2,7 +2,9 @@
 @extends('default')
 @section('content')
     <link href="{{asset('resources/assets/css/ui.dynatree.css')}}" rel="stylesheet">
+    <link href="{{asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
     <link href="{{asset('resources/assets/css/jquery.steps.css')}}" rel="stylesheet">
+    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
     <link href="{{asset('resources/assets/css/edit.css')}}" rel="stylesheet">
     <div id="edit">
         <h1>РЕДАКТИРОВАНИЕ НАПРАВЛЕНИЯ</h1>
@@ -35,7 +37,7 @@
                             <label for="email">Эл. почта</label>
                             <input id="email" name="email" type="email" class="form-control" value="{{$folders[0]['EMAIL']}}">
                             <label for="b_d">Дата рождения *</label>
-                            <input id="b_d" name="b_d" type="text" class="required form-control datepicker" value="{{$folders[0]['DATE_BIRTH']}}">
+                            <input id="b_d" name="b_d" type="text" class="required datepicker form-control" value="{{date('d.m.Y', strtotime($folders[0]['DATE_BIRTH']))}}">
                             <label for="address">Адрес</label>
                             <input id="address" name="address" type="text" class="form-control" value="{{$folders[0]['ADDRESS']}}">
                         </div>
@@ -210,7 +212,7 @@
                             <label for="Remail">Эл. почта</label>
                             <input id="Remail" type="email" class="form-control" readonly>
                             <label for="Rb_d">Дата рождения *</label>
-                            <input id="Rb_d" type="date" class="form-control" readonly>
+                            <input id="Rb_d" type="text" class="form-control" readonly>
                             <label for="Raddress">Адрес</label>
                             <input id="Raddress" type="text" class="form-control" readonly>
                         </div>

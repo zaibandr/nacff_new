@@ -1,17 +1,12 @@
-<script src="{{asset('resources/assets/scripts/jquery-ui.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.steps.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
+<script src="{{asset('public/js/bootstrap-datepicker.js')}}"></script>
+<script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     var max=0;
     $(function ()
     {
-        $( ".datepicker" ).datepicker({
-            format: 'dd.mm.yyyy',
-            language: 'ru',
-            autoclose: true,
-            clearBtn: true
-        });
         var form = $("#RegAll");
         var dept;
         var rules = [];
@@ -426,7 +421,12 @@
             }
         });
 
-
+        $( ".datepicker" ).datepicker({
+            format: 'dd.mm.yyyy',
+            language: 'ru',
+            autoclose: true,
+            clearBtn: true
+        });
         $("#tree-dest").dynatree({
             onClick: function (node) {
                 if (!node.data.isFolder) getLegend(node.data.icon); else $("#legend2").hide('fade');
@@ -553,34 +553,6 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        var date = $('#b_d').val();
-        if(date != null || date != ''){
-
-            //split the date as a tmp var
-            var tmp = date.split('-');
-
-            //get the month and year
-
-            var month = tmp[1];
-            var year = tmp[0];
-            var day = tmp[2];
-            if(day >= 1 && day <= 31) {
-                if (month >= 1 && month <= 12) {
-                    if (year >= 1900 && year <= 2016) {
-
-                    } else {
-                        alert('Неправильный формат даты');
-                        return false;
-                    }
-                } else {
-                    alert('Неправильный формат даты');
-                    return false;
-                }
-            } else {
-                alert('Неправильный формат даты');
-                return false;
-            }
-        }
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {
@@ -588,11 +560,12 @@
                     o = false;
                     return o;
                 }
-
-            if (($("#tree-dest #m" + node.data.id).val() == '70') ||
-                    ($("#tree-dest #m" + node.data.id).val() == '')) {
-                b = false;
-                return b;
+            if($("#tree-dest #m" + obj.id).val()) {
+                if (($("#tree-dest #m" + node.data.id).val() == '70') ||
+                        ($("#tree-dest #m" + node.data.id).val() == '')) {
+                    b = false;
+                    return b;
+                }
             }
         });
         if ($("#tree-dest").dynatree("getTree").count() == 0) {

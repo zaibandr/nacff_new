@@ -160,7 +160,7 @@ class NewRegController extends DBController
             $pat .= "\"label\":\"" . $val['SURNAME'] . "\",";
             $pat .= "\"value\":\"" . $val['SURNAME'] . "\",";
             $pat .= "\"gender\":\"" . $val['GENDER'] . "\",";
-            $pat .= "\"bd\":\"" . $val['DATE_BIRTH'] . "\",";
+            $pat .= "\"bd\":\"" . date('d.m.Y', strtotime($val['DATE_BIRTH'])) . "\",";
             $pat .= "\"address\":\"" . $val['ADDRESS'] . "\",";
             $pat .= "\"passport\":\"" . $val['PASSPORT_SERIES'] . " " . $val['PASSPORT_NUMBER'] . "\",";
             $pat .= "\"phone\":\"" . $val['PHONE'] . "\",";

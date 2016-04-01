@@ -1,4 +1,3 @@
-<script src="{{asset('resources/assets/scripts/jquery-ui.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.steps.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
@@ -410,6 +409,7 @@
             onFinishing: function (event, currentIndex)
             {
                 form.validate().settings.ignore = ":disabled";
+                if(validateFrm())
                     return form.valid();
             },
             onFinished: function (event, currentIndex)
@@ -579,34 +579,6 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        var date = $('#b_d').val();
-        if(date != null || date != ''){
-
-            //split the date as a tmp var
-            var tmp = date.split('-');
-
-            //get the month and year
-
-            var month = tmp[1];
-            var year = tmp[2];
-            var day = tmp[0];
-            if(day >= 1 && day <= 31) {
-                if (month >= 1 && month <= 12) {
-                    if (year >= 1900 && year <= 2016) {
-
-                    } else {
-                        alert('Неправильный формат даты');
-                        return false;
-                    }
-                } else {
-                    alert('Неправильный формат даты');
-                    return false;
-                }
-            } else {
-                alert('Неправильный формат даты');
-                return false;
-            }
-        }
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {
@@ -614,11 +586,12 @@
                     o = false;
                     return o;
                 }
-
-            if (($("#tree-dest #m" + node.data.id).val() == '70') ||
-                    ($("#tree-dest #m" + node.data.id).val() == '')) {
-                b = false;
-                return b;
+            if($("#tree-dest #m" + obj.id).val()) {
+                if (($("#tree-dest #m" + node.data.id).val() == '70') ||
+                        ($("#tree-dest #m" + node.data.id).val() == '')) {
+                    b = false;
+                    return b;
+                }
             }
         });
         if ($("#tree-dest").dynatree("getTree").count() == 0) {

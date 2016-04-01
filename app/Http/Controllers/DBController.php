@@ -282,7 +282,7 @@ class DBController extends Controller
 
     public function getPricelist()
     {
-        $query = "select DISTINCT p.id, d.dept from pricelists p inner join departments d on p.dept=d.id where p.status='A' and d.deptcode='".\Session::get('clientcode')."'";
+        $query = "select DISTINCT p.id, d.dept from pricelists p inner join departments d on p.dept=d.id inner join userdept u on u.dept = d.id where p.status='A' and u.usernam='".\Session::get('login')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
