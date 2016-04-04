@@ -33,3 +33,7 @@ form
 {
     padding: 2%;
 }
+form input[type=file]
+{
+    display: inline-block !important;
+}

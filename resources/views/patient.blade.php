@@ -34,6 +34,8 @@
                 <b>{{is_null($patient[0]['PHONE'])?'':$patient[0]['PHONE']}}</b><br>
                 <b>{{is_null($patient[0]['EMAIL'])?'':$patient[0]['EMAIL']}}</b><br>
             </div>
+        </div>
+        <div class="row">
             <col-lg-12>
                 <table class="table table-striped table-bordered">
                     <tr>
