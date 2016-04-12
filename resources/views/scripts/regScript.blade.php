@@ -343,7 +343,7 @@
                     }
                 }).data("ui-autocomplete")._renderItem = function (ul, item) {
             return $( "<li>" )
-                    .append( "<a>" + item.name + "<br>Дата рождения" + item.bd + ", отделение регистрации:" + item.dept + "</a>" )
+                    .append( "<a>" + item.name + "<br>Дата рождения" + item.bd + "</a>" )
                     .appendTo( ul );
         };
 
@@ -481,7 +481,7 @@
                     o = false;
                     return o;
                 }
-            if($("#tree-dest #m" + obj.id).val()) {
+            if($("#tree-dest #m" + node.data.id).val()) {
                 if (($("#tree-dest #m" + node.data.id).val() == '70') ||
                         ($("#tree-dest #m" + node.data.id).val() == '')) {
                     b = false;

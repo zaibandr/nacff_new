@@ -109,11 +109,11 @@ class DBController extends Controller
         return $a;
     }
     function getPrices(){
-        $dept = \Input::get('price', \Session::get('dept'));
+        $dept = \Input::get('dept', \Session::get('dept'));
         $query = "select p.COST, p.panel, coalesce(p.MEDAN, pn.panel), p.NACPH, p.COMMENTS from PRICES p ";
         $query.= "inner join PRICELISTS pr on pr.id = p.PRICELISTID ";
         $query.= "inner join panels pn on pn.code=p.panel ";
-        $query.= "where pr.status='A' and pr.dept=$dept";
+        $query.= "where pr.status='A' and pr.dept=$dept order by p.panel";
         $stmt = ibase_query($this->db,$query);
         $a = [];
         while($row = ibase_fetch_row($stmt)){
@@ -121,25 +121,32 @@ class DBController extends Controller
         }
         return $a;
     }
+
+    public function serviceGroup()
+    {
+        $query = "select s.name, s.id from services s where s.price is NULL and s.status='A' and s.deptid =".\Input::get('dept');
+        return $this->getResult($this->queryDB($query));
+    }
     function getServices(){
-        $query = "select s.NAME, s.CODE, s.PRICE from SERVICES s ";
+        $query = "select s.NAME, s.CODE, s.PRICE, s.status from SERVICES s ";
         $query.= "inner join DEPARTMENTS d on d.id = s.DEPTID ";
         if(\Input::has('dept'))
-            $query.= "where s.status='A' and s.price is not null and d.id='".\Input::get('dept')."'";
+            $query.= "where s.price is not null and d.id='".\Input::get('dept')."'";
         else
-            $query.= "where s.status='A' and s.price is not null and d.DEPTCODE='".\Session::get('clientcode')."'";
+            $query.= "where s.price is not null and d.DEPTCODE='".\Session::get('clientcode')."'";
         //dd($query);
+        $query.= " order by s.code";
         $stmt = ibase_query($this->db,$query);
         $a = $this->getResult($stmt);
         return $a;
     }
     function getPatient(){
-        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid, d.dept ";
+        $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid ";
         $query .= "FROM PATIENT a ";
         $query .= "inner join FOLDERS f on f.PID=a.PID ";
         $query .= "inner join DEPARTMENTS d on d.ID = f.CLIENTID ";
         $query .= "inner join userdept u on u.dept = d.id ";
-        $query .= "where u.usernam='".\Session::get('login')."'";
+        $query .= "where u.usernam='".\Session::get('login')."' order by a.surname";
         $res = $this->queryDB($query);
         //dd($this->getResult($res));
         return $this->getResult($res);
@@ -502,7 +509,7 @@ class DBController extends Controller
         $query.= "inner join userdept ud on ud.usernam=u.usernam ";
         $query.= "inner join userroles ur on ur.usernam=u.usernam ";
         $query.= "inner join departments d on ud.dept=d.id ";
-        $query.= "where d.deptcode='".\Session::get('clientcode')."'";
+        $query.= "where d.id in (select udp.dept from userdept udp where udp.usernam='".\Session::get('login')."')"; ;
         return $this->getResult($this->queryDB($query));
     }
 }

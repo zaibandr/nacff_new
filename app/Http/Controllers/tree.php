@@ -84,15 +84,11 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                     $a[0]['children'][count($a[0]['children']) - 1]['children'][] = ['id' => $row['PGRP'], 'parent' => $row['PCAT'], 'title' => $row['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
                 }
             }
-            $query = "select s.name, s.parent, s.sorter from services s inner join pricelists p on p.dept = s.deptid where s.price is null and p.status='A' and p.id =".$_GET['dept'];
+            $query = "select s.name, s.parent, s.id from services s inner join pricelists p on p.dept = s.deptid where s.price is NULL and p.status='A' and p.id =".$_GET['dept'];
             $stmt = ibase_query($db, $query);
             while($res = ibase_fetch_assoc($stmt))
             {
-                if(!is_null($res['PARENT'])){
-                    $a[1]['children'][] = ['id' => $res['SORTER'], 'parent' => $res['PARENT'], 'title' => $res['NAME'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                }
-                else
-                    $a[1]['children'][] = ['id' => $res['SORTER'], 'parent' => 'a', 'title' => $res['NAME'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
+                    $a[1]['children'][] = ['id' => $res['ID'], 'parent' => 'a', 'title' => $res['NAME'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
             }
             if(count($a[1]['children'])==0)
                 $a[1]['children'][] = [ "icon"=> "false", "title"=> "<i>Нет данных | N/A</i>", "id"=> 'none'];

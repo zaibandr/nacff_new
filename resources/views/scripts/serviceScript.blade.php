@@ -15,7 +15,7 @@
             // 'columns', 'filter', 'stickyHeaders' & 'resizable'
             // 'uitheme' is another widget, but requires loading
             // a different skin and a jQuery UI theme.
-            widgets: [ 'zebra', 'filter', 'stickyHeaders'],
+            widgets: [ 'zebra', 'filter'],
             widgetOptions : {
                 // uitheme widget: * Updated! in tablesorter v2.4 **
                 // Instead of the array of icon class names, this option now
@@ -111,11 +111,43 @@
         filters[col] = txt;
         // using "table.hasFilters" here to make sure we aren't targetting a sticky header
         $.tablesorter.setFilters( $('.tablesorter'), filters, true ); // new v2.9
+        $('#addPanel input[type=radio][name=point]').change(function(){
+            if(this.value=='0'){
+                $('#addGroup input').attr('disabled','disabled');
+                $('#addOne input').removeAttr('disabled');
+            } else if(this.value=='1') {
+                $('#addOne input').attr('disabled','disabled');
+                $('#addGroup input').removeAttr('disabled');
+            }
+        });
+
     });
+    function addSer(e){
+        if($('#group').css('display')=='none') {
+            $('#group').css('display', 'block');
+            $('#addPanel input').attr('disabled','disabled');
+            $('#gr').attr('disabled','disabled');
+            $('#newGroup').removeAttr("disabled");
+            e.innerText='Добавить панель';
+        } else {
+            $('#group').css('display', 'none');
+            $('#addOne input').removeAttr('disabled');
+            $('#addPanel input[type=radio]').removeAttr('disabled');
+            $('#gr').removeAttr('disabled');
+            $('#newGroup').attr('disabled','disabled');
+            e.innerText='Добавить группу';
+        }
+    }
     function modal(a, b){
         tr = a.closest('tr');
         $('#code').val(tr.cells[0].innerHTML);
         $('#panel').val(tr.cells[1].innerHTML);
         $('#cost').val(tr.cells[3].innerHTML);
+        $('#active').val(tr.cells[2].innerHTML);
+    }
+    function del(a, b){
+        if(confirm('Вы действительно хотите удалить панель?')){
+            window.location.replace("{{url('page53')}}"+"?del=1&delCode="+b+"&dept="+{{Input::get('dept')}});
+        }
     }
 </script>

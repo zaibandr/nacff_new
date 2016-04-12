@@ -110,10 +110,76 @@ class MainController extends DB
     //  Услуни ЛПУ
     public function page53()
     {
-        return View::make('services')->with([
-           'services'=>$this->getServices() ,
-            'depts'=>$this->getDepts()
-        ]);
+        //dd(Input::all());
+        if(Input::has('dept')) {
+            $error = '';
+            if (Input::has('del')) {
+                try {
+                    $this->queryDB("delete from services s where s.code='" . Input::get('delCode') . "' and s.deptid=" . Input::get('dept'));
+                } catch (\Exception $e) {
+                    $error = "Удаление панели невозможно";
+                    return View::make('services')->with([
+                        'services' => $this->getServices(),
+                        'depts' => $this->getDepts(),
+                        'error' => $error
+                    ]);
+                }
+            }
+            if (Input::has('newGroup')) {
+                $group = Func::m_quotes(Input::get('newGroup'));
+                $this->queryDB("insert into services(name, deptid) VALUES ('$group', " . Input::get('dept') . ")");
+            }
+            if (Input::has('code')) {
+                $name = Func::m_quotes(Input::get('panel', ''));
+                $code = Func::m_quotes(Input::get('code', ''));
+                $cost = (int)(Input::get('cost', ''));
+                $status = Input::get('active')=='Активный'?'A':'F';
+                $this->queryDB("update services s set s.name='" . $name . "', s.price=" . $cost . ", status='$status' where s.deptid=" . Input::get('dept') . " and s.code='" . $code . "'");
+
+            }
+            if (Input::has('codeNew')) {
+                $name = Func::m_quotes(Input::get('panelNew', ''));
+                $code = Func::m_quotes(Input::get('codeNew', ''));
+                $cost = (int)(Input::get('costNew', ''));
+                $group = (int)Input::get('group');
+                $this->queryDB("insert into services(name, code, deptid, parent, price) VALUES ('" . $name . "','" . $code . "'," . Input::get('dept') . ", $group," . $cost . " )");
+
+            }
+            if (Input::hasFile('excel')) {
+                $excel = [];
+                $e = Excel::load(Input::file('excel'), function ($reader) use ($excel) {
+                });
+                $objExcel = $e->getExcel();
+                $sheet = $objExcel->getSheet(0);
+                $highestRow = $sheet->getHighestRow();
+                $highestColumn = $sheet->getHighestColumn();
+                //  Loop through each row of the worksheet in turn
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    //  Read a row of data into an array
+                    $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+                        NULL, TRUE, FALSE);
+                    $excel = $rowData[0];
+                    if (!empty($excel[0])) {
+                        $name = Func::m_quotes($excel[1]);
+                        $code = Func::m_quotes($excel[0]);
+                        $cost = (int)($excel[2]);
+                        $res = $this->getResult($this->queryDB("select s.code from services s where s.code='" . $code . "'"));
+                        if (empty($res))
+                            $this->queryDB("insert into services(name, code, deptid, parent, price) VALUES ('" . $name . "','" . $code . "'," . Input::get('dept') . ",".Input::get('group')."," . $cost . " )");
+                        else
+                            $this->queryDB("update services s set s.name='" . $name . "', s.price='" . $cost . "' where s.deptid=" . Input::get('dept') . " and s.code='" . $code . "'");
+                    }
+                }
+            }
+            return View::make('services')->with([
+                'services' => $this->getServices(),
+                'depts' => $this->getDepts(),
+                'groups' => $this->serviceGroup()
+            ]);
+        } else
+            return View::make('services')->with([
+                'depts' => $this->getDepts()
+            ]);
     }
     //  Направления
     public function page43(){
@@ -138,7 +204,7 @@ class MainController extends DB
     //  Регистратура
     public function page45(){
         if(Input::has('save')) {
-            //dd(Input::all());
+            dd(Input::all());
             if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
             //dd(Input::all());
             if (Input::has("surname")) {
@@ -284,7 +350,6 @@ class MainController extends DB
                 $pat .= "\"label\":\"" . $val['SURNAME'] . "\",";
                 $pat .= "\"value\":\"" . $val['SURNAME'] . "\",";
                 $pat .= "\"gender\":\"" . $val['GENDER'] . "\",";
-                $pat .= "\"dept\":\"" . $val['DEPT'] . "\",";
                 $pat .= "\"bd\":\"" . date('d.m.Y', strtotime($val['DATE_BIRTH'])) . "\",";
                 $pat .= "\"address\":\"" . $val['ADDRESS'] . "\",";
                 $pat .= "\"passport\":\"" . $val['PASSPORT_SERIES'] . " " . $val['PASSPORT_NUMBER'] . "\",";
