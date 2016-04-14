@@ -39,7 +39,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('request', 'RequestController', array('only' => array('index', 'show')));
     Route::get('draft/{id}', 'DraftController@index');
     Route::get('pid/{id}', 'PidController@index');
-    Route::get('print/{id}', 'PrintController@index');
+    Route::any('print/{id}', 'PrintController@index');
     Route::get('delete/{id}', 'DeleteController@index');
     Route::resource('edit', 'EditController', array('only' => array('index', 'show')));
     Route::resource('new', 'NewRegController', array('only' => array('index', 'show')));

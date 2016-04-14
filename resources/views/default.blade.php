@@ -88,7 +88,7 @@
 <div class="container-fluid footer">
     <div class="row">
         <div class="col-lg-12">
-            <p>&copy; НАКФФ, 2007-2015 laboratory@nacpp.ru <br>
+            <p>&copy; НАКФФ, 2007-{{date('Y')}} laboratory@nacpp.ru <br>
                 Россия, 115088, Москва, ул. Угрешская, д.2, стр. 8. <br>
                 +7 495  259-44-44, схема проезда</p>
         </div>

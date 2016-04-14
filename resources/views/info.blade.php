@@ -7,7 +7,7 @@
 
                 {!! Form::open(['method'=>'get', 'class'=>'form-inline']) !!}
                 {!! Form::label('search', 'Поиск по раннее опубликованной информации', ['style'=>'font-size: 1.2em;']) !!}
-                {!! Form::text('search', null, ['placeholder'=>'Введите текст', 'class'=>'form-control search']) !!}
+                {!! Form::text('search', Input::get('search',''), ['placeholder'=>'Введите текст', 'class'=>'form-control search']) !!}
                 {!! Form::submit('Поиск',['class'=>'btn btn-primary']) !!}
                 {!! Form::close() !!}
             </div>

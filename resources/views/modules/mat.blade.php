@@ -47,6 +47,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <input type="hidden" name="dept" value="{{Input::get('dept','')}}">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
                     <button type="submit" class="btn btn-primary"> Сохранить </button>
                 </div>

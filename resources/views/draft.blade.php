@@ -43,7 +43,7 @@
         <div class="col-lg-9">
             <table class="table" id="c">
                 <tr>
-                    <td><a href="{{url("print/$id?action=label")}}" ><i class="fa fa-barcode">&nbsp;Штрих-код</i></a></td>
+                    <td><a href="" data-target="#label" data-toggle="modal"><i class="fa fa-barcode">&nbsp;Штрих-код</i></a></td>
                     <td><a href="{{url("print/$id?action=act")}}" ><i class="fa fa-file-pdf-o">&nbsp;Акт</i></a></td>
                     <td><a href="{{url("edit/$id")}}" ><i class="fa fa-pencil-square-o">&nbsp;Редактировать</i></a></td>
                     <td><a href="{{url("delete/$id")}}" ><i class="fa fa-trash-o">&nbsp;Удалить</i></a></td>
@@ -78,4 +78,5 @@
         </div>
     </div>
 </div>
+    @include('modules.label')
     @stop

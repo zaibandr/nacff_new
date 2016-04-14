@@ -51,3 +51,7 @@ span#folderno
 {
     margin-top: 2%;
 }
+.wizard > .content
+{
+    overflow: auto;
+}
