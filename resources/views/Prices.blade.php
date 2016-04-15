@@ -11,16 +11,16 @@
             <div class="col-md-12">
                 <form action="" method="post" class="form-inline" enctype="multipart/form-data">
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <span>Выберите отделение:</span><select name="price" class="form-control">
+                    <span>Выберите отделение:</span><select name="dept" class="form-control">
                         <option value="" selected disabled></option>
                 @foreach($depts as $key=>$val)
-                    <option value='{{$val['ID']}}' {{Input::get('price')==$val['ID']?"selected ":""}}>{{$val['DEPT']}}</option>
+                    <option value='{{$val['ID']}}' {{Input::get('dept')==$val['ID']?"selected ":""}}>{{$val['DEPT']}}</option>
                     @endforeach
                     </select>
                     {!! Form::file('excel') !!}
                     <button type="submit" class="btn btn-primary">Обновить</button>
                 </form>
-                @if(Input::has('price'))
+                @if(Input::has('dept'))
                 <table class="tablesorter">
                     <thead>
                         <tr>

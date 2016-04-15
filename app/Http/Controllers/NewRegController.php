@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 use App\Http\Controllers\DBController;
+use Illuminate\Support\Facades\Input;
+use App\Http\Controllers\FuncController as Func;
 
 class NewRegController extends DBController
 {
@@ -27,7 +28,11 @@ class NewRegController extends DBController
             $namepatr = mb_strtoupper(Func::m_quotes(Input::get("namepatr")));
             // $namepatr = preg_replace("/([\s\x{0}\x{0B})+)/i", " ", trim($namepatr));
         } else $namepatr = '';
-        if (Input::has("doctor")) $doctor = (int)(Input::get("doctor")); else $doctor = 'null';
+        if (Input::has("doctorId")) $doctor = (int)(Input::get("doctorId")); else $doctor = 'null';
+        if (Input::get("doctorId")=='' && Input::get('doctorName')!==''){
+            $e = $this->getResult($this->queryDB("insert into doctors(doctor) VALUES ('".Input::get("doctorName")."') returning id"));
+            $doctor = $e[0]['ID'];
+        }
         if (Input::has("polis")) $policy = mb_strtoupper(Func::m_quotes(Input::get("polis"))); else $policy = 'null';
         if (Input::has("str")) $insurer = mb_strtoupper(Func::m_quotes(Input::get("str"))); else $insurer = "N/A";
         if (Input::has("sex")) $gender = Func::m_quotes(Input::get("sex"));
@@ -87,7 +92,8 @@ class NewRegController extends DBController
         if (Input::has("cash")) $cash = Input::get("cash");
         if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
         $age = Func::age($dt_bday); $fullcost = $cost + $dis;
-        if (Input::has('pid') && Input::get('pid')!='')
+        $pid = Input::get('pid','');
+        /* if (Input::has('pid') && Input::get('pid')!='')
         {
             $pid = Input::get('pid');
             $query = "update patient set surname='".$surname."' , name='".$name."' , patronymic='".$namepatr."' ";
@@ -109,7 +115,7 @@ class NewRegController extends DBController
                 return 'Ошибка сохранения пациента';
             $res = $this->getResult($stmt);
             $pid = $res[0]['PID'];
-        }
+        } */
         $query = "delete from pool rows 1 returning folderno ";
         $stmt = ibase_query($query);
         $res = ibase_fetch_assoc($stmt);
@@ -139,7 +145,6 @@ class NewRegController extends DBController
                     $costA = $res[0]['PRICE']*(100-$dis2)/100;
                     $query = "insert into orders(discount, loguser, folderno, serviceid, price, cost) VALUES ($dis2,'".\Session::get('login')."', '$folderno', ".$res[0]['ID'].",".$res[0]['PRICE'].", $costA )";
                     $res = $this->queryDB($query);
-
                 }
             }
             if(isset($c) && $c=='OK'){

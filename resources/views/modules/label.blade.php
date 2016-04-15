@@ -13,6 +13,7 @@
                         <div class="col-md-6"><i>Количество</i></div>
                     </div><? $a=[] ?>
                     @foreach($order as $val)
+                        @if($val['CONTAINERNO']!=='' && isset($val['CONTAINERNO']))
                     @if(!in_array($val['CONTAINERNO'],$a))
                         <? $a[] = $val['CONTAINERNO']; ?>
                     <div class="form-inline">
@@ -22,6 +23,7 @@
                         </div>
                     </div>
                     @endif
+                        @endif
                     @endforeach
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>

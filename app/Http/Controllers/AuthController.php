@@ -26,11 +26,11 @@ class AuthController extends Controller
             return \View::make('auth')->with([
                'error'=>$error
             ]);
-        } elseif(!captcha_check(Input::get('captcha'))){
+/*        } elseif(!captcha_check(Input::get('captcha'))){
             $error = 'Введите код с картинки корректно';
             return \View::make('auth')->with([
                 'error'=>$error
-            ]);
+            ]);*/
         } else {
             \Session::put('userCheck',1);
             \Session::put('login',$a[0]['USERNAM']);
@@ -44,7 +44,7 @@ class AuthController extends Controller
             $query.= "inner join MODULEROLE mr on mr.MODULEID=m.ID ";
             $query.= "inner join ROLES r on r.ID=mr.ROLEID ";
             $query.= "inner join USERROLES u on r.ID=u.ROLEID ";
-            $query.= "where u.USERNAM='".$a[0]['USERNAM']."' order by mc.sorter";
+            $query.= "where mr.available='Y' and u.USERNAM='".$a[0]['USERNAM']."' order by mc.sorter";
             $res =$con->queryDB($query);
             $a = [];
             while($row=ibase_fetch_row($res)){

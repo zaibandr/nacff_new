@@ -20,9 +20,8 @@
                         <label for="cost">Цена</label>
                         <input type="text" name="cost" id="cost" class="form-control">
                     </div>
-                    <input type="hidden" value="{{Input::get('price','')}}" name="price">
+                    <input type="hidden" value="{{Input::get('dept','')}}" name="dept">
                         <div class="modal-footer">
-                            <input type="hidden" name="dept" value="{{Input::get('dept')}}">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
                             <button type="submit" class="btn btn-primary"> Сохранить </button>
                         </div>

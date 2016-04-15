@@ -115,7 +115,7 @@ class PrintController extends DBController
                             'params'=>array(
                                 'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno'=>$folderno,
-                                'client-id'=>\Session::get('clientcode')
+                                'client-id'=>2420
                             )
                         );
 

@@ -16,7 +16,7 @@
                 </tr>
                 <tr>
                     <td>Дата и время сбора</td>
-                    <td><b>{{date('d.m.Y i.H',strtotime($folder['LOGDATE']))}}</b></td>
+                    <td><b>{{date('d.m.Y H:i',strtotime($folder['LOGDATE']))}}</b></td>
                 </tr>
                 <tr>
                     <td>Фамилия</td>

@@ -65,7 +65,7 @@ class Authenticate
             $query.= "inner join MODULEROLE mr on mr.MODULEID=m.ID ";
             $query.= "inner join ROLES r on r.ID=mr.ROLEID ";
             $query.= "inner join USERROLES u on r.ID=u.ROLEID ";
-            $query.= "where u.USERNAM='".$a[0]['USERNAM']."' order by mc.sorter";
+            $query.= "where mr.available='Y' and u.USERNAM='".$a[0]['USERNAM']."' order by mc.sorter";
             $res =$con->queryDB($query);
             $a = [];
             while($row=ibase_fetch_row($res)){

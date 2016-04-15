@@ -114,8 +114,8 @@
                             <label for="diagnoz">Диагноз</label>
                             <input id="diagnoz" name="diagnoz" type="text" class="form-control" value="{{$folders[0]['RN2']}}">
                             <label for="doctor">Врач</label>
-                            <input name="doctor" class="form-control doctor" type="text" value="{{$folders[0]['DOCTOR']}}">
-                            <input name="doctor" class="form-control" id="Rdoc" type="text" style="display: none" value="{{$folders[0]['DOCTOR_01']}}">
+                            <input name="doctorName" class="form-control doctor" type="text" value="{{$folders[0]['DOCTOR']}}">
+                            <input name="doctorId" class="form-control" id="Rdoc" type="text" style="display: none" value="{{$folders[0]['DOCTOR_01']}}">
 
                         </div>
                         <div class="col-md-3">

@@ -204,7 +204,7 @@ class MainController extends DB
     //  Регистратура
     public function page45(){
         if(Input::has('save')) {
-            dd(Input::all());
+            //dd(Input::all());
             if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
             //dd(Input::all());
             if (Input::has("surname")) {
@@ -219,7 +219,11 @@ class MainController extends DB
                 $namepatr = mb_strtoupper(Func::m_quotes(Input::get("namepatr")));
                 // $namepatr = preg_replace("/([\s\x{0}\x{0B})+)/i", " ", trim($namepatr));
             } else $namepatr = '';
-            if (Input::has("doctor")) $doctor = (int)(Input::get("doctor")); else $doctor = 'null';
+            if (Input::has("doctorId")) $doctor = (int)(Input::get("doctorId")); else $doctor = 'null';
+            if (Input::get("doctorId")=='' && Input::get('doctorName')!==''){
+                $e = $this->getResult($this->queryDB("insert into doctors(doctor) VALUES ('".Input::get("doctorName")."') returning id"));
+                $doctor = $e[0]['ID'];
+            }
             if (Input::has("polis")) $policy = mb_strtoupper(Func::m_quotes(Input::get("polis"))); else $policy = 'null';
             if (Input::has("str")) $insurer = mb_strtoupper(Func::m_quotes(Input::get("str"))); else $insurer = "N/A";
             if (Input::has("sex")) $gender = Func::m_quotes(Input::get("sex"));

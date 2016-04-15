@@ -134,8 +134,8 @@
                             <label for="diagnoz">Диагноз</label>
                             <input id="diagnoz" name="diagnoz" type="text" class="form-control">
                             <label for="doctor">Врач</label>
-                            <input name="doctor" class="form-control doctor" type="text">
-                            <input name="doctor" class="form-control" id="Rdoc" type="text" style="display: none">
+                            <input name="doctorName" class="form-control doctor" type="text">
+                            <input name="doctorId" class="form-control" id="Rdoc" type="text" style="display: none">
 
                         </div>
                         <div class="col-md-3">
@@ -268,12 +268,12 @@
                                 <input id="Rprob" type="text" class="form-control" readonly>
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <label for="Rantib_s">Применялись с</label>
-                                        <input id="Rantib_s" type="text" class="datepicker" readonly>
+                                        <label for="Rantib_s">с</label>
+                                        <input id="Rantib_s" type="text" class="datepicker" disabled style="width: 100%">
                                     </div>
                                     <div class="col-sm-6">
                                         <label for="Rantib_e">по</label>
-                                        <input id="Rantib_e" type="text" class="datepicker" readonly>
+                                        <input id="Rantib_e" type="text" class="datepicker" disabled style="width: 100%">
                                     </div>
                                 </div>
                                 <label for="Rdiagnoz">Диагноз</label>
