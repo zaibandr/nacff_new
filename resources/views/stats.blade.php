@@ -29,7 +29,7 @@
                         <input type="text" class="form-control" name="date_en" value="{{Input::get('date_en',date('d.m.Y'))}}"/>
                     </div>
                     <div class="form-group">
-                        <label for="dept">Отделение</label>
+                        <label for="dept">ЛПУ</label>
                         <select name="dept" class="form-control">
                             <option value="all">Все</option>
                             @foreach($depts as $val)

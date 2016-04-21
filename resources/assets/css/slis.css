@@ -1,39 +1,19 @@
-.ui-tabs .ui-tabs-panel
+#tabs
 {
-    background: #FFFFFF;
+    padding: 2%;
+    background: rgba(233, 237, 240, 0.42);
 }
-.ui-widget-header
+#tabs .form-control
 {
-    border: 1px solid #EEEEEE;
-    background: #EEEEEE;
+    width: 25%;
+    padding: 0px 12px;
+    font-size: 1.3em;
+    margin-right: 3%;
 }
-.ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited
+#tabs label
 {
-    color: #6B6B6B;
-}
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default
-{
-    color: #6B6B6B;
-}
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active
-{
-    border: 1px solid #CCCCCC;
-}
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited
-{
-    color: #6B6B6B;
-}
-.ui-state-hover a, .ui-state-hover a:hover, .ui-state-hover a:link, .ui-state-hover a:visited, .ui-state-focus a, .ui-state-focus a:hover, .ui-state-focus a:link, .ui-state-focus a:visited
-{
-    color: #6B6B6B;
-    background: #e6f0e2;
-    border-color: #e6f0e2;
-    border: none;
-    text-decoration: none;
-}
-.ui-widget-header
-{
-    background: #49B1C2;
+    font-size: 1.3em;
+    margin-right: 3%;
 }
 .tablesorter-dropbox .header, .tablesorter-dropbox thead tr, .tablesorter-dropbox .tablesorter-headerRow
 {
@@ -45,10 +25,4 @@
     background: rgba(168, 218, 226, 0.33);
     border-color: #49B1C2 #e7f2fb #49B1C2;
     color: #6B6B6B;
-    border: none;
-}
-#tabs
-{
-    padding: 2%;
-    background: rgba(233, 237, 240, 0.42);
 }

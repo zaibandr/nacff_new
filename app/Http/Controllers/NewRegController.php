@@ -161,11 +161,12 @@ class NewRegController extends DBController
         $pat = '';
         foreach ($p as $val) {
             $pat .= "{\"logdate\":\"" . substr($val['LOGDATE'], 0, 10) . "\",";
-            $pat .= "\"name\":\"" . $val['SURNAME'] . " " . $val['NAME'] . " " . $val['PATRONYMIC'] . "\",";
+            $pat .= "\"name\":\"" . $val['NAME'] . "\",";
+            $pat .= "\"surname\":\"" . $val['SURNAME'] . "\",";
+            $pat .= "\"patr\":\"" . $val['PATRONYMIC'] . "\",";
             $pat .= "\"label\":\"" . $val['SURNAME'] . "\",";
             $pat .= "\"value\":\"" . $val['SURNAME'] . "\",";
             $pat .= "\"gender\":\"" . $val['GENDER'] . "\",";
-            $pat .= "\"dept\":\"" . $val['DEPT'] . "\",";
             $pat .= "\"bd\":\"" . date('d.m.Y', strtotime($val['DATE_BIRTH'])) . "\",";
             $pat .= "\"address\":\"" . $val['ADDRESS'] . "\",";
             $pat .= "\"passport\":\"" . $val['PASSPORT_SERIES'] . " " . $val['PASSPORT_NUMBER'] . "\",";
@@ -176,9 +177,6 @@ class NewRegController extends DBController
         $pat = substr($pat, 0, -1);
         //dd($pat);
         $depts = $this->getDepts();
-        if (count($depts) > 1)
-            $web = 1;
-        else $web = '';
         $panels = $this->editPanels($id);
         foreach($panels as $val)
         {
@@ -186,7 +184,7 @@ class NewRegController extends DBController
                 $mats = '';
                 $code = str_replace('.', '', $val['CODE']);
                 if (!is_null($val['MATS'])) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
+                    $mat = "<span id='additional%s' style='margin-left:35px; display:block'>" .
                         "<table class='bio'>" .
                         "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
                         "</table>" .
@@ -218,7 +216,6 @@ class NewRegController extends DBController
             'panels'=>$a,
             'backref' => $this->getBackref(),
             'patients' => $pat,
-            'web' => $web,
             'depts'=> $depts
         ]);
     }

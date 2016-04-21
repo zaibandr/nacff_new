@@ -5,11 +5,11 @@
 <script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     var max=0;
+    var rules = [];
     $(function ()
     {
         var form = $("#RegAll");
         var dept;
-        var rules = [];
         form.validate({
             errorPlacement: function errorPlacement(error, element) { element.before(error); },
             rules: {
@@ -263,7 +263,7 @@
                                     "title": title,
                                     "id": ui.item.id,
                                     "color": ui.item.color,
-                                    "code": ui.item.value,
+                                    "code": ui.item.code,
                                     "cost": ui.item.cost
                                 });
                                 var a = parseInt(ui.item.cost);
@@ -530,5 +530,55 @@
             $("label[for='"+rs+"']").hide();
             $("#"+rs).hide();
         }
+    }
+    function selectPrice(a){
+        var txt = a.options[a.selectedIndex].text;
+        $('#price option').each(function(){
+            if($(this).text()==txt){
+                $(this).attr("selected", "selected")
+            } else {
+                $(this).removeAttr("selected")
+            }
+        });
+        var deptid = $('#otd').val();
+        $('#discount').empty();
+        $.get("../app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'rule': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $('#discount').append('<option value=""></option>');
+                    for (var i = 0; i < data.length; i++) {
+                        $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
+                        privilege = '';
+                        var day = new Date();
+                        if (eval(data[i].SQL)) {
+                            rules.push(data[i].PER);
+                        }
+                    }
+                }, "json");
+        $.get("../app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'doc': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $(".doctor").autocomplete({
+                        minLength: 0,
+                        source: data,
+                        select: function (event, ui) {
+                            $(".doctor").val(ui.item.label);
+                            $("#Rdoc").val(ui.item.id);
+
+                            return false;
+                        }
+                    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                        return $( "<li>" )
+                                .append( "<a>" + item.label + "</a>" )
+                                .appendTo( ul );
+                    }}, "json");
     }
 </script>

@@ -23,6 +23,15 @@
                     @endfor
             </table>
             <div class="row">
+                <div class="col-lg-12">
+                    <b>Необходимо контейнеров:
+                    @foreach($val['conts'] as $key=>$val)
+                        <i>{{$key}}</i>-{{$val}} ;&nbsp;&nbsp;
+                        @endforeach
+                    </b>
+                </div>
+            </div>
+            <div class="row">
                 <div class="col-lg-4 col-lg-offset-8" style="margin-top: 20px">
                     <a href="{{url("page0022?folderno=$id")}}" ><button class="btn btn-info"> Анализы взяты!</button></a>
                 </div>

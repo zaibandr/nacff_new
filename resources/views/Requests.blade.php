@@ -42,7 +42,7 @@
                         <th data-priority="5">Пол</th>
                         <th data-priority="critical">Дата регистрации</th>
                         <th data-priority="5">Дата рождения</th>
-                        <th data-priority="4">Отделение</th>
+                        <th data-priority="4">ЛПУ</th>
                         <th data-priority="3">Организация</th>
                         <th data-priority="2">Доктор</th>
                         <th data-priority="2">Страховая компания</th>

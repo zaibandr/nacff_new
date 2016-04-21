@@ -28,11 +28,17 @@ class MainController extends DB
         $panels = $this->getPanel();
         $mattypes = $this->getMattype();
         $pconts = $this->getPCont();
+        $analytes = $this->getAnalyte();
+        foreach($analytes as $val)
+        {
+            $a[$val['TESTCODE']][] = [$val['UNITS'],$val['ANALYTE']];
+        }
         return View::make('SLis')->with([
             'panels'=>$panels,
             'mattypes'=>$mattypes,
             'pconts'=>$pconts,
-            'tests'=>$this->getTests()
+            'tests'=>$this->getTests(),
+            'a'=>$a
         ]);
     }
 
@@ -205,8 +211,6 @@ class MainController extends DB
     public function page45(){
         if(Input::has('save')) {
             //dd(Input::all());
-            if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
-            //dd(Input::all());
             if (Input::has("surname")) {
                 $surname = mb_strtoupper(Func::m_quotes(Input::get("surname")));
                 //$surname = preg_replace("/([\s\x{0}\x{0B}]+)/i", " ", trim($surname));
@@ -282,6 +286,7 @@ class MainController extends DB
             if (Input::has("nacpp")) $ncost =(int) Func::m_quotes(Input::get("nacpp")); else $ncost= 'null';
             if (Input::has("cash")) $cash = (int) Input::get("cash");
             if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
+            //dd($panels);
             $age = Func::age($dt_bday); $fullcost = $cost + $dis;
             $pid = Input::get('pid','');
          /*   if (Input::has('pid') && Input::get('pid')!='')
@@ -322,15 +327,19 @@ class MainController extends DB
             $query.= "'$phase', $ais, '$org', '$insurer', '$cito',  $weight, $height, $policy, '$antibiot', '$antibiotics', $dt_biostart,$dt_bioend)";
             $stmt = $this->queryDB($query);
             if ($stmt === false) echo "Error in executing query.</br>"; else {
-
                 foreach($panels as $value){
-                    $query = "select p.panel from prices p inner join pricelists pr on pr.id=p.pricelistid where pr.status='A' and p.panel='$value' and pr.id=".$priceid;
+                    $query = "select p.panel from prices p inner join pricelists pr on pr.id=p.pricelistid where p.panel='$value' and pr.id=".$priceid;
                     $res = $this->getResult($this->queryDB($query));
                     if(count($res)>0) {
                         $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
                         $stmt = $this->queryDB($query);
                         while ($row = ibase_fetch_assoc($stmt))
                             $c = $row['COMMENTS'];
+                        if(Input::has(str_replace('.','_',$value)))
+                        {
+                            $res2 = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.apprsts!='R' and ord.folderno='$folderno' and ord.panel='$value'"));
+                            $this->queryDB("update foldercontainers set mattypeid=".Input::get(str_replace('.','_',$value))." where id=".$res2[0]['CONTAINERID']);
+                        }
                     } else {
                         $res = $this->getResult($this->queryDB("select id, price from services where code='$value' and deptid=$department"));
                         $costA = $res[0]['PRICE']*(100-$dis2)/100;
@@ -350,7 +359,9 @@ class MainController extends DB
             $pricelist = $this->getPricelist();
             foreach ($p as $val) {
                 $pat .= "{\"logdate\":\"" . substr($val['LOGDATE'], 0, 10) . "\",";
-                $pat .= "\"name\":\"" . $val['SURNAME'] . " " . $val['NAME'] . " " . $val['PATRONYMIC'] . "\",";
+                $pat .= "\"name\":\"" . $val['NAME'] . "\",";
+                $pat .= "\"surname\":\"" . $val['SURNAME'] . "\",";
+                $pat .= "\"patr\":\"" . $val['PATRONYMIC'] . "\",";
                 $pat .= "\"label\":\"" . $val['SURNAME'] . "\",";
                 $pat .= "\"value\":\"" . $val['SURNAME'] . "\",";
                 $pat .= "\"gender\":\"" . $val['GENDER'] . "\",";
@@ -364,14 +375,11 @@ class MainController extends DB
             $pat = substr($pat, 0, -1);
             //dd($pat);
             $depts = $this->getDepts();
-            if (count($depts) > 1)
-                $web = 1;
-            else $web = '';
+
             //dd($pricelist);
             return View::make('Registration')->with([
                 'patients' => $pat,
                 'pricelist' => $pricelist,
-                'web' => $web,
                 'depts' => $depts,
                 'backref' => $this->getBackref()
             ]);
@@ -385,19 +393,32 @@ class MainController extends DB
         }
         $proc = $this->getProc();
         $a = [];
+        $b = [];
         foreach($proc as $val)
         {
             $a[$val['FOLDERNO']]['NAME'] = $val['SURNAME']." ".$val['NAME']." ".$val['PATRONYMIC'];
+            if(!isset($a[$val['FOLDERNO']]['conts']))
+                $a[$val['FOLDERNO']]['conts'] = [];
+            if(!isset($a[$val['FOLDERNO']]['contno']))
+                $a[$val['FOLDERNO']]['contno'] = [];
             if(isset($val['PANEL']))
                 $a[$val['FOLDERNO']]['PANEL'][] = $val['CODE_01']." - ".$val['PANEL'];
             else
                 $a[$val['FOLDERNO']]['PANEL'][] = $val['CODE']." - ".$val['NAME_01'];
+            if(!array_key_exists($val['CONTAINERNO'],$a[$val['FOLDERNO']]['contno']))
+            {
+                if(array_key_exists($val['CONTGROUP'],$a[$val['FOLDERNO']]['conts']))
+                    $a[$val['FOLDERNO']]['conts'][$val['CONTGROUP']]++;
+                else
+                    $a[$val['FOLDERNO']]['conts'][$val['CONTGROUP']] = 1;
+                $a[$val['FOLDERNO']]['contno'][$val['CONTAINERNO']] = 1;
+            }
             $a[$val['FOLDERNO']]['CONT'][] = $val['CONTAINERNO'];
             $a[$val['FOLDERNO']]['CONTG'][] = $val['CONTGROUP'];
             $a[$val['FOLDERNO']]['MAT'][] = $val['MATTYPE'];
         }
         return View::make('procedur')->with([
-           'proc' => $a
+           'proc' => $a,
         ]);
     }
     //  Статистика

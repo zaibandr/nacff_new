@@ -5,11 +5,51 @@
 <script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     var max=0;
+    var rules = [];
     $(function ()
     {
         var form = $("#RegAll");
         var dept;
-        var rules = [];
+        var deptid = $('#otd').val();
+        $('#discount').empty();
+        $.get("app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'rule': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $('#discount').append('<option value=""></option>');
+                    for (var i = 0; i < data.length; i++) {
+                        $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
+                        privilege = '';
+                        var day = new Date();
+                        if (eval(data[i].SQL)) {
+                            rules.push(data[i].PER);
+                        }
+                    }
+                }, "json");
+        $.get("app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'doc': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $(".doctor").autocomplete({
+                        minLength: 0,
+                        source: data,
+                        select: function (event, ui) {
+                            $(".doctor").val(ui.item.label);
+                            $("#Rdoc").val(ui.item.id);
+
+                            return false;
+                        }
+                    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                        return $( "<li>" )
+                                .append( "<a>" + item.label + "</a>" )
+                                .appendTo( ul );
+                    }}, "json");
         form.validate({
             errorPlacement: function errorPlacement(error, element) { element.before(error); },
             rules: {
@@ -34,60 +74,8 @@
             onStepChanging: function (event, currentIndex, newIndex)
             {
                 form.validate().settings.ignore = ":disabled,:hidden";
-                var fio;
-                fio = $('#userName').val().split(' ');
-                if(fio.length>1) {
-                    $("#name").val(fio[0]);
-                    $("#surname").val(fio[1]);
-                    $("#namepatr").val(fio[2])
-                } else $("#surname").val($('#userName').val());
                 dept = $('#price').val();
-                if(document.getElementById("steps-uid-0-p-0").className=='body current') {
-                    $('#discount').empty();
-                    @if($web!=='')
-                        deptid = $('#otd').val();
-                    @else
-                        deptid = '';
-                    @endif
-                    $.get("app/Http/Controllers/docAndRule.php", {
-                                'dept': deptid,
-                                'rule': 1,
-                                'd':{{Session::get('dept')}}
-                            },
-                            function (data) {
-                                console.log(data);
-                                $('#discount').append('<option value=""></option>');
-                                for (var i = 0; i < data.length; i++) {
-                                    $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
-                                    var day = new Date();
-                                    if (eval(data[i].SQL)) {
-                                        rules.push(parseInt(data[i].PER));
-                                    }
-                                }
-                            }, "json");
-                    $.get("app/Http/Controllers/docAndRule.php", {
-                                'dept': deptid,
-                                'doc': 1,
-                                'd':{{Session::get('dept')}}
-                            },
-                            function (data) {
-                                //console.log(data);
-                                $(".doctor").autocomplete({
-                                    minLength: 0,
-                                    source: data,
-                                    select: function (event, ui) {
-                                        $(".doctor").val(ui.item.label);
-                                        $("#Rdoc").val(ui.item.id);
-
-                                        return false;
-                                    }
-                                }).data("ui-autocomplete")._renderItem = function (ul, item) {
-                                    return $( "<li>" )
-                                            .append( "<a>" + item.label + "</a>" )
-                                            .appendTo( ul );
-                            }}, "json");
-                }
-                if(document.getElementById("steps-uid-0-p-2").className=='body current'){
+                if(document.getElementById("steps-uid-0-p-1").className=='body current'){
                     $("#Rname").val($("#name").val());
                     $("#Rsurname").val($("#surname").val());
                     $("#Rb_d").val($("#b_d").val());
@@ -182,7 +170,7 @@
                     dis = Math.round($('#cost').val()*max/(100-max));
                     $('input#discount').val(dis);
                 }
-                if(document.getElementById("steps-uid-0-p-1").className=='body current') {
+                if(document.getElementById("steps-uid-0-p-0").className=='body current') {
                     oldmax = max;
                     max=0;
                     var privilege = $('select#discount option:selected').val();
@@ -275,7 +263,7 @@
                                     "title": title,
                                     "id": ui.item.id,
                                     "color": ui.item.color,
-                                    "code": ui.item.value,
+                                    "code": ui.item.code,
                                     "cost": ui.item.cost
                                 });
                                 var a = parseInt(ui.item.cost);
@@ -320,13 +308,16 @@
             clearBtn: true
         });
         var projects = [<?=$patients?>];
-        $( "#userName" ).autocomplete({
-                    minLength: 0,
+        $( "#surname" ).autocomplete({
+                    minLength: 1,
                     source: projects,
                     select: function( event, ui ){
                     //console.log(ui);
-                        $( "#userName" ).val( ui.item.name );
+                        //$( "#userName" ).val( ui.item.name );
                         $( "#sex" ).val( ui.item.gender );
+                        $( "#name" ).val( ui.item.name );
+                        $( "#surname" ).val( ui.item.surname );
+                        $( "#namepatr" ).val( ui.item.patr );
                         $( "#b_d" ).val( ui.item.bd).datepicker('update');
                         $( "#address" ).val( ui.item.address );
                         $( "#pid" ).val( ui.item.pid );
@@ -343,7 +334,7 @@
                     }
                 }).data("ui-autocomplete")._renderItem = function (ul, item) {
             return $( "<li>" )
-                    .append( "<a>" + item.name + "<br>Дата рождения" + item.bd + "</a>" )
+                    .append( "<a>" + item.surname + " " + item.name + " " + item.patr + " " + "<br>Дата рождения" + item.bd + "</a>" )
                     .appendTo( ul );
         };
 
@@ -554,5 +545,55 @@
             $("label[for='"+rs+"']").hide();
             $("#"+rs).hide();
         }
+    }
+    function selectPrice(a){
+        var txt = a.options[a.selectedIndex].text;
+        $('#price option').each(function(){
+           if($(this).text()==txt){
+               $(this).attr("selected", "selected")
+           } else {
+               $(this).removeAttr("selected")
+           }
+        });
+        var deptid = $('#otd').val();
+        $('#discount').empty();
+        $.get("app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'rule': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $('#discount').append('<option value=""></option>');
+                    for (var i = 0; i < data.length; i++) {
+                        $('#discount').append('<option value="' + data[i].PER + '">' + data[i].RULENAME + '</option>');
+                        privilege = '';
+                        var day = new Date();
+                        if (eval(data[i].SQL)) {
+                            rules.push(data[i].PER);
+                        }
+                    }
+                }, "json");
+        $.get("app/Http/Controllers/docAndRule.php", {
+                    'dept': deptid,
+                    'doc': 1,
+                    'd':{{Session::get('dept')}}
+                            },
+                function (data) {
+                    console.log(data);
+                    $(".doctor").autocomplete({
+                        minLength: 0,
+                        source: data,
+                        select: function (event, ui) {
+                            $(".doctor").val(ui.item.label);
+                            $("#Rdoc").val(ui.item.id);
+
+                            return false;
+                        }
+                    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                        return $( "<li>" )
+                                .append( "<a>" + item.label + "</a>" )
+                                .appendTo( ul );
+                    }}, "json");
     }
 </script>

@@ -10,7 +10,7 @@
          <div class="col-md-10">
              <form action="" method="post" class="form-inline">
                  {{csrf_field()}}
-                 <span>Выберите отделение:</span><select name="dept" class="form-control">
+                 <span>Выберите ЛПУ:</span><select name="dept" class="form-control">
                      <option value="" selected disabled></option>
                      @foreach($depts as $val){
                      <option value='{{$val['ID']}}' {{Input::get('dept')==$val['ID']?'selected':''}}>{{$val['DEPT']}}</option>

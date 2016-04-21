@@ -20,7 +20,7 @@ class EditController extends DBController
     public function index()
     {
         $c = true;
-        if (Input::has("panels")) $panels = Func::m_quotes(substr(Input::get('panels'), 0, -1));
+        //dd(Input::all());
         if (Input::has("surname")) {
             $surname = mb_strtoupper(Func::m_quotes(Input::get("surname")));
             //$surname = preg_replace("/([\s\x{0}\x{0B}]+)/i", " ", trim($surname));
@@ -96,6 +96,7 @@ class EditController extends DBController
         if (Input::has("nacpp")) $ncost =(int) Func::m_quotes(Input::get("nacpp")); else $ncost= 'null';
         if (Input::has("cash")) $cash = Input::get("cash");
         if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
+
         $age = Func::age($dt_bday); $fullcost = $cost + $dis;
         if (Input::has("oldcost")) $oldcost =(int) Func::m_quotes(Input::get("oldcost")); else $oldcost= 0;
         if (Input::has('pid')) $pid = Func::m_quotes(Input::get("pid"));
@@ -128,16 +129,28 @@ class EditController extends DBController
                     $stmt = $this->queryDB($query);
                     while ($row = ibase_fetch_assoc($stmt))
                         $c = $row['COMMENTS'];
+                    if(Input::has(str_replace('.','_',$value)))
+                    {
+                        $res = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.folderno='$folderno' and ord.panel='$value'"));
+                        $this->queryDB("update foldercontainers set mattypeid=".Input::get(str_replace('.','_',$value))." where id=".$res[0]['CONTAINERID']);
+                    }
                 } else {
                     $res = $this->getResult($this->queryDB("select id, price from services where code='$value' and deptid=$department"));
                     $costA = $res[0]['PRICE'] * (100 - $dis2) / 100;
                     $query = "insert into orders(discount, loguser, folderno, serviceid, price, cost) VALUES ($dis2,'" . \Session::get('login') . "', '$folderno', " . $res[0]['ID'] . "," . $res[0]['PRICE'] . ", $costA )";
                     $res = $this->queryDB($query);
-
                 }
             }
             if ($res !== 'OK')
                 $c = false;
+        } else {
+           foreach($panels as $value){
+               if(Input::has(str_replace('.','_',$value)))
+               {
+                   $res = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.folderno='$folderno' and ord.panel='$value'"));
+                   $this->queryDB("update foldercontainers set mattypeid=".Input::get(str_replace('.','_',$value))." where id=".$res[0]['CONTAINERID']);
+               }
+           }
         }
         $arr = array_diff($oldPanels, $panels);
         if(count($arr)>0) {
@@ -169,13 +182,14 @@ class EditController extends DBController
     {
         $folders = $this->editReg($id);
         $panels = $this->editPanels($id);
+        //dd($panels);
         foreach($panels as $val)
         {
             if(isset($val['PANEL'])) {
                 $mats = '';
                 $code = str_replace('.', '', $val['CODE']);
                 if (!is_null($val['MATS'])) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
+                    $mat = "<span id='additional%s' style='margin-left:35px; display:block'>" .
                         "<table class='bio'>" .
                         "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
                         "</table>" .
@@ -193,7 +207,7 @@ class EditController extends DBController
                     $mat1 .= "</select>";
                     $mats = sprintf($mat, $id, $mat1);
                 }
-                $str = ['color' => '', 'cost' => $val['PRICE'], 'ncost' => $val['NACPH'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $val['CODE'] . ']  ' . $val['PANEL'] . '  (' . $val['PRICE'] . ')' . $mats, 'id' => $code, 'value' => $val['CODE'], 'code' => $val['CODE']];
+                $str = ['color' => '', 'cost' => $val['PRICE'], 'ncost' => $val['NACPH'], 'bioset' => $val['MATTYPEID'], 'biodef' => '', 'icon' => '', 'title' => '  [' . $val['CODE'] . ']  ' . $val['PANEL'] . '  (' . $val['PRICE'] . ')' . $mats, 'id' => $code, 'value' => $val['CODE'], 'code' => $val['CODE']];
                 $a[] = json_encode($str);
             } else {
                 $code = str_replace('.', '', $val['CODE_01']);
@@ -201,13 +215,15 @@ class EditController extends DBController
                 $a[] = json_encode($str);
             }
         }
+        //dd($a);
         $pricelist = $this->getPricelist();
         return \View::make('edit')->with([
             'id'=>$id,
             'folders'=>$folders,
             'pricelist'=>$pricelist,
             'panels'=>$a,
-            'backref' => $this->getBackref()
+            'backref' => $this->getBackref(),
+            'depts' => $this->getDepts(),
         ]);
     }
 

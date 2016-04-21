@@ -35,7 +35,7 @@
                     <td><b>{{$folder['DOCTOR']}}</b></td>
                 </tr>
                 <tr>
-                    <td class="grey">Отделение</td>
+                    <td class="grey">ЛПУ</td>
                     <td><b>{{$folder['DEPT']}}</b></td>
                 </tr>
             </table>

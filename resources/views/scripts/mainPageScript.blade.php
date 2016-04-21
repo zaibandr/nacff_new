@@ -4,6 +4,15 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("#menu ul").hide();
+        $('#menu ul').each(function(){
+            var i=0;
+            $(this).find("li").each(function(){
+                if($(this).find("a").attr("href")==window.location.href)
+                    i=1;
+            })
+            if(i==1)
+                $(this).show();
+        });
         $("#menu li span").click(function() { $(this).next().slideToggle("normal"); });
     });
 </script>

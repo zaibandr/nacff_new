@@ -25,16 +25,6 @@ class DBController extends Controller
         ibase_close($this->db);
     }
 
-    function queryDB($query){
-        $stmt = ibase_query($this->db,$query);
-        return $stmt;
-    }
-    function getResult($res){
-        $a = [];
-        while($row = ibase_fetch_assoc($res))
-            $a[] = $row;
-        return $a;
-    }
     function getUser($l, $p)
     {
         $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid from users u ";
@@ -46,6 +36,19 @@ class DBController extends Controller
         $a =  $this->getResult($result);
         return $a;
     }
+
+    function queryDB($query){
+        $stmt = ibase_query($this->db,$query);
+        return $stmt;
+    }
+
+    function getResult($res){
+        $a = [];
+        while($row = ibase_fetch_assoc($res))
+            $a[] = $row;
+        return $a;
+    }
+
     function getPanel(){
         /*$query = "SELECT p.CODE, p.PANEL, m.ID, m.MATTYPE, g.id, g.contgroup from PANELS p ";
         $query.= "inner join PRICES pr on pr.PANEL = p.CODE ";
@@ -55,62 +58,31 @@ class DBController extends Controller
         $query.= "inner join MATTYPES m on m.ID=pc.MATTYPE_ID ";
         $query.= "inner join CONTGROUPS g on g.ID=pc.CONTGROUPID ";*/
         $query = "SELECT p.CODE, p.PANEL from panels p";
-        $stmt = ibase_query($this->db,$query);
-        $a['code'] = [];
-        while($row = ibase_fetch_row($stmt)){
-            //dd($row);
-            if(!in_array($row[0],$a['code'])) {
-                $a['code'][] = $row[0];
-                $a['panel'][] = $row[1];
-            }
-        }
+        $a = $this->getResult($this->queryDB($query));
         //dd($a);
         return $a;
     }
     function getMattype(){
         $query = "SELECT  m.ID, m.MATTYPE from MATTYPES m";
-        $stmt = ibase_query($this->db,$query);
-        $a['id'] = [];
-        while($row = ibase_fetch_row($stmt)){
-            //dd($row);
-            if(!in_array($row[0],$a['id'])) {
-                $a['id'][] = $row[0];
-                $a['mattype'][] = $row[1];
-            }
-        }
-        //dd($a);
+        $a = $this->getResult($this->queryDB($query));
         return $a;
     }
     function getPCont(){
         $query = "SELECT  g.id, g.contgroup from CONTGROUPS g";
-        $stmt = ibase_query($this->db,$query);
-        $a['id'] = [];
-        while($row = ibase_fetch_row($stmt)){
-            //dd($row);
-            if(!in_array($row[0],$a['id'])) {
-                $a['id'][] = $row[0];
-                $a['contgroup'][] = $row[1];
-            }
-        }
-        //dd($a);
+        $a = $this->getResult($this->queryDB($query));
         return $a;
     }
+    function getAnalyte(){
+        $query = "select a.testcode, a.analyte, a.units from analytes a ORDER by a.sorter";
+        return $this->getResult($this->queryDB($query));
+    }
     function getTests(){
-        $query = "SELECT a.id, a.testcode, a.analyte, t.testname from analytes a inner join tests t on t.id=a.testcode";
-        $stmt = ibase_query($this->db,$query);
-        $a = [];
-        while($row = ibase_fetch_row($stmt)){
-            //dd($row);
-                $a[$row[3]]['testcode'] = $row[1];
-                $a[$row[3]]['id'][] = $row[0];
-                $a[$row[3]]['analyte'][] = $row[2];
-        }
-        //dd($a);
-        return $a;
+        $query = "SELECT a.id, a.testname from tests a";
+        return $this->getResult($this->queryDB($query));
     }
     function getPrices(){
         $dept = \Input::get('dept', \Session::get('dept'));
-        $query = "select p.COST, p.panel, coalesce(p.MEDAN, pn.panel), p.NACPH, p.COMMENTS from PRICES p ";
+        $query = "select p.COST, p.panel, coalesce(p.MEDAN, pn.panel), p.NACPH, p.COMMENTS, p.due from PRICES p ";
         $query.= "inner join PRICELISTS pr on pr.id = p.PRICELISTID ";
         $query.= "inner join panels pn on pn.code=p.panel ";
         $query.= "where pr.status='A' and pr.dept=$dept order by p.panel";
@@ -311,9 +283,8 @@ class DBController extends Controller
         $query.= "left join ordtask ot on ot.ORDERSID=o.ID ";
         $query.= "left join foldercontainers fc on fc.ID=ot.CONTAINERID ";
         $query.= "left join PANELS p on p.CODE=o.PANEL ";
-        $query.= "left join PANEL_CONTAINERS pc on pc.PANEL=p.CODE ";
-        $query.= "left join MATTYPES m on m.ID=pc.MATTYPE_ID ";
-        $query.= "left join CONTGROUPS cg on cg.ID=pc.CONTGROUPID ";
+        $query.= "left join MATTYPES m on m.ID=fc.MATTYPEID ";
+        $query.= "left join CONTGROUPS cg on cg.ID=fc.CONTAINERTYPEID ";
         $query.= "left join SERVICES s on s.ID=o.SERVICEID and s.DEPTID=f.CLIENTID ";
         $query.= "where o.apprsts!='R' and f.FOLDERNO='$folderno' ";
         $res = $this->getResult($this->queryDB($query));
@@ -383,9 +354,11 @@ class DBController extends Controller
 
     public function editPanels($id)
     {
-        $query  = "select p.CODE, p.PANEL, p.MATS, o.PRICE, o.NACPH, s.CODE, s.NAME ";
+        $query  = "select distinct p.CODE, p.PANEL, p.MATS, o.PRICE, o.NACPH, s.CODE, s.NAME, f.mattypeid ";
         $query .= "from ORDERS o ";
         $query .= "left join PANELS p on o.panel=p.code ";
+        $query .= "left join ORDTASK od on od.ordersid=o.id ";
+        $query .= "left join FOLDERCONTAINERS f on f.id=od.containerid ";
         $query .= "left join SERVICES s on o.SERVICEID=s.ID ";
         $query .= "where o.apprsts!='R' and o.folderno = '$id'";
         return $this->getResult($this->queryDB($query));
