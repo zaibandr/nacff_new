@@ -25,6 +25,11 @@ Route::get('messages','InfoController@index');
 Route::get('integration','InfoController@index');
 Route::get('help','InfoController@index');
 Route::group(['middleware' => 'auth'], function () {
+    Route::group(['middleware' => 'isAdmin'], function () {
+        Route::resource('page66','LPU');
+        Route::get('page67','LPU@index');
+        Route::get('page68','LPU@index');
+    });
     Route::get('/', function () {
         return View::make('main');
     });

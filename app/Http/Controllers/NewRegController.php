@@ -68,8 +68,8 @@ class NewRegController extends DBController
             $dt_biostart = 'null';
             $dt_bioend = 'null';
         }
-        if (Input::has("p_s")) $passport_series = Func::m_quotes(Input::get("p_s")); else $passport_series = '';
-        if (Input::has("p_n")) $passport_number = Func::m_quotes(Input::get("p_n")); else $passport_number = '';
+        if (Input::has("s_p")) $passport_series = Func::m_quotes(Input::get("s_p")); else $passport_series = '';
+        if (Input::has("n_p")) $passport_number = Func::m_quotes(Input::get("n_p")); else $passport_number = '';
         if (Input::has("email")) $email = Func::m_quotes(Input::get("email")); else $email = '';
         if (Input::has("s_email")) $s_email = 'Y'; else $s_email = 'N';
         if (Input::has("s_sms")) $s_sms = 'Y'; else $s_sms = 'N';
@@ -90,6 +90,7 @@ class NewRegController extends DBController
         if (Input::has("discount2")) $dis2 = (int)Func::m_quotes(Input::get("discount2")); else $dis2= 0;
         if (Input::has("nacpp")) $ncost =(int) Func::m_quotes(Input::get("nacpp")); else $ncost= 'null';
         if (Input::has("cash")) $cash = Input::get("cash");
+        if (Input::has("kk")) $kk = (int)Input::get("kk"); else $kk = 'null';
         if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
         $age = Func::age($dt_bday); $fullcost = $cost + $dis;
         $pid = Input::get('pid','');
@@ -123,12 +124,12 @@ class NewRegController extends DBController
         $query = "INSERT INTO FOLDERS (FOLDERNO, LOGUSER, PID, SURNAME, NAME, PATRONYMIC, DATE_BIRTH, ";
         $query.= "ADDRESS, PASSPORT_SERIES, PASSPORT_NUMBER, PHONE, EMAIL, GENDER, CLIENTID, DOCTOR, COMMENTS, ";
         $query.= "PREGNANCY, AGE, PRICELISTID, S_SMS, S_EMAIL, COST, PRIME,NACPH, PRICE, DISCOUNT, CASH, DOC, ";
-        $query.= "ISSUED, CARDNO, BACKREF, rn1, rn2, rn3, AIS, ORG, STR, CITO, HEIGHT, WEIGHT, POLIS, ANTIBIOT, ANTIBIOTIC, BIOSTART, BIOEND)";
+        $query.= "ISSUED, CARDNO, BACKREF, rn1, rn2, rn3, AIS, ORG, STR, CITO, HEIGHT, WEIGHT, POLIS, ANTIBIOT, ANTIBIOTIC, BIOSTART, BIOEND, KCODE)";
         $query.= " VALUES ('$folderno','".\Session::get('login')."', '$pid', '$surname', '$name', '$namepatr', ";
         $query.= "'$dt_bday', '$address', '$passport_series', '$passport_number', '$phone', '$email', '$gender', ";
         $query.= "$department, $doctor, '$comments', $pregnancy, $age, $priceid,'$s_sms', '$s_email', $cost, '$prime', ";
         $query.= "$ncost, $fullcost, $dis2, '$cash', '$docc', '$issued', '$card', $backref, '$diuresis', '$diagnosis', ";
-        $query.= "'$phase', $ais, '$org', '$insurer', '$cito',  $weight, $height, $policy, '$antibiot', '$antibiotics', $dt_biostart,$dt_bioend)";
+        $query.= "'$phase', $ais, '$org', '$insurer', '$cito',  $weight, $height, $policy, '$antibiot', '$antibiotics', $dt_biostart,$dt_bioend, $kk)";
         $stmt = $this->queryDB($query);
         if ($stmt === false) echo "Error in executing query.</br>"; else {
 

@@ -215,6 +215,27 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-3">
+                                            <label for="kk">Код контингента</label>
+                                            <select name="kk" id="kk" class="form-control">
+                                                <option></option>
+                                                <option value="102" {{$folders[0]['KCODE']==102?'selected':''}}>102 - больные наркоманией</option>
+                                                <option value="103" {{$folders[0]['KCODE']==103?'selected':''}}>103 - гомо- бисексуалисты</option>
+                                                <option value="104" {{$folders[0]['KCODE']==104?'selected':''}}>104 - больные ЗПП</option>
+                                                <option value="109" {{$folders[0]['KCODE']==109?'selected':''}}>109 - беременные</option>
+                                                <option value="112" {{$folders[0]['KCODE']==112?'selected':''}}>112 - лица в местах лишения свободы</option>
+                                                <option value="113" {{$folders[0]['KCODE']==113?'selected':''}}>113 - обследования по клиническим показаниям</option>
+                                                <option value="115" {{$folders[0]['KCODE']==115?'selected':''}}>115 - медперсонал, работающий с больными ВИЧ</option>
+                                                <option value="118" {{$folders[0]['KCODE']==118?'selected':''}}>118 - прочие</option>
+                                                <option value="200" {{$folders[0]['KCODE']==120?'selected':''}}>200 - иностранные граждане</option>
+                                            </select>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label for="prob">Препарат</label>
+                                                    <input id="prob" name="prob" type="text" class="form-control" disabled value="{{$folders[0]['ANTIBIOTIC']}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label for="antib">Антибиотики</label>
                                             <input id="antib" name="antib" type="checkbox" onchange="toggleBio(this); return false;" {{$folders[0]['ANTIBIOT']=='Y'?'checked':''}} style="display: block; margin: auto; width: 20px; height: 20px;">
                                             <br> Применялись
@@ -226,10 +247,6 @@
                                                     по<input id="antib_e" name="antib_e" type="text" class="datepicker form-control" disabled>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label for="prob">Препарат</label>
-                                            <input id="prob" name="prob" type="text" class="form-control" disabled value="{{$folders[0]['ANTIBIOTIC']}}">
                                         </div>
                                         <div class="col-md-3">
                                             <label for="s_sms">Отправлять смс</label>
@@ -284,6 +301,11 @@
                         <div class="col-md-6">
                             <label for="cost">Общая сумма</label>
                             <input id="cost" type="number" value="0" name="fullCost" class="form-control col-md-3" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 description" style="padding: 2%">
+
                         </div>
                     </div>
                 </section>

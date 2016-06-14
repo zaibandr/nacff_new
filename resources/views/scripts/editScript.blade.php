@@ -6,6 +6,8 @@
 <script>
     var max=0;
     var rules = [];
+    var kp = 0;
+    var kpMas = ['[10.100]','[12.100]'];
     $(function ()
     {
         var form = $("#RegAll");
@@ -196,7 +198,16 @@
                             timeout: 0
                         },
                         onClick: function (node) {
-                            if (!node.data.isFolder) getLegend(node.data.icon); else $("#legend2").hide('fade');
+                            if (!node.data.isFolder) {
+                                $('.description').empty();
+                                $('.description').append("<h4>Преаналитика<h4>");
+                                if(node.data.prean)
+                                    $('.description').append(node.data.prean);
+                                else
+                                    $('.description').append("<i>-----Здесь может быть ваша реклама------</i>");
+                            } else {
+                                $('.description').empty();
+                            }
                         },
                         onDblClick: function (node) {
                             if (!node.data.isFolder) {
@@ -264,7 +275,8 @@
                                     "id": ui.item.id,
                                     "color": ui.item.color,
                                     "code": ui.item.code,
-                                    "cost": ui.item.cost
+                                    "cost": ui.item.cost,
+                                    "prean": ui.item.prean
                                 });
                                 var a = parseInt(ui.item.cost);
                                 var b = parseInt($("#cost").val());
@@ -284,10 +296,14 @@
                         close: function (event, ui) {
                         }
                     });
+                }
+                if(!$("#tree-dest").dynatree('getRoot').hasChildren()) {
                     @foreach($panels as $val)
-                    obj = <? echo htmlspecialchars_decode($val,ENT_QUOTES) ?>;
+                     obj = <? echo htmlspecialchars_decode($val,ENT_QUOTES) ?>;
                     //console.log(obj);
                     if (!findDuplicate(obj.id)) {
+                        if (kpMas.indexOf(obj.code) !== -1)
+                            kp = 1;
                         title = obj.label;
                         $("#tree-dest").dynatree('getRoot').addChild(obj);
                         a = parseInt(obj.cost);
@@ -300,10 +316,8 @@
                         $("#oldcost").val(a + b);
                     }
                     @endforeach
-                            }
-
-
-                return form.valid();
+                }
+            return form.valid();
             },
             onFinishing: function (event, currentIndex)
             {
@@ -326,7 +340,20 @@
         });
         $("#tree-dest").dynatree({
             onClick: function (node) {
-                if (!node.data.isFolder) getLegend(node.data.icon); else $("#legend2").hide('fade');
+                if (!node.data.isFolder){
+                    $('.description').empty();
+                    $('.description').append("<h4>Преаналитика<h4>");
+                    if(node.data.prean)
+                        $('.description').append(node.data.prean);
+                    else
+                        $('.description').append("<i>-----Здесь может быть ваша реклама------</i>");
+                    /* alert($(this).offset());
+                     $(".popover").remove();
+                     $("body").append("<div class=\"popover\" role=\"tooltip\"><div class=\"arrow\"></div><h3 class=\"popover-title\"></h3><div class=\"popover-content\">dsfsgsgvsffsssdg sbdfsblnksdn akjbfasdjbkv</div></div>");
+                     //getLegend(node.data.icon);*/
+                } else
+                    $('.description').empty();
+                //$("#legend2").hide('fade');
             },
             onDblClick: function (node, event) {
                 if (this.count() < 2) alert("Вы не можете удалить последнюю панель из заявки. Хотя бы одна панель должна присутствовать в заявке."); else if (confirm("Вы уверены, что хотите удалить выбранную панель?")) {
@@ -339,6 +366,7 @@
                     $("#cost").val(b-a);
                     $("#nacppCost").val(b1-a1);
                     $("#p-cnt").html(this.count());
+                    node.remove();
                     checkCito();
                 }
             },
@@ -423,13 +451,13 @@
         var p=""; var dept=$("#price").val();
         event = event || window.event //For IE
         if (event == undefined) { event = window.event; }
-        if (event.keyCode == 13) {
+        if (event.keyCode == 13 && o.value!='') {
             $.get("{{asset('app/Http/Controllers/tree.php')}}", {"term":o.value.replace(",","."),"dept":dept,"clientcode":<?php echo Session::get('clientcode');?>, "a":1 }, function(data) {
                 if (data!="") {
                     var obj = jQuery.parseJSON(data);
                     var title = obj.label;
                     if (!findDuplicate(obj.id)) {
-                        $("#tree-dest").dynatree("getRoot").addChild({"icon":obj.icon, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.value});
+                        $("#tree-dest").dynatree("getRoot").addChild({"icon":obj.icon, "prean":obj.prean, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.value});
                         checkCito();
                         $("#searchp").val('');
                         var a = parseInt(obj.cost);
@@ -450,6 +478,10 @@
     function validateFrm() {
         var b = true;
         var o = true;
+        if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
+            alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
+            return false;
+        }
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {

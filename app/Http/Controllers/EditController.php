@@ -73,8 +73,8 @@ class EditController extends DBController
             $dt_biostart = 'null';
             $dt_bioend = 'null';
         }
-        if (Input::has("p_s")) $passport_series = Func::m_quotes(Input::get("p_s")); else $passport_series = '';
-        if (Input::has("p_n")) $passport_number = Func::m_quotes(Input::get("p_n")); else $passport_number = '';
+        if (Input::has("s_p")) $passport_series = Func::m_quotes(Input::get("s_p")); else $passport_series = '';
+        if (Input::has("n_p")) $passport_number = Func::m_quotes(Input::get("n_p")); else $passport_number = '';
         if (Input::has("email")) $email = Func::m_quotes(Input::get("email")); else $email = '';
         if (Input::has("s_email")) $s_email = 'Y'; else $s_email = 'N';
         if (Input::has("s_sms")) $s_sms = 'Y'; else $s_sms = 'N';
@@ -95,6 +95,7 @@ class EditController extends DBController
         if (Input::has("discount2")) $dis2 = (int)Func::m_quotes(Input::get("discount2")); else $dis2= 0;
         if (Input::has("nacpp")) $ncost =(int) Func::m_quotes(Input::get("nacpp")); else $ncost= 'null';
         if (Input::has("cash")) $cash = Input::get("cash");
+        if (Input::has("kk")) $kk = (int)Input::get("kk"); else $kk = 'null';
         if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
 
         $age = Func::age($dt_bday); $fullcost = $cost + $dis;
@@ -113,7 +114,7 @@ class EditController extends DBController
         $query.= "', ANTIBIOTIC='".$antibiotics."', BIOSTART=".$dt_biostart.", BIOEND=".$dt_bioend.", HEIGHT=".$height.", WEIGHT=".$weight;
         $query.= ", PASSPORT_SERIES='".$passport_series."', PASSPORT_NUMBER='".$passport_number."', PHONE='".$phone."', EMAIL='".$email."', GENDER='".$gender;
         $query.= "', DOCTOR=".$doctor.", COMMENTS='".$comments."', PREGNANCY=".$pregnancy.", AGE=".$age.", PRICELISTID=".$priceid.", COST=".$cost.", NACPH=".$ncost.", PRICE=".$fullcost;
-        $query.= ", DISCOUNT=".$dis2.", rn1='".$diuresis."', rn2='".$diagnosis."', rn3='".$phase."' where folderno='$folderno'";
+        $query.= ", DISCOUNT=".$dis2.", rn1='".$diuresis."', rn2='".$diagnosis."', rn3='".$phase."', KCODE=".$kk." where folderno='$folderno'";
         $stmt = $this->queryDB($query) or die(ibase_errmsg());
         $query = "select panel from orders where apprsts!='R' and folderno='$folderno'";
         $stmt = $this->getResult($this->queryDB($query));

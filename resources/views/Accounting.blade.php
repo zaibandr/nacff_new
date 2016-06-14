@@ -50,7 +50,7 @@
                     </thead>
                     <tbody>
                     @foreach($folders as $val)
-                        @if($val['APPRSTS']!=='D')
+                        @if($val['APPRSTS']!=='D' && $val['APPRSTS']!=='R')
                     <tr>
                         <td>{{date('d.m.Y',strtotime($val['LOGDATE']))}}</td>
                         <td>

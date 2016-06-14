@@ -17,5 +17,6 @@ class IsAdmin
     {
         if(\Session::has('isAdmin') && \Session::get('isAdmin')==1)
             return $next($request);
+        else return redirect()->intended();
     }
 }

@@ -28,8 +28,8 @@ class DBController extends Controller
     function getUser($l, $p)
     {
         $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid from users u ";
-        $query.="inner join userdept ud on ud.usernam = u.usernam ";
-        $query.="inner join departments d on ud.dept = d.id ";
+        $query.="left join userdept ud on ud.usernam = u.usernam ";
+        $query.="left join departments d on ud.dept = d.id ";
         $query.="inner join userroles ur on ur.usernam = u.usernam ";
         $query.="where u.status='A' and u.usernam='".$l."' and u.password2 = '".$p."'";
         $result = $this->queryDB($query);
@@ -341,7 +341,7 @@ class DBController extends Controller
 
     public function editReg($id)
     {
-        $query = "select f.surname, f.name, f.patronymic, f.pid, f.date_birth, f.clientid, f.address, f.passport_number,";
+        $query = "select f.surname, f.kcode, f.name, f.patronymic, f.pid, f.date_birth, f.clientid, f.address, f.passport_number,";
         $query.= "f.passport_series, f.phone, f.email, f.gender, d.doctor, f.comments, f.pregnancy, f.pricelistid, f.discount, ";
         $query.= "f.s_sms, f.s_email, f.prime, f.doc, f.cash, f.issued, f.cardno, f.backref, f.ais, f.org, f.str, f.cito, ";
         $query.= "f.cost, f. nacph, f.price, rn1, rn2, rn3, f.doctor, f.height, f.weight, f.polis, f.antibiot, f.antibiotic, f.biostart, f.bioend";
@@ -484,5 +484,28 @@ class DBController extends Controller
         $query.= "inner join departments d on ud.dept=d.id ";
         $query.= "where d.id in (select udp.dept from userdept udp where udp.usernam='".\Session::get('login')."')"; ;
         return $this->getResult($this->queryDB($query));
+    }
+
+    public function getLPU()
+    {
+        $query = "select d.dept, d.deptcode, d.description, ur.roleid, u.usernam, us.password3 from departments d ";
+        $query.= "inner join userdept u on u.dept=d.id ";
+        $query.= "inner join users us on us.usernam=u.usernam ";
+        $query.= "inner join userroles ur on us.usernam=ur.usernam ";
+        $query.= "where us.status='A' order by d.deptcode";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function getLPUNumbers()
+    {
+        $query = "select distinct deptcode from departments where status='Y'";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    public function getContainers()
+    {
+        $query = "select id,contgroup from contgroups";
+        return $this->getResult($this->queryDB($query));
+
     }
 }

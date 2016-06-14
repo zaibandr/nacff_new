@@ -213,6 +213,27 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-md-3">
+                                            <label for="kk">Код контингента</label>
+                                            <select name="kk" id="kk" class="form-control">
+                                                <option></option>
+                                                <option value="102">102 - больные наркоманией</option>
+                                                <option value="103">103 - гомо- бисексуалисты</option>
+                                                <option value="104">104 - больные ЗПП</option>
+                                                <option value="109">109 - беременные</option>
+                                                <option value="112">112 - лица в местах лишения свободы</option>
+                                                <option value="113">113 - обследования по клиническим показаниям</option>
+                                                <option value="115">115 - медперсонал, работающий с больными ВИЧ</option>
+                                                <option value="118">118 - прочие</option>
+                                                <option value="200">200 - иностранные граждане</option>
+                                            </select>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <label for="prob">Препарат</label>
+                                                    <input id="prob" name="prob" type="text" class="form-control" disabled>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label for="antib">Антибиотики</label>
                                             <input id="antib" name="antib" type="checkbox" onchange="toggleBio(this); return false;" style="display: block; margin: auto; width: 20px; height: 20px;">
                                             <br> Применялись
@@ -224,10 +245,6 @@
                                                     по<input id="antib_e" name="antib_e" type="text" class="datepicker form-control" disabled>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label for="prob">Препарат</label>
-                                            <input id="prob" name="prob" type="text" class="form-control" disabled>
                                         </div>
                                         <div class="col-md-3">
                                             <label for="s_sms">Отправлять смс</label>
@@ -282,6 +299,11 @@
                         <div class="col-md-6">
                             <label for="cost">Общая сумма</label>
                             <input id="cost" type="number" value="0" name="fullCost" class="form-control col-md-3" readonly>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 description" style="padding: 2%">
+
                         </div>
                     </div>
                 </section>

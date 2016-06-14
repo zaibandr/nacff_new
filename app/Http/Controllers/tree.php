@@ -16,11 +16,13 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                     $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'] . '  (' . $row['PRICE'] . ')' , 'id' => $row['SORTER'], 'code' => $row['CODE'], 'cost' => $row['PRICE']];
                 }
             } else {
-                $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats from PRICES p ";
+                $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
                 $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
                 $query .= "inner join PANEL_CATEGORIES pc on pc.ID = p.PCAT  ";
                 $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
                 $query .= "inner join PRICELISTS pl on pl.id=p.pricelistid ";
+                $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
+                $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
                 $query .= "where pl.status='A' and pg.pgrp='" . $_GET['p'] . "' and pc.pcat='" . $_GET['g'] . "' and p.pricelistid=" . $_GET['dept'];
                 //echo $query; die();
                 $stmt = ibase_query($db, $query);
@@ -47,7 +49,15 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                         $mat1 .= "</select>";
                         $mats = sprintf($mat, $id, $mat1);
                     }
-                    $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row[0] . ']  ' . $row[3] . '  (' . $row[1] . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $row[1], 'ncost'=>$row[2]];
+                    $img ='';
+                    $imgCont = 'Контейнеры: ';
+                    if(isset($row[6])){
+                        $imgs = explode(";",$row[6]);
+                        foreach($imgs as $iVal){
+                            $img.="<img src='/nacff_new/images/".$iVal."' />";
+                        }
+                    }
+                    $a[] = ['prean'=>$row[5], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . '  (' . $row[1] . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $row[1], 'ncost'=>$row[2]];
                 }
             }
         } else {
@@ -98,11 +108,11 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
     }
     if(isset($_GET['s'])) {
         if (isset($_GET['term'])) {
-            $query = "select distinct p.panel,p.nacph, p.COST, COALESCE (p.medan, pan.PANEL), pan.mats from PRICES p ";
-            $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
-            $query .= "inner join PANEL_CATEGORIES pc on pc.ID = p.PCAT  ";
+            $query = "select distinct p.panel,p.nacph, p.COST, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
             $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
             $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' and pl.id=".$_GET['dept']." ";
+            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
+            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
             $query .= "where p.panel like '%".$_GET['term']."%' or COALESCE (p.medan, pan.PANEL) like '%".$_GET['term']."%'";
             $stmt = ibase_query($db, $query);
             while ($row = ibase_fetch_row($stmt)) {
@@ -128,7 +138,15 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                     $mat1 .= "</select>";
                     $mats = sprintf($mat, $id, $mat1);
                 }
-                $a[] = ['color'=>'','cost' => $row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$row[1] ];
+                $img ='';
+                $imgCont = 'Контейнеры: ';
+                if(isset($row[6])){
+                    $imgs = explode(";",$row[6]);
+                    foreach($imgs as $iVal){
+                        $img.="<img src='/nacff_new/images/".$iVal."' />";
+                    }
+                }
+                $a[] = ['prean'=>$row[5], 'color'=>'','cost' => $row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$row[1] ];
             }
             $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where p.status='A' and s.status='A' and p.id=".$_GET['dept']." and s.code like '%".$_GET['term']."%'";
             $stmt = ibase_query($db,$query);
@@ -142,10 +160,11 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
     }
     if(isset($_GET['a'])) {
         if (isset($_GET['term'])) {
-            $query = "select distinct pan.CODE, p.COST,p.nacph, COALESCE (p.medan, pan.PANEL), pan.mats from PRICES p ";
-            $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
-            $query .= "inner join PANEL_CATEGORIES pc on pc.ID = p.PCAT  ";
+            $query = "select distinct pan.CODE, p.COST,p.nacph, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
             $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
+            $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' ";
+            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
+            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
             $query .= "where p.panel ='".$_GET['term']."' and p.pricelistid=".$_GET['dept'];
             $stmt = ibase_query($db, $query);
             while ($row = ibase_fetch_row($stmt)) {
@@ -171,7 +190,15 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                     $mat1 .= "</select>";
                     $mats = sprintf($mat, $id, $mat1);
                 }
-                $a = ['color'=>'','cost' => $row[1], 'ncost'=>$row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  [' . $row[0] . ']  ' . $row[3] .'  ('.$row[1].')'. $mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
+                $img ='';
+                $imgCont = 'Контейнеры: ';
+                if(isset($row[6])){
+                    $imgs = explode(";",$row[6]);
+                    foreach($imgs as $iVal){
+                        $img.="<img src='/nacff_new/images/".$iVal."' />";
+                    }
+                }
+                $a = ['prean'=>$row[5],'color'=>'','cost' => $row[1], 'ncost'=>$row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] .'  ('.$row[1].')'.$mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
             }
             if(empty($a)) {
                 $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and p.id=".$_GET['dept']." and s.code ='".$_GET['term']."'";
