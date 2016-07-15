@@ -193,6 +193,31 @@ class DBController extends Controller
 
     }
 
+    public function getFoldersAdmin(){
+        if (\Input::has('date_st'))
+            $date_st = \Input::get('date_st');
+        else $date_st = date('Y-m-d', strtotime("-1 days"));
+        if (\Input::has('date_en'))
+            $date_en = date('Y-m-d 23:59:59', strtotime(\Input::get('date_en')));
+        else $date_en = date('Y-m-d 23:59:59');
+        $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
+        $query.= "inner join departments d on d.id=f.clientid ";
+        $query.= "inner join statuses a on a.status=f.apprsts ";
+        $query.= "where f.apprsts!='R'";
+        $query.= " and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        if (\Input::has('status'))
+            $query.=" and f.apprsts='".\Input::get('status')."'";
+        if (\Input::has('positive'))
+            $query.=" and f.status='".\Input::get('positive')."'";
+        if (\Input::has('lpu'))
+            $query.= " and d.deptcode=".\Input::get('lpu');
+        if (\Input::has('client'))
+            $query.=" and d.dept like '%".trim(\Input::get('client'))."%'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
     public function getMaterials()
     {
         $query = "select m.id, m.material from materials m where m.parent is not NULL";
@@ -482,15 +507,15 @@ class DBController extends Controller
         $query.= "inner join userdept ud on ud.usernam=u.usernam ";
         $query.= "inner join userroles ur on ur.usernam=u.usernam ";
         $query.= "inner join departments d on ud.dept=d.id ";
-        $query.= "where d.id in (select udp.dept from userdept udp where udp.usernam='".\Session::get('login')."')"; ;
+        $query.= "where d.id in (select udp.dept from userdept udp where udp.usernam='".\Session::get('login')."')";
         return $this->getResult($this->queryDB($query));
     }
 
     public function getLPU()
     {
-        $query = "select d.dept, d.deptcode, d.description, ur.roleid, u.usernam, us.password3 from departments d ";
-        $query.= "inner join userdept u on u.dept=d.id ";
-        $query.= "inner join users us on us.usernam=u.usernam ";
+        $query = "select d.dept, d.deptcode, ur.roleid, us.usernam, us.password3 from users us ";
+        $query.= "left join userdept u on us.usernam=u.usernam ";
+        $query.= "left join departments d on u.dept=d.id ";
         $query.= "inner join userroles ur on us.usernam=ur.usernam ";
         $query.= "where us.status='A' order by d.deptcode";
         return $this->getResult($this->queryDB($query));

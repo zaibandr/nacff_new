@@ -10,7 +10,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Http\Controllers\DBController;
+
 
 class Test extends DBController
 {
@@ -30,22 +30,27 @@ class Test extends DBController
                 $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
                     NULL, TRUE, FALSE);
                 $excel = $rowData[0];
-                if (!empty($excel[4]) && !empty($excel[0])) {
-                    $panel = trim(str_replace(",",".",$excel[0]));
-                    if(!in_array(trim($excel[4]),$a)) {
-                        $query = "insert into preanalytics(description) VALUES ('".trim($excel[4])."') returning id";
-                        $res = $this->getResult($this->queryDB($query));
-                        //dd($res);
-                        $query = "update panel_containers set preanalitic_id=" . $res[0]['ID'] . " where panel='$panel'";
-                        $res2 = $this->queryDB($query);
-                        $a[$res[0]['ID']] = trim($excel[4]);
-                    } else {
-                        $b = array_search(trim($excel[4]),$a);
-                        //dd($a,$b);
-                        $query = "update panel_containers set preanalitic_id=" .$b . " where panel='$panel'";
-                        $res2 = $this->queryDB($query);
+                if (!empty($excel[0])) {
+                    $panel = trim(str_replace(",", ".", $excel[0]));
+                    if(!empty($excel[4]))
+                        \Session::put('prean',$excel[4]);
+                    else
+                        \Session::put('prean','Дополнительное исследование или уже не используется');
+                    $query = "select id from preanalytics where description='" . trim(\Session::get('prean')) . "'";
+                    $id = $this->getResult($this->queryDB($query));
+                    if (empty($id)) {
+                        $query = "insert into preanalytics(description) VALUES ('" . trim(\Session::get('prean')) . "') returning id";
+                        $id = $this->getResult($this->queryDB($query));
                     }
-
+                    $query = "select id from samplingrules where samplingrule='MICRO'";
+                    $Sid = $this->getResult($this->queryDB($query));
+                    if (empty($Sid)) {
+                        $query = "insert into samplingrules(samplingrule) VALUES ('MICRO') returning id";
+                        $Sid = $this->getResult($this->queryDB($query));
+                    }
+                    $query = "update panel_containers set preanalitic_id=" . $id[0]['ID'] . ",samplingsrules_id=".$Sid[0]['ID']." where panel='$panel'";
+                    $res2 = $this->queryDB($query);
+                    $a[$id[0]['ID']] = trim(\Session::get('prean'));
                 }
             }
         }
@@ -74,6 +79,57 @@ class Test extends DBController
                     $this->queryDB($query);
                 }
             }
+        }
+        if(Input::hasFile('preanPlusRules')){
+/*            $e = Excel::load(Input::file('preanPlusRules'), function($reader) use ($excel) {
+                $reader->each(function($sheet){
+                    $sheet->each(function($row){
+                        dd($row->get());
+                    });
+                });
+            });*/
+            Excel::selectSheetsByIndex(9)->load(Input::file('preanPlusRules')
+                , function($sheet) {
+                    $sheet->each(function($row){
+                        $columns = $row->all();
+                        //dd($columns);
+                        if(isset($columns['kod_paneli'])) {
+                            if (isset($columns['otobrazhaemoe_opisanie_preanalitiki']))
+                                \Session::put('prean', trim($columns['otobrazhaemoe_opisanie_preanalitiki']));
+
+                                \Session::put('zab', 'Мазок');
+                            //dd($columns);
+
+                            $panels = explode('-', $columns['kod_paneli']);
+                            if (isset($panels[1])) {
+                                $query = "select code from panels where code>='" . trim($panels[0]) . "' and code<='" . trim($panels[1]) . "'";
+                                $panel = $this->getResult($this->queryDB($query));
+                            } else
+                                $panel = $panels;
+                            foreach ($panel as $val) {
+                                if (is_array($val))
+                                    $val = trim(str_replace(',', '.', $val['CODE']));
+                                $val = trim(str_replace(',', '.', $val));
+                                while (strlen($val) < 6)
+                                    $val .= '0';
+                                $query = "select id from preanalytics where description='" . trim(\Session::get('prean')) . "'";
+                                $id = $this->getResult($this->queryDB($query));
+                                if (empty($id)) {
+                                    $query = "insert into preanalytics(description) VALUES ('" . trim(\Session::get('prean')) . "') returning id";
+                                    $id = $this->getResult($this->queryDB($query));
+                                }
+                                $query = "select id from samplingrules where samplingrule='KDL-" . trim(\Session::get('zab')) . "'";
+                                $Sid = $this->getResult($this->queryDB($query));
+                                if (empty($Sid)) {
+                                    $query = "insert into samplingrules(samplingrule) VALUES ('KDL-" . trim(\Session::get('zab')) . "') returning id";
+                                    $Sid = $this->getResult($this->queryDB($query));
+                                }
+                                $query = "update panel_containers set preanalitic_id=" . $id[0]['ID'] . ",samplingsrules_id=" . $Sid[0]['ID'] . " where panel='$val'";
+                                $res2 = $this->queryDB($query);
+                            }
+                        }
+                    });
+                });
         }
         return \View::make('test')->with([
 

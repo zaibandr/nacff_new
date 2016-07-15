@@ -149,6 +149,9 @@ class NewRegController extends DBController
                 }
             }
             if(isset($c) && $c=='OK'){
+                $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
+                $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes',$folderno)";
+                $this->queryDB($query);
                 echo "<script>$('#folderno').html('" . $folderno . "');</script>";
                 echo "<img style=\"vertical-align: inherit; margin:0px; border:0\" src=\"images/ok.jpg\" /><b>Заявка была успешно сохранена под номером #" . $folderno . "</b>";
             }

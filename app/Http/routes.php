@@ -27,7 +27,7 @@ Route::get('help','InfoController@index');
 Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => 'isAdmin'], function () {
         Route::resource('page66','LPU');
-        Route::get('page67','LPU@index');
+        Route::resource('page67','AdminFolders', array('only'=>['index','store']));
         Route::get('page68','LPU@index');
     });
     Route::get('/', function () {

@@ -5,26 +5,27 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">Редактировать панель</h4>
             </div>
-            <form action="" method="post">
+            <form action="page66/{page66}" method="post">
                 {{csrf_field()}}
+                <input type="hidden" name="_method" value="put" />
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="name">Логин</label>
-                        <input type="text" id='name' name="name" readonly class="form-control">
+                        <input type="text" id='name' name="name" readonly class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Пароль</label>
-                        <input type="text" name="password" id='password' class="form-control">
+                        <input type="text" name="password" id='password' class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label for="lpu">Номер ЛПУ</label>
-                        <select name="lpu" id="lpu" class="form-control">
-                            @foreach($numbers as $val)
-                            <option value="{{$val['DEPTCODE']}}">{{$val['DEPTCODE']}}</option>
-                                @endforeach
-                            </select>
+                    <div class="lpu-group">
+                        <div class="form-group">
+                            <label for="lpu">Номер ЛПУ</label><i class="fa fa-close" style='color: red' onclick="delInput(0)"></i>
+                            <input type="text" name="lpu" class="form-control lpuItem0" required onblur="addDeps(0,this.value)">
+                        </div>
+                        <div class="form-group" id="deps0"></div>
                     </div>
-                    <div class="form-group" id="deps"></div>
+                    <hr>
+                    <i id="moreLpu" class="fa fa-plus-circle" style="margin: 5% 0" onclick="addLPU()">Добавить еще ЛПУ</i>
                     <div class="form-group">
                         <label for="roleD">Гл.врач</label>
                         <input type="radio" name="role" id="roleM" value="M">

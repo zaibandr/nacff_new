@@ -2,6 +2,7 @@
 <script src="{{asset('resources/assets/scripts/jquery.tablesorter.widgets.js')}}"></script>
 <script src="{{asset('resources/assets/scripts/widgets/widget-scroller.js')}}"></script>
 <script>
+    var clpu = 0;
     $(function(){
         $('.tablesorter').tablesorter({
             // Add a theme - try 'blackice', 'blue', 'dark', 'default'
@@ -107,57 +108,83 @@
                 $t = $(this),
                 col = $t.data('filter-column'), // zero-based index
                 txt = $t.data('filter-text') || $t.text(); // text to add to filter
-
         filters[col] = txt;
         // using "table.hasFilters" here to make sure we aren't targetting a sticky header
         $.tablesorter.setFilters( $('.tablesorter'), filters, true ); // new v2.9
 
-        $("select#lpu").change(function(){
-           var lpu=this.value;
+        //$("#moreLpu").click(addLPU(clpu));
+
+    });
+    function addLPU(){
+        clpu++;
+        $(".lpu-group").append("<div class=\"form-group\"><label for=\"lpu"+clpu+"\">Номер ЛПУ</label><i class=\"fa fa-close\" style=\'color: red\' onclick=\'delInput("+clpu+")\'></i><input type=\"text\" name=\"lpu"+clpu+"\" class=\"form-control lpuItem"+clpu+"\" onblur=\"addDeps("+clpu+",this.value)\"></div><div class=\"form-group\" id=\"deps"+clpu+"\"></div>");
+    }
+    function addDeps(a,lpu){
             v = $.get("app/Http/Controllers/LPUDeps.php", {
                         'lpu': lpu
                     },
                     function (data) {
-                        $("#deps").empty();
+                        $("#deps"+a).empty();
                         $.each(data,function(i,item){
-                            $("#deps").append("<label for='"+item.DEPT+"'>"+item.DEPT+"</label>");
-                            $("#deps").append("<input type='checkbox' name='dept"+i+"' value='"+item.DEPT+"' />");
-                            console.log(item);
+                            $("#deps"+a).append("<label for='"+item.DEPT+"'>"+item.DEPT+"</label>");
+                            $("#deps"+a).append("<input type='checkbox' name='dept"+i+clpu+"' value='"+item.DEPT+"' />");
+                            //console.log(item);
                         });
 
                     }, 'json');
-            //console.log(lpu);
-        });
-    });
+    }
     function modal(a, b){
+        for(var i=clpu;i>0;i--){
+            //console.log(i);
+            delInput(i);
+        }
+        clpu=0;
+
         tr = a.closest('tr');
         $('#name').val(tr.cells[0].innerHTML);
         $('#password').val(tr.cells[1].innerHTML);
-        $('#lpu').val(tr.cells[2].innerHTML);
-        $.get("app/Http/Controllers/LPUDeps.php", {
-                    'lpu': tr.cells[2].innerHTML
-                },
-                function (data) {
-                    $("#deps").empty();
-                    $.each(data,function(i,item){
-                        $("#deps").append("<label for='"+item.DEPT+"'>"+item.DEPT+"</label>");
-                        if(tr.cells[3].innerHTML==item.DEPT)
-                            $("#deps").append("<input type='checkbox' name='dept"+i+"' value='"+item.DEPT+"' checked/>");
-                        else
-                            $("#deps").append("<input type='checkbox' name='dept"+i+"' value='"+item.DEPT+"'/>");
-                        //console.log(item);
-                    });
+        $('.lpuItem').val(tr.cells[2].innerHTML);
+        lus = tr.cells[2].innerHTML.split("<br>");
+        des = tr.cells[3].innerHTML.split("<br>");
 
-                }, 'json');
-        console.log($.trim(tr.cells[5].innerHTML));
-        if($.trim(tr.cells[5].innerHTML)=='Медсестра') {
-            $('roleM').prop('checked',true);
-            $('roleD').prop('checked',false);
+        a = {};
+        for(i=0;i<lus.length-1; i++){
+            if(lus[i].trim() in a){
+                a[lus[i].trim()] = a[lus[i].trim()]+','+des[i].trim();
+            } else
+            a[lus[i].trim()] = des[i].trim();
+        }
+            //console.log(a);
+        j=0;
+        jQuery.each(a,function(i,v){
+            if(j==0){
+                $(".lpuItem"+clpu).val(i);
+                addDeps(j,i);
+                checkboxes =  $("#deps"+clpu+" input:checkbox");
+                    checkboxes.prop('checked',true);
+                console.log(checkboxes.val());
+            } else {
+                addLPU();
+                $(".lpuItem"+clpu).val(i);
+                addDeps(j,i);
+            }
+            j++;
+        });
+        if($.trim(tr.cells[4].innerHTML)=='Медсестра') {
+            $('#roleD').prop('checked',true);
+            $('#roleM').prop('checked',false);
         }
         else
         {
-            $('roleM').prop('checked',true);
-            $('roleD').prop('checked',false);
+            $('#roleM').prop('checked',true);
+            $('#roleD').prop('checked',false);
         }
+    }
+    function isDel(){
+        return confirm('Вы действительно хотите удалить?');
+    }
+    function delInput(i){
+        $(".form-group label[for='lpu"+i+"']").closest('.form-group').remove();
+        $("#deps"+i).remove();
     }
 </script>
