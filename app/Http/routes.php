@@ -63,6 +63,7 @@ Route::group(['middleware' => 'auth'], function () {
     */
 });
 Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
+Route::any('/panelPreanalytics', ['as' => 'PR', 'uses' => 'PR@index']);
 Route::any('/logout', function () {
     Session::put('userCheck', 0);
     Session::forget('login');

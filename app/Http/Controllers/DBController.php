@@ -533,4 +533,12 @@ class DBController extends Controller
         return $this->getResult($this->queryDB($query));
 
     }
+
+    protected function getPR()
+    {
+        $query = "select p.panel, p.code from panels p ";
+        $query.= "inner join panel_containers pc on pc.panel=p.code ";
+        $query.= "where pc.preanalitic_id is null order by p.code";
+        return $this->getResult($this->queryDB($query));
+    }
 }
