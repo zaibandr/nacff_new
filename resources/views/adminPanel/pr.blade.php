@@ -11,16 +11,30 @@
         <tr>
             <td>Панель</td>
             <td>Код</td>
+            <td>Биоматериал</td>
+            <td>Контейнер</td>
+            <td>Преаналитика</td>
             <td></td>
         </tr>
         </thead>
         <tbody>
-        @foreach($panels as $val)
+        @foreach($panels as $key=>$val)
             <tr>
-                <td>{{$val['CODE']}}</td>
-                <td>{{$val['PANEL']}}</td>
+                <td>{{$key}}</td>
+                <td>{{$val['panel']}}</td>
                 <td>
-                    <button data-toggle="modal" data-target="#edit" class="btn-primary btn" onclick="edit('{{$val['CODE']}}','{{$val['PANEL']}}')">Редактировать</button>
+                    @foreach($val['mattype'] as $v)
+                        {{$v}}<br>
+                        @endforeach
+                </td>
+                <td>
+                    @foreach($val['cont'] as $vv)
+                        {{$vv}}<br>
+                    @endforeach
+                </td>
+                <td>{{($val['prean'])?'Есть':'Отсутствует'}}</td>
+                <td>
+                    <button data-toggle="modal" data-target="#edit" class="btn-primary btn" onclick="edit('{{$key}}','{{$val['panel']}}')">Редактировать</button>
                 </td>
             </tr>
             @endforeach

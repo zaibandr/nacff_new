@@ -13,8 +13,15 @@ class PR extends DBController
 {
     public function index()
     {
+        $panels = $this->getPR();
+        foreach($panels as $val){
+            $a[$val['CODE']]['panel'] = $val['PANEL'];
+            $a[$val['CODE']]['mattype'][] = $val['MATTYPE'];
+            $a[$val['CODE']]['cont'][] = $val['CONTGROUP'];
+            $a[$val['CODE']]['prean'] = $val['PREANALITIC_ID'];
+        }
         if(\Input::has('name')){
-            //dd(\Input::all());
+            dd(\Input::all());
             $desc = trim(\Input::get('desc'));
             $code = \Input::get('code');
             $query = "select id from preanalytics where description='$desc'";
@@ -27,7 +34,7 @@ class PR extends DBController
             $this->queryDB($query);
         }
         return \View::make('adminPanel.pr')->with([
-            'panels'=>$this->getPR()
+            'panels'=>$a
         ]);
     }
 }

@@ -131,6 +131,31 @@ class Test extends DBController
                     });
                 });
         }
+        if(Input::hasFile('groups')){
+            Excel::load(Input::file('groups'), function($reader) {
+                foreach($reader->all() as $sheet) {
+                    foreach ($sheet as $row) {
+                        $items = $row->all();
+                        //dd($items);
+                        if($items['img'])
+                            $img = "'".$items['img']."'";
+                        else $img = null;
+                        if($items['mat'])
+                            $mat = "'".$items['mat']."'";
+                        else $mat=null;
+                        $query = "select code from panels where code = '".$items['code']."'";
+                        $id = $this->getResult($this->queryDB($query));
+                        if (empty($id)) {
+                            $query = "insert into panels(code,panel,mats,img) VALUES ('".$items['code']."','" . $items['panel'] . "',".$mat.",".$img.")";
+                            $this->queryDB($query);
+                        } else {
+                            $query = "update panels set mats=".$mat.", img=".$img." where code = '".$items['code']."'";
+                            $this->queryDB($query);
+                        }
+                    }
+                }
+            });
+        }
         return \View::make('test')->with([
 
         ]);

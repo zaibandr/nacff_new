@@ -536,9 +536,11 @@ class DBController extends Controller
 
     protected function getPR()
     {
-        $query = "select p.panel, p.code from panels p ";
+        $query = "select DISTINCT p.panel, p.code, m.mattype, c.contgroup,pc.preanalitic_id from panels p ";
         $query.= "inner join panel_containers pc on pc.panel=p.code ";
-        $query.= "where pc.preanalitic_id is null order by p.code";
+        $query.= "left join mattypes m on pc.mattype_id=m.id ";
+        $query.= "left join contgroups c on pc.contgroupid=c.id ";
+        $query.= "where pc.preanalitic_id is null or pc.mattype_id is null or pc.contgroupid is null order by p.code";
         return $this->getResult($this->queryDB($query));
     }
 }
