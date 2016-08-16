@@ -19,6 +19,7 @@ class PR extends DBController
             $a[$val['CODE']]['mattype'][] = $val['MATTYPE'];
             $a[$val['CODE']]['cont'][] = $val['CONTGROUP'];
             $a[$val['CODE']]['prean'] = $val['PREANALITIC_ID'];
+            $a[$val['CODE']]['samp'] = $val['SAMPLINGRULE'];
         }
         if(\Input::has('name')){
             dd(\Input::all());

@@ -28,7 +28,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => 'isAdmin'], function () {
         Route::resource('page66','LPU');
         Route::resource('page67','AdminFolders', array('only'=>['index','store']));
-        Route::get('page68','LPU@index');
+        Route::resource('page68','AdminDep');
+        Route::resource('page69','MenuSettings',array('only'=>['index','store', 'edit']));
+        Route::resource('page70','PanelSettings',array('only'=>['index','store','create']));
+        Route::resource('page71','TestSettings',array('only'=>['index','edit']));
     });
     Route::get('/', function () {
         return View::make('main');

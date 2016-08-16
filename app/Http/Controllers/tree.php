@@ -1,4 +1,18 @@
 <?php
+function tree(array &$a, array $b){
+
+    foreach($a as &$val){
+        if($val['id']==$b['PARENT']){
+            $val['children'][] = ['id'=>$b['ID'], 'parent'=>$b['PARENT'], 'title' => $b['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
+        }
+        else {
+            if(!empty($val['children'])){
+                tree($val['children'],$b);
+            }
+        }
+        unset($val);
+    }
+}
 if(isset($_GET['dept']) && $_GET['clientcode'])
 {
     $host="192.168.0.14:RC";
@@ -18,13 +32,11 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
             } else {
                 $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
                 $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
-                $query .= "inner join PANEL_CATEGORIES pc on pc.ID = p.PCAT  ";
                 $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
                 $query .= "inner join PRICELISTS pl on pl.id=p.pricelistid ";
                 $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
                 $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
-                $query .= "where pl.status='A' and pg.pgrp='" . $_GET['p'] . "' and pc.pcat='" . $_GET['g'] . "' and p.pricelistid=" . $_GET['dept'];
-                //echo $query; die();
+                $query .= "where pl.status='A' and pg.id=" . $_GET['p'] . " and p.pricelistid=" . $_GET['dept'];
                 $stmt = ibase_query($db, $query);
                 while ($row = ibase_fetch_row($stmt)) {
                     $row[3] = str_replace('  ',' ',$row[3]);
@@ -43,9 +55,13 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                         for ($j = 1; $j < count($arr); $j++)
                             $string .= ",'" . $arr[$j] . "'";
                         $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                        while ($row2 = ibase_fetch_assoc($rs2)) {
-                            $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                        }
+                        try {
+                            while ($row2 = ibase_fetch_assoc($rs2)) {
+                                $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
+                            }
+                        } catch (Exception $e){
+
+                        };
                         $mat1 .= "</select>";
                         $mats = sprintf($mat, $id, $mat1);
                     }
@@ -61,38 +77,23 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                 }
             }
         } else {
-            $query = "select distinct pc.PCAT, pg.PGRP from PRICES p ";
-            $query .= "inner join PANEL_CATEGORIES pc on pc.ID=p.PCAT ";
-            $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
-            $query .= "inner join PRICELISTS pr on pr.id=p.PRICELISTID ";
-            $query .= "where pr.status = 'A' and pr.id=".$_GET['dept'];
-            $stmt = ibase_query($db, $query);
+           //$query = "select distinct pc.PCAT, pg.PGRP from PRICES p ";
+           //$query .= "inner join PANEL_CATEGORIES pc on pc.ID=p.PCAT ";
+           //$query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
+           //$query .= "inner join PRICELISTS pr on pr.id=p.PRICELISTID ";
+           //$query .= "where pr.status = 'A' and pr.id=".$_GET['dept'];
+            $query = "select distinct pc.PCAT, pc.id from PANEL_CATEGORIES pc order by pc.id";
+            $stmt = ibase_query($query);
             $s = 'Группы панелей';
             $a = [['id' => 0, 'parent' => '', 'title' => 'Группы панелей', 'isLazy' => true, 'isFolder' => true, 'children' => []],
                   ['id' => 'a', 'parent' => '', 'title' => 'Услуги центра', 'isLazy' => true, 'isFolder' => true, 'children' => []]];
             while ($row = ibase_fetch_assoc($stmt)) {
-                if (!empty($a[0]['children'])) {
-                    $k = 0;
-                    for ($i = 1; $i <= count($a[0]['children']); $i++) {
-                        if ($a[0]['children'][$i - 1]['id'] == $row['PCAT'])
-                            $k = 1;
-                    }
-                    //echo $k;
-                    if ($k == 0) {
-                        $a[0]['children'][] = ['id' => $row['PCAT'], 'parent' => '0', 'title' => $row['PCAT'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                        $a[0]['children'][count($a[0]['children']) - 1]['children'][] = ['id' => $row['PGRP'], 'parent' => $row['PCAT'], 'title' => $row['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                    } else {
-                        $d = 0;
-                        for ($j = 1; $j <= count($a[0]['children'][count($a[0]['children']) - 1]['children']); $j++)
-                            if ($a[0]['children'][count($a[0]['children']) - 1]['children'][$j - 1]['id'] == $row['PGRP'])
-                                $d = 1;
-                        if ($d == 0)
-                            $a[0]['children'][count($a[0]['children']) - 1]['children'][] = ['id' => $row['PGRP'], 'parent' => $row['PCAT'], 'title' => $row['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                    }
-                } else {
-                    $a[0]['children'][] = ['id' => $row['PCAT'], 'parent' => '0', 'title' => $row['PCAT'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                    $a[0]['children'][count($a[0]['children']) - 1]['children'][] = ['id' => $row['PGRP'], 'parent' => $row['PCAT'], 'title' => $row['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-                }
+                $a[0]['children'][] = ['id'=>$row['ID'], 'parent'=>0, 'title' => $row['PCAT'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
+            }
+            $query = "select pgrp, parent, id from panel_groups order by sorter";
+            $stmt = ibase_query($query);
+            while ($row = ibase_fetch_assoc($stmt)){
+                tree($a, $row);
             }
             $query = "select s.name, s.parent, s.id from services s inner join pricelists p on p.dept = s.deptid where s.price is NULL and p.status='A' and p.id =".$_GET['dept'];
             $stmt = ibase_query($db, $query);

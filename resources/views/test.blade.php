@@ -20,4 +20,9 @@
 {!! Form::file('groups') !!}
 {!! Form::submit('load') !!}
 {!! Form::close() !!}
+<h1>Загрузка панелей</h1>
+{!! Form::open(['method'=>'post', 'enctype'=>"multipart/form-data"]) !!}
+{!! Form::file('panels') !!}
+{!! Form::submit('load') !!}
+{!! Form::close() !!}
     @stop

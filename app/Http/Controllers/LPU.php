@@ -54,6 +54,7 @@ class LPU extends DBController
      */
     public function store(Request $request)
     {
+        //dd($request->all());
         $login = trim(mb_strtoupper($request->login));
         $password = trim($request->password);
         $this->queryDB("insert into users(usernam,fullname,password2,password3) VALUES ('$login', '$request->name','".md5($password)."', '$password')");
@@ -98,7 +99,7 @@ class LPU extends DBController
      */
     public function update(Request $request, $id)
     {
-         $a = [];
+         $a = []; $c = [];
         foreach($request->all() as $key=>$val){
             if(strpos($key,'dept') || strpos($key,'dept')===0){
                 if(!in_array($val, $a))
@@ -122,11 +123,11 @@ class LPU extends DBController
             foreach(array_diff($a,$c) as $val)
                 $this->queryDB("insert into userdept(dept,usernam) VALUES ((select d.id from departments d where d.dept='$val'), '$request->name')");
         }
-     }
-			foreach($a as $val)
-			{
-					$this->queryDB("insert into userdept(dept,usernam) VALUES ((select d.id from departments d where d.dept='$val'), '$request->name')");		
-			}
+     } else {
+            foreach ($a as $val) {
+                $this->queryDB("insert into userdept(dept,usernam) VALUES ((select d.id from departments d where d.dept='$val'), '$request->name')");
+            }
+        }
         $role = ($request->role=='M')?7:15;
         $this->queryDB("update userroles set roleid=$role where usernam = '$request->name'");
         return redirect()->action('LPU@index');

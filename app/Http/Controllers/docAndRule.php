@@ -2,7 +2,7 @@
     $host="192.168.0.14:RC";
     $username="SYSDBA";
     $password="cdrecord";
-    $db = ibase_pconnect($host, $username, $password)
+    $db = ibase_connect($host, $username, $password)
     or die("Ошибка подключения к БД! ". ibase_error());
     if(isset($_GET['rule'])) {
         if ($_GET['dept'] == '')

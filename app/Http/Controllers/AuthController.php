@@ -37,7 +37,7 @@ class AuthController extends Controller
             \Session::put('name',$a[0]['FULLNAME']);
             \Session::put('clientcode',$a[0]['DEPTCODE']);
             \Session::put('dept',$a[0]['ID']);
-            if($a[0]['ROLEID']==17)
+            if($a[0]['ROLEID']==17 or $a[0]['ROLEID']==16)
                 \Session::put('isAdmin',1);
             $query = "SELECT DISTINCT mc.MENU, m.id, m.CAPTION FROM MENUCATEGORY mc ";
             $query.= "inner join MODULES m on mc.ID=m.MENUID ";

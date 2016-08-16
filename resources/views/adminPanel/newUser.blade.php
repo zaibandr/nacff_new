@@ -2,7 +2,7 @@
 @section('content')
     <link href="{{asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
     <div id="lpu">
-        <h1>Список ЛПУ</h1>
+        <h1>Добавить ЛПУ</h1>
         <div class="row">
             <div class="col-lg-10 col-lg-offset-1">
                 <form action="{{route('page66.store')}}" method="post" id="formUserAdd">
@@ -34,6 +34,8 @@
                             <input type="radio" name="role" id="roleM" value="7" required>
                             <label for="roleM">Медсестра</label>
                             <input type="radio" name="role" id="roleD" value="15" required>
+                            <label for="roleM">Администратор</label>
+                            <input type="radio" name="role" id="role" value="16" required>
                         </div>
                         <div class="modal-footer">
                             <a href="javascript:history.go(-1)" class="btn btn-default" >Отмена</a>

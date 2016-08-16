@@ -57,7 +57,7 @@ class DBController extends Controller
         $query.= "inner join DEPARTMENTS d on d.ID=pl.DEPT ";
         $query.= "inner join MATTYPES m on m.ID=pc.MATTYPE_ID ";
         $query.= "inner join CONTGROUPS g on g.ID=pc.CONTGROUPID ";*/
-        $query = "SELECT p.CODE, p.PANEL from panels p";
+        $query = "SELECT p.CODE, p.PANEL, p.CHECKED from panels p order by p.code";
         $a = $this->getResult($this->queryDB($query));
         //dd($a);
         return $a;
@@ -77,7 +77,7 @@ class DBController extends Controller
         return $this->getResult($this->queryDB($query));
     }
     function getTests(){
-        $query = "SELECT a.id, a.testname from tests a";
+        $query = "SELECT a.id, a.testname, a.quantity from tests a";
         return $this->getResult($this->queryDB($query));
     }
     function getPrices(){
@@ -237,6 +237,13 @@ class DBController extends Controller
         }
         return $this->getResult($this->queryDB($query));
     }
+    public function getDeptsAdmin()
+    {
+        $query = "select d.id, d.dept, d.deptcode, d.description from departments d";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
     public function getDepts()
     {
         $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
@@ -247,6 +254,17 @@ class DBController extends Controller
     public function getDeptPrice()
     {
         $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A' and deptcode='".\Session::get('clientcode')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+
+    public function getPriceAdmin($id)
+    {
+        $query = "select pan.code, p.cost, p.nacph, p.due, coalesce(p.medan, pan.panel) from prices p ";
+        $query.= "inner join panels pan on pan.code=p.panel ";
+        $query.= "inner join pricelists pr on p.pricelistid=pr.id ";
+        $query.= "where pr.dept=$id order by pan.code";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -536,11 +554,23 @@ class DBController extends Controller
 
     protected function getPR()
     {
-        $query = "select DISTINCT p.panel, p.code, m.mattype, c.contgroup,pc.preanalitic_id from panels p ";
+        $query = "select DISTINCT p.panel, p.code, m.mattype, c.contgroup,pc.preanalitic_id, s.samplingrule from panels p ";
         $query.= "inner join panel_containers pc on pc.panel=p.code ";
         $query.= "left join mattypes m on pc.mattype_id=m.id ";
         $query.= "left join contgroups c on pc.contgroupid=c.id ";
+        $query.= "left join samplingrules s on pc.samplingsrules_id=s.id ";
         $query.= "where pc.preanalitic_id is null or pc.mattype_id is null or pc.contgroupid is null order by p.code";
+        return $this->getResult($this->queryDB($query));
+    }
+
+    protected function getMenu(){
+        $query = "select r.rolename, m.caption, mr.available from modules m ";
+        $query.= "inner join modulerole mr on m.id=mr.moduleid ";
+        $query.= "inner join roles r on mr.roleid=r.id order by m.caption";
+        return $this->getResult($this->queryDB($query));
+    }
+    protected function getMenuCategory() {
+        $query = "select menu,id from menucategory";
         return $this->getResult($this->queryDB($query));
     }
 }

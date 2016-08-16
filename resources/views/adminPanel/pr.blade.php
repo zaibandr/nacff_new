@@ -14,6 +14,7 @@
             <td>Биоматериал</td>
             <td>Контейнер</td>
             <td>Преаналитика</td>
+            <td>Группа забора</td>
             <td></td>
         </tr>
         </thead>
@@ -33,6 +34,7 @@
                     @endforeach
                 </td>
                 <td>{{($val['prean'])?'Есть':'Отсутствует'}}</td>
+                <td>{{($val['samp'])?$val['samp']:'Отсутствует'}}</td>
                 <td>
                     <button data-toggle="modal" data-target="#edit" class="btn-primary btn" onclick="edit('{{$key}}','{{$val['panel']}}')">Редактировать</button>
                 </td>
@@ -60,18 +62,23 @@
 
                                 <div class="col-md-6">
                                     {!! Form::label('mod1', 'Использовать преаналитику панели') !!}
-                                    {!! Form::radio('mod','mod2',true) !!}
+                                    {!! Form::radio('mod','mod1',true) !!}
                                 </div>
                                 <div class="col-md-6">
                                     {!! Form::label('mod2', 'Ввести новую') !!}
-                                    {!! Form::radio('mod','mod1',false) !!}
+                                    {!! Form::radio('mod','mod2',false) !!}
                                 </div>
                             </div>
+
                             {!! Form::label('panel', 'Код панели') !!}
                             {!! Form::text('panel',null,['class'=>'form-control', 'id'=>'panel', 'style'=>'margin-bottom:2%', 'placeholder'=>'Введите панель','required']) !!}
                             {!! Form::label('desc', 'Описание') !!}
                             {!! Form::textarea('desc', null, ['class'=>'form-control', 'id'=>'desc', 'style'=>'margin-bottom:2%', 'readonly', 'required'])!!}
 
+                        </div>
+                        <div class="col-lg-12">
+                            {{Form::label('samp', 'Группа забора')}}
+                            {{Form::text('samp',null,['class'=>'form-control samp', 'style'=>'margin-bottom:2%', 'placeholder'=>'Введите группу','required'])}}
                         </div>
                     </div>
                     <div class="modal-footer">

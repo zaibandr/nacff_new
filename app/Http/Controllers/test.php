@@ -156,6 +156,46 @@ class Test extends DBController
                 }
             });
         }
+        if(Input::hasFile('panels')){
+            Excel::load(Input::file('panels'), function($reader) {
+                foreach($reader->all() as $sheet) {
+                    foreach ($sheet as $row) {
+                        $items = $row->all();
+                        //dd($items);
+                        $code = $items['code'];
+                        while(strlen($code)<6)
+                            $code.='0';
+                        $query = "select code from panels where code = '".$code."'";
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)){
+                            $query = "insert into panels(code,panel,mats,img) ";
+                            $query.= "VALUES ('$code','".trim($items['panel'])."', '".$items['mattypes']."', '".$items['img']."')";
+                            $this->queryDB($query);
+                        }
+                        $query = "select pc.panel from panel_containers pc where ";
+                        $query.= "pc.panel='$code' and pc.contgroupid=".$items['cont']." and pc.mattype_id=".$items['matt']." and pc.containerno=".$items['no'];
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)){
+                            $query = "insert into panel_containers(panel,mattype_id,contgroupid,containerno) values";
+                            $query.= "('$code',".trim($items['matt']).", ".$items['cont'].", ".$items['no'].")";
+                            $this->queryDB($query);
+                        }
+                        $query = "select panel from prices where panel='$code' and pricelistid=49";
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)) {
+                            if ($items['catid'] == '[null]') {
+                                $query = "insert into prices(pricelistid, panel, due, pgrp) VALUES ";
+                                $query .= "(49, '$code'," . $items['dur'] . ", 1)";
+                            } else {
+                                $query = "insert into prices(pricelistid, panel, due, pgrp) VALUES ";
+                                $query .= "(49, '$code'," . $items['dur'] . "," . $items['catid'] . ")";
+                            }
+                            $this->queryDB($query);
+                        }
+                    }
+                }
+            });
+        }
         return \View::make('test')->with([
 
         ]);

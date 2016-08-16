@@ -37,3 +37,6 @@ form input[type=file]
 {
     display: inline-block !important;
 }
+ul.ui-autocomplete {
+    z-index: 1100;
+}
