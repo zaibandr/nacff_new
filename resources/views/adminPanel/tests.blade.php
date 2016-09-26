@@ -5,7 +5,7 @@
     <table class="table table-striped">
         <tr>
             <td>Название</td>
-            <td>Необходимое количество, мл</td>
+            <td>Необходимое количество, мкл</td>
             <td></td>
         </tr>
         @foreach($tests as $val)

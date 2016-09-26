@@ -115,7 +115,7 @@ class PrintController extends DBController
                             'params'=>array(
                                 'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno'=>$folderno,
-                                'client-id'=>2420
+                                'client-id'=>2420,
                             )
                         );
 
@@ -127,7 +127,7 @@ class PrintController extends DBController
                         $json = Func::getJsonMainList($params);
                         $obj = json_decode($json, true);
 
-                        if(isset($obj["status"]) && ($obj["status"]=='fail')) {
+                    if(isset($obj["status"]) && ($obj["status"]=='fail')) {
                             if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
                         } else {
                             header('Content-Disposition: filename=report#' . $folderno . '.pdf');

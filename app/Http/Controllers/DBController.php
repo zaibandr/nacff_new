@@ -62,6 +62,13 @@ class DBController extends Controller
         //dd($a);
         return $a;
     }
+    function getPanel2(){
+        $query = "SELECT p.CODE, p.PANEL, p.CHECKED from panels p ";
+        $query.= "inner join panel_containers pc on pc.panel = p.code ";
+        $query.= "where pc.SAMPLINGSRULES_ID in (25,26,27,28) or pc.SAMPLINGSRULES_ID is null order by p.code";
+        $a = $this->getResult($this->queryDB($query));
+        return $a;
+    }
     function getMattype(){
         $query = "SELECT  m.ID, m.MATTYPE from MATTYPES m";
         $a = $this->getResult($this->queryDB($query));
@@ -254,6 +261,8 @@ class DBController extends Controller
     public function getDeptPrice()
     {
         $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A' and deptcode='".\Session::get('clientcode')."'";
+        if(\Session::has('isAdmin') && \Session::get('isAdmin')==1)
+            $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -442,12 +451,13 @@ class DBController extends Controller
 
     public function getOrdtask($id)
     {
-        $query = "SELECT distinct r.FINALRESULT,r.CHARLIMITS,r.UNIT,r.STATUS, p.PANEL, p.CODE, ord.APPRSTS, a.ANALYTE, s.STATUSCOLOR, s.STATUSNAME ";
+        $query = "SELECT distinct r.FINALRESULT,r.CHARLIMITS,r.UNIT,r.STATUS, p.PANEL, p.CODE, ord.APPRSTS, a.ANALYTE, s.STATUSCOLOR, s.STATUSNAME, t.testname ";
         $query.= "from ORDERS ord ";
         $query.= "inner join ORDTASK o on ord.ID=o.ORDERSID ";
-        $query.= "left join RESULTS r on o.ID=r.ORDTASKID ";
+        $query.= "inner join RESULTS r on o.ID=r.ORDTASKID ";
         $query.= "inner join PANELS p on p.CODE=ord.PANEL ";
-        $query.= "left join ANALYTES a on a.ID=r.ANALYTEID and a.testcode=r.testid ";
+        $query.= "inner join tests t on t.id=o.testcode and r.testid=t.id ";
+        $query.= "inner join ANALYTES a on a.testcode=t.id and a.id=r.analyteid ";
         $query.= "inner join STATUSES s on s.STATUS=ord.APPRSTS ";
         $query.= "where ord.apprsts!='R' and ord.FOLDERNO='$id' ";
         $query.= "order by a.ANALYTE ";

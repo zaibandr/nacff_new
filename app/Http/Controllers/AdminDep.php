@@ -28,7 +28,10 @@ class AdminDep extends DBController
      */
     public function create()
     {
-        //
+        $price = $this->getDeptPrice();
+        return \View::make('adminPanel.newDept')->with([
+            'prices'=>$price
+        ]);
     }
 
     /**
@@ -39,7 +42,28 @@ class AdminDep extends DBController
      */
     public function store(Request $request)
     {
-        //
+        //dd(\Input::all());
+        $lpu = (int)trim($request->lpu);
+        $name = mb_strtoupper(trim($request->name));
+        $desc = addslashes(trim($request->name));
+        $priceId = $request->price;
+        $query = "insert into departments(deptcode,dept,description,status) VALUES ('$lpu','$name','$desc','A') returning id";
+        $deptId = $this->getResult($this->queryDB($query));
+        $deptId = $deptId[0]['ID'];
+        if(isset($request->dateend))
+            $dateend = date('Y-m-d',strtotime($request->dateend));
+        else $dateend = date('Y-m-d',strtotime(time()+3600*24*365));
+        if(isset($request->datestart))
+            $datestart = date('Y-m-d',strtotime($request->datestart));
+        else $datestart = date('Y-m-d');
+        $query = "insert into pricelists(status,datebegin,dateend,by_user,dept) VALUES ('A','$datestart','$dateend','ADMIN',$deptId) returning id";
+        $newPriceId = $this->getResult($this->queryDB($query));
+        $newPriceId = $newPriceId[0]['ID'];
+        $query = "INSERT INTO PRICES (PRICELISTID, COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN) ";
+        $query.= "select $newPriceId,COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN from prices where PRICELISTID=$priceId";
+        if($this->queryDB($query))
+            return \Redirect::route('page68.index');
+
     }
 
     /**

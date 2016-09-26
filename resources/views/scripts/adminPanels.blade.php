@@ -125,8 +125,10 @@
                     $.each(json, function(index,element){
                         $("#browse #code").val(element.CODE);
                         $("#browse #name").val(element.PANEL);
+                        if($.trim(element.CHECKED)=='')
+                            $('#checked').removeAttr('checked');
                         text+='<div class="panel">';
-                        text+='<div class="col-lg-5 form-group"><label for="cont'+i+'">Контейнер</label><input type="text" class="form-control cont" name="cont'+i+'" value="'+element.CONTGROUP+'" /></div>';
+                        text+='<div class="col-lg-5 form-group"><label for="cont'+i+'">Контейнер</label><input type="text" class="form-control contr" name="cont'+i+'" value="'+element.CONTGROUP+'" /></div>';
                         text+='<div class="col-lg-4 form-group"><label for="matt'+i+'">Биоматериал</label><input type="text" class="form-control matt" name="matt'+i+'" value="'+element.MATTYPE+'" /></div>';
                         text+='<div class="col-lg-2 form-group"><label for="count'+i+'">Количество</label><input type="text" class="form-control" name="count'+i+'" value="'+element.COUNT+'" /></div>';
                         text+='<div class="col-lg-1"><i class="fa fa-times-circle fa-2x" style="color:red; cursor:pointer" onclick="delRow(this)"></i></div>';
@@ -139,7 +141,8 @@
                     text+='<div class="col-md-6"><label for="mod1">Использовать преаналитику панели</label><input name="mod" type="radio" value="mod2" checked="checked"></div>';
                     text+='<div class="col-md-6"><label for="mod2">Новая преаналитика</label><input name="mod" type="radio" value="mod1"></div>';
                     text+='</div></div>';
-                    text+='<div class="col-lg-12 form-group"><label for="panpr">Код панели</label><input type="text" class="form-control" name="panpr" id="panpr"></div>';
+                    text+='<div class="col-lg-6 form-group"><label for="panpr">Код панели</label><input type="text" class="form-control" name="panpr" id="panpr"></div>';
+                    text+='<div class="col-lg-6 form-group"><label for="prSearch">Поиск преаналитики</label><input type="text" class="form-control" name="prSearch" id="prSearch"></div>';
                     text+='<div class="col-lg-12 form-group"><label for="prean">Преаналитика</label><textarea class="form-control" name="prean" readonly id="prean">'+json[0].DESCRIPTION+'</textarea></div>';
                     text+='<div class="col-lg-12 form-group"><label for="samp">Группа забора</label><input type="text" class="form-control samp" name="samp" value="'+json[0].SAMPLINGRULE+'" /></div>';
                     $('#panelContainer').html(text);
@@ -162,7 +165,7 @@
                                     if(data.DESCRIPTION)
                                         $('#prean').val(data.DESCRIPTION);
                                 }, 'json');
-                    })
+                    });
                     $('#browse form').keydown(function(event){
                         if(event.keyCode == 13) {
                             event.preventDefault();
@@ -171,7 +174,7 @@
                     });
                     $.get("app/Http/Controllers/contsAndMatts.php", {'checker':'password', 'cont':1},
                         function(data){
-                            $(".cont").autocomplete({
+                            $(".contr").autocomplete({
                                 source: data,
                                 minLength:1
                             });
@@ -190,6 +193,14 @@
                                     minLength:1
                                 });
                             }, 'json');
+                    $("#prSearch").autocomplete({
+                        source:"app/Http/Controllers/contsAndMatts.php?checker=password&prean=1",
+                        minLength: 2,
+                        select: function(event,ui){
+                            //console.log(ui);
+                            $('#prean').val(ui.item.value);
+                        }
+                    });
 
         });
     }
@@ -208,7 +219,7 @@
         a.closest('.panel').parentNode.insertBefore(clone,a.closest('.panel'));
         $.get("app/Http/Controllers/contsAndMatts.php", {'checker':'password', 'cont':1},
                 function(data){
-                    $(".cont").autocomplete({
+                    $(".contr").autocomplete({
                         source: data,
                         minLength:1
                     });

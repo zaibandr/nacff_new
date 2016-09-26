@@ -12,7 +12,7 @@
             <tr>
                 <th>Код</th>
                 <th>Название</th>
-                <th>Проверено</th>
+                <th>Готовность</th>
                 <th></th>
             </tr>
             </thead>
@@ -21,7 +21,7 @@
                 <tr>
                     <td>{{$val['CODE']}}</td>
                     <td>{{$val['PANEL']}}</td>
-                    <td><i class="fa fa-circle fa-2x" style="color: {{$val['CHECKED']?'green':'red'}};"></i></td>
+                    <td><i style="color: {{trim($val['CHECKED'])!=''?'green':'red'}};">{{trim($val['CHECKED'])!=''?'Готово':'Не готово'}}</i></td>
                     <td><button class="btn btn-primary" data-toggle="modal" data-target="#browse" onclick="loadPanel('{{$val['CODE']}}','{{$val['CHECKED']}}')">Обзор</button></td>
                 </tr>
                 @endforeach
@@ -43,7 +43,7 @@
                             {!!Form::text('code', null, ['class'=>'form-control', 'id'=>'code', 'readonly', 'style'=>'margin-bottom:2%; width:90%'])!!}
                         </div>
                         <div class="col-lg-6" style="margin-bottom: 2%">
-                            {!! Form::label('name', 'Код') !!}
+                            {!! Form::label('name', 'Название') !!}
                             {!!Form::text('name', null, ['class'=>'form-control', 'id'=>'name', 'readonly', 'style'=>'margin-bottom:2%; width:90%'])!!}
                         </div>
                             <div id="panelContainer">

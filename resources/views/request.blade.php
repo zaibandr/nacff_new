@@ -54,37 +54,42 @@
             <table width="100%">
                 @foreach($ordtask as $key=>$val)
                     <tr>
-                        <td>
+                        <td style="padding-bottom: 2%">
                             <a href="#" onclick="showinfo('{{str_replace('.','',$key)}}'); return false;"><span class="glyphicon glyphicon-minus {{str_replace('.','',$key)}}" ></span><b style="font-size: 1.3em; margin-left: 10px;">{{$key}} - {{$val['PANEL']}}</b></a>
                             <sup style="color: {{$val['STATUSCOLOR']}}">{{$val['STATUSNAME']}}</sup>
                         </td>
-                        @if(count($val['ANALYTE'])<1))
+                    </tr>
+                        @if(count($val['TESTNAME'])<1))
                             <tr><td>Результатов еще нет</td></tr>
                     @else
-                                <tr>
-                                    <td>
-                                        <div style="margin-bottom:5%; margin-left: 10%; margin-top:1%; line-height: 25px; " class="{{str_replace('.','',$key)}}">
-                                            <table width="100%" id="b">
-                                                <tr>
-                                                    <th>Исследование</th>
-                                                    <th>Результат</th>
-                                                    <th>Предельные значения</th>
-                                                    <th>Ед. изм.</th>
+                        @foreach($val['TESTNAME'] as $k=>$v)
+                            <tr>
+                                <td colspan="4" ><div class="{{str_replace('.','',$key)}}" style="font-weight: bold; font-size: 1.1em">{{$k}}</div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div style="margin-bottom:2%; margin-left: 10%; margin-top:1%; line-height: 25px; " class="{{str_replace('.','',$key)}}">
+                                        <table width="100%" id="b">
+                                            <tr>
+                                                <th>Исследование</th>
+                                                <th>Результат</th>
+                                                <th>Предельные значения</th>
+                                                <th>Ед. изм.</th>
+                                            </tr>
+                                            @for($i=0; $i<count($v['ANALYTE']);$i++)
+                                                <tr style="background: @if($v['STATUS'][$i]=='O') rgba(204, 115, 87, 0.28); @endif">
+                                                    <td>{{$v['ANALYTE'][$i]}}</td>
+                                                    <td>{{$v['FINALRESULT'][$i]}}</td>
+                                                    <td>{{$v['CHARLIMITS'][$i]}}</td>
+                                                    <td>{{$v['UNIT'][$i]}}</td>
                                                 </tr>
-                                                @for($i=0; $i<count($val['ANALYTE']);$i++)
-                                                    <tr style="background: @if($val['STATUS'][$i]=='O') rgba(204, 115, 87, 0.28); @endif">
-                                                        <td>{{$val['ANALYTE'][$i]}}</td>
-                                                        <td>{{$val['FINALRESULT'][$i]}}</td>
-                                                        <td>{{$val['CHARLIMITS'][$i]}}</td>
-                                                        <td>{{$val['UNIT'][$i]}}</td>
-                                                    </tr>
-                                                    @endfor
-                                            </table>
-                                        </div>
-                                    </td>
-                                </tr>
-                    @endif
-                    </tr>
+                                            @endfor
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                            @endif
                     @endforeach
             </table>
         </div>

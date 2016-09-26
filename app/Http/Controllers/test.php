@@ -15,14 +15,13 @@ use Maatwebsite\Excel\Facades\Excel;
 class Test extends DBController
 {
     public function index(){
-        if(Input::hasFile('excel')){
+/*        if(Input::hasFile('excel')){
             $excel = [];
             $e = Excel::load(Input::file('excel'), function($reader) use ($excel) {});
             $objExcel = $e->getExcel();
             $sheet = $objExcel->getSheet(0);
             $highestRow = $sheet->getHighestRow();
             $highestColumn = $sheet->getHighestColumn();
-            $a = [];
             //  Loop through each row of the worksheet in turn
             for ($row = 1; $row <= $highestRow; $row++)
             {
@@ -31,15 +30,15 @@ class Test extends DBController
                     NULL, TRUE, FALSE);
                 $excel = $rowData[0];
                 if (!empty($excel[0])) {
+                    //dd($rowData);
                     $panel = trim(str_replace(",", ".", $excel[0]));
                     if(!empty($excel[4]))
-                        \Session::put('prean',$excel[4]);
-                    else
-                        \Session::put('prean','Дополнительное исследование или уже не используется');
-                    $query = "select id from preanalytics where description='" . trim(\Session::get('prean')) . "'";
+                        $prean = trim($excel[4]);
+
+                    $query = "select id from preanalytics where description='$prean'";
                     $id = $this->getResult($this->queryDB($query));
                     if (empty($id)) {
-                        $query = "insert into preanalytics(description) VALUES ('" . trim(\Session::get('prean')) . "') returning id";
+                        $query = "insert into preanalytics(description) VALUES ('$prean') returning id";
                         $id = $this->getResult($this->queryDB($query));
                     }
                     $query = "select id from samplingrules where samplingrule='MICRO'";
@@ -50,11 +49,10 @@ class Test extends DBController
                     }
                     $query = "update panel_containers set preanalitic_id=" . $id[0]['ID'] . ",samplingsrules_id=".$Sid[0]['ID']." where panel='$panel'";
                     $res2 = $this->queryDB($query);
-                    $a[$id[0]['ID']] = trim(\Session::get('prean'));
                 }
             }
-        }
-        if(Input::hasFile('img')){
+        }*/
+       /* if(Input::hasFile('img')){
             $img = [];
             $e = Excel::load(Input::file('img'), function($reader) use ($img) {});
             $objExcel = $e->getExcel();
@@ -79,16 +77,9 @@ class Test extends DBController
                     $this->queryDB($query);
                 }
             }
-        }
+        }*/
         if(Input::hasFile('preanPlusRules')){
-/*            $e = Excel::load(Input::file('preanPlusRules'), function($reader) use ($excel) {
-                $reader->each(function($sheet){
-                    $sheet->each(function($row){
-                        dd($row->get());
-                    });
-                });
-            });*/
-            Excel::selectSheetsByIndex(9)->load(Input::file('preanPlusRules')
+            Excel::selectSheetsByIndex(0)->load(Input::file('preanPlusRules')
                 , function($sheet) {
                     $sheet->each(function($row){
                         $columns = $row->all();
@@ -96,8 +87,8 @@ class Test extends DBController
                         if(isset($columns['kod_paneli'])) {
                             if (isset($columns['otobrazhaemoe_opisanie_preanalitiki']))
                                 \Session::put('prean', trim($columns['otobrazhaemoe_opisanie_preanalitiki']));
-
-                                \Session::put('zab', 'Мазок');
+                            if (isset($columns['gruppa_zabora']))
+                                \Session::put('zab', $columns['gruppa_zabora']);
                             //dd($columns);
 
                             $panels = explode('-', $columns['kod_paneli']);
@@ -131,6 +122,7 @@ class Test extends DBController
                     });
                 });
         }
+        /*
         if(Input::hasFile('groups')){
             Excel::load(Input::file('groups'), function($reader) {
                 foreach($reader->all() as $sheet) {
@@ -195,7 +187,7 @@ class Test extends DBController
                     }
                 }
             });
-        }
+        }*/
         return \View::make('test')->with([
 
         ]);

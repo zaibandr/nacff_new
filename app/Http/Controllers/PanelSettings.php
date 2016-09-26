@@ -29,7 +29,7 @@ class PanelSettings extends DBController
     public function create(Request $request)
     {
         $cont = 'cont1';
-        //dd($request->all);
+        dd($request->all);
         $panel = trim(str_replace(',','.',$request['code']));
         $name = trim($request['name']);
         $query = "delete from panel_containers where panel='".$request['code']."'";
@@ -100,10 +100,21 @@ class PanelSettings extends DBController
             $container = (trim($request[$cont]));
             $mattype = mb_strtoupper(trim($request[str_replace('cont1','matt1',$cont)]));
             $counter = trim($request[str_replace('cont1','count1',$cont)]);
+            $query = "select id from contgroups where contgroup='$container'";
+            $Contid = $this->getResult($this->queryDB($query));
+            if (empty($Contid)) {
+                $query = "insert into contgroups(contgroup) VALUES ('$container') returning id";
+                $Contid = $this->getResult($this->queryDB($query));
+            }
+            $query = "select id from mattypes where mattype='$mattype'";
+            $Matid = $this->getResult($this->queryDB($query));
+            if (empty($Matid)) {
+                $query = "insert into mattypes(mattype) VALUES ('$mattype') returning id";
+                $Matid = $this->getResult($this->queryDB($query));
+            }
             for($i=0; $i<$counter; $i++) {
                 $query = "insert into panel_containers(panel,containerno, mattype_id, contgroupid, preanalitic_id, samplingsrules_id) ";
-                $query .= "values('$panel', $i, (select coalesce(m.id,null) from mattypes m where m.mattype='" . $mattype . "'), ";
-                $query .= "(select coalesce(c.id,null) from contgroups c where c.contgroup='" . $container . "')," . $id[0]['ID'] . ", " . $Sid[0]['ID'] . ")";
+                $query .= "values('$panel', $i,".$Matid[0]['ID'].",".$Contid[0]['ID']." ," . $id[0]['ID'] . ", " . $Sid[0]['ID'] . ")";
                 $this->queryDB($query);
             }
             $cont.='1';

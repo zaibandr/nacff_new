@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page69','MenuSettings',array('only'=>['index','store', 'edit']));
         Route::resource('page70','PanelSettings',array('only'=>['index','store','create']));
         Route::resource('page71','TestSettings',array('only'=>['index','edit']));
+        Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
     Route::get('/', function () {
         return View::make('main');
@@ -65,7 +66,6 @@ Route::group(['middleware' => 'auth'], function () {
     |
     */
 });
-Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
 Route::any('/panelPreanalytics', ['as' => 'PR', 'uses' => 'PR@index']);
 Route::any('/logout', function () {
     Session::put('userCheck', 0);

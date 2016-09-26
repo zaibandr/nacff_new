@@ -25,11 +25,11 @@ class RequestController extends DBController
             $a[$ord['CODE']]['APPRSTS'] = $ord['APPRSTS'];
             $a[$ord['CODE']]['STATUSCOLOR'] = $ord['STATUSCOLOR'];
             $a[$ord['CODE']]['STATUSNAME'] = $ord['STATUSNAME'];
-            $a[$ord['CODE']]['FINALRESULT'][] = $ord['FINALRESULT'];
-            $a[$ord['CODE']]['CHARLIMITS'][] = $ord['CHARLIMITS'];
-            $a[$ord['CODE']]['UNIT'][] = $ord['UNIT'];
-            $a[$ord['CODE']]['STATUS'][] = $ord['STATUS'];
-            $a[$ord['CODE']]['ANALYTE'][] = $ord['ANALYTE'];
+            $a[$ord['CODE']]['TESTNAME'][$ord['TESTNAME']]['FINALRESULT'][] = $ord['FINALRESULT'];
+            $a[$ord['CODE']]['TESTNAME'][$ord['TESTNAME']]['CHARLIMITS'][] = $ord['CHARLIMITS'];
+            $a[$ord['CODE']]['TESTNAME'][$ord['TESTNAME']]['UNIT'][] = $ord['UNIT'];
+            $a[$ord['CODE']]['TESTNAME'][$ord['TESTNAME']]['STATUS'][] = $ord['STATUS'];
+            $a[$ord['CODE']]['TESTNAME'][$ord['TESTNAME']]['ANALYTE'][] = $ord['ANALYTE'];
 
         }
         return \View::make('request')->with([

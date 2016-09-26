@@ -154,6 +154,7 @@ return [
         Khill\Lavacharts\Laravel\LavachartsServiceProvider::class,
         sngrl\SphinxSearch\SphinxSearchServiceProvider::class,
         Mews\Captcha\CaptchaServiceProvider::class,
+        Firebird\FirebirdServiceProvider::class
 
 
     ],
