@@ -12,7 +12,7 @@ namespace App\Http\Controllers;
 class DBController extends Controller
 {
     public $db;
-    protected $host="192.168.0.14:RC";
+    protected $host="192.168.0.249:rc";
     protected $username="SYSDBA";
     protected $password="cdrecord";
     function __construct(){
@@ -84,7 +84,7 @@ class DBController extends Controller
         return $this->getResult($this->queryDB($query));
     }
     function getTests(){
-        $query = "SELECT a.id, a.testname, a.quantity from tests a";
+        $query = "SELECT a.id, a.testname, a.quantity from tests a order by a.testname";
         return $this->getResult($this->queryDB($query));
     }
     function getPrices(){
@@ -253,7 +253,10 @@ class DBController extends Controller
     }
     public function getDepts()
     {
-        $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
+        if(\Session::has('isAdmin') && \Session::get('isAdmin'))
+            $query = "select d.id, d.dept from departments d order by d.dept";
+        else
+            $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.primary_dept = 'Y' and u.usernam='".\Session::get('login')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;

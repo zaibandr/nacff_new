@@ -15,7 +15,7 @@ function tree(array &$a, array $b){
 }
 if(isset($_GET['dept']) && $_GET['clientcode'])
 {
-    $host="192.168.0.14:RC";
+    $host="192.168.0.249:rc";
     $username="SYSDBA";
     $password="cdrecord";
     $db = ibase_pconnect($host, $username, $password)

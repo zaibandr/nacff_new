@@ -15,14 +15,18 @@ class MailController extends DBController
     public function index($id)
     {
         $folderno = $id;
-        $dept = \Session::get('dept');
-        $tsql = "select dept from departments d WHERE d.id = $dept";
-        $stmt = $this->queryDB($tsql);
-        $res = ibase_fetch_row($stmt);
-        if( $res === false ) {
-            echo "Error in executing query.<br/>"; die(0);
+        $c = '';
+        if(!(\Session::has('isAdmin') && \Session::get('isAdmin')==1)) {
+            $stmt = $this->getDepts();
+            $res = ibase_fetch_row($stmt);
+            if ($res === false) {
+                echo "Error in executing query.<br/>";
+                die(0);
+            }
+            $c = $res[0];
+        } else {
+            $c = $this->getDepts();
         }
-        $c = $res[0];
         $query = "select p.surname, p.name, p.patronymic, p.date_birth from patient p inner join folders f on f.pid=p.pid where f.folderno='$folderno'";
         $stmt = $this->getResult($this->queryDB($query));
         if( $stmt===false) {
@@ -43,7 +47,6 @@ class MailController extends DBController
             $theme = str_replace("\"", "'", \Input::get('theme'));
         if(\Input::has('body'))
             $body = str_replace("\"", "'", \Input::get('body'));
-
         $params = array('domain'=>'https://192.168.0.17:1028/api/report.json',
             'cookies'=>'cookies.txt',
             'params'=>array(
@@ -59,14 +62,53 @@ class MailController extends DBController
         $json = Func::getJsonMainList($params);
         $obj = json_decode($json, true);
         $file = '';
+        $query = "select mail_from, mail_password from departments where dept='$from'";
+        $stmt = $this->getResult($this->queryDB($query));
+        $mail_from = 'laboratory@nacpp.ru';
+        $mail_pass = 'ABCabc123';
+        if(isset($stmt[0])){
+            $mail_from = $stmt[0]['MAIL_FROM'];
+            $mail_pass = $stmt[0]['MAIL_PASSWORD'];
+            preg_match('/@([^.]*)/', $mail_from, $a);
+            $mail = $a[1];
+            switch($mail){
+                case 'gmail':
+
+                case 'yandex':
+                    $host = 'ssl://smtp.yandex.ru';  // Specify main and backup SMTP servers
+                    break;
+                case 'rambler':
+                    $host = 'ssl://smtp.rambler.ru';  // Specify main and backup SMTP servers
+                    break;
+                case 'med-det':
+                    $host = 'ssl://smtp.yandex.ru';  // Specify main and backup SMTP servers
+                    break;
+                default:
+                    $host = 'ssl://smtp.mail.ru';  // Specify main and backup SMTP servers
+                    break;
+            }
+            \Config::set('mail',[
+                'driver' => 'smtp',
+                'host' => $host,
+                'port' => 25,
+                'from' => array('address' => $mail_from, 'name' => $from),
+                'encryption' => 'tls',
+                'username' => $mail_from,
+                'password' => $mail_pass,
+            ]);
+        }
         if(isset($obj["status"]) && ($obj["status"]=='fail')) {
             if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
         } else {
-            $file .= 'Content-Disposition: filename=report#' . $id . ".pdf \n";
-            $file .= 'Content-Type: application/pdf';
-            $file .= base64_decode($obj["data"][0]["pdf"]);
+            $file = base64_decode($obj["data"][0]["pdf"]);
         }
-        $r = Func::send_mail($from, $to, $theme, $body, $file, $id);
+        //$r = Func::send_mail($from, $to, $theme, $body, $file, $id);
+        $r = \Mail::raw($body,function($message) use ($to, $mail_from, $from, $theme, $file){
+            $message->to($to);
+            $message->from($mail_from,$from);
+            $message->subject($theme);
+            $message->attachData($file,'attach.pdf');
+        });
 
         if ($r==false) {
             echo "При отправке письма произошла ошибка!<br/><a href='".url("request/$id")."'>Вернуться назад</a>";

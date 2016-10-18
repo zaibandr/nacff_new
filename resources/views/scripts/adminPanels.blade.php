@@ -54,7 +54,7 @@
                 // filter widget: Set this option to true to hide the filter row
                 // initially. The rows is revealed by hovering over the filter
                 // row or giving any filter input/select focus.
-                filter_hideFilters: true,
+                filter_hideFilters: false,
 
                 // filter widget: Set this option to false to keep the searches
                 // case sensitive
@@ -207,14 +207,18 @@
     function delRow(a){
         a.closest('.panel').remove();
     }
+    /**
+     * Добавить новые поля для контейнера и биоматериала, добавлять с последней записи пока не исправил
+     * @param a
+     */
     function addRow(a){
         var clone = a.closest('.panel').cloneNode(true);
         inputs = clone.getElementsByTagName('input');
         labels = clone.getElementsByTagName('label');
         for (i=0; i<inputs.length; i++){
             name = inputs[i].getAttribute('name');
-            inputs[i].setAttribute('name',name+'1');
-            labels[i].setAttribute('name',name+'1');
+            inputs[i].setAttribute('name',name.substring(0,name.length-1)+(parseInt(name.substring(name.length-1,name.length))+1));
+            labels[i].setAttribute('for',name.substring(0,name.length-1)+(parseInt(name.substring(name.length-1,name.length))+1));
         }
         a.closest('.panel').parentNode.insertBefore(clone,a.closest('.panel'));
         $.get("app/Http/Controllers/contsAndMatts.php", {'checker':'password', 'cont':1},

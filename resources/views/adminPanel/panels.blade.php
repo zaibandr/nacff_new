@@ -14,6 +14,7 @@
                 <th>Название</th>
                 <th>Готовность</th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -23,6 +24,12 @@
                     <td>{{$val['PANEL']}}</td>
                     <td><i style="color: {{trim($val['CHECKED'])!=''?'green':'red'}};">{{trim($val['CHECKED'])!=''?'Готово':'Не готово'}}</i></td>
                     <td><button class="btn btn-primary" data-toggle="modal" data-target="#browse" onclick="loadPanel('{{$val['CODE']}}','{{$val['CHECKED']}}')">Обзор</button></td>
+                    <td>
+                        {!! Form::open(['action'=>['PanelSettings@destroy','code'=>$val['CODE']], 'onsubmit'=>' return confirm("Вы действительно хотите удалить панель?")']) !!}
+                        {!! Form::hidden('_method','delete') !!}
+                        {!! Form::submit('Удалить',['class'=>'btn btn-danger']) !!}
+                        {!! Form::close() !!}
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

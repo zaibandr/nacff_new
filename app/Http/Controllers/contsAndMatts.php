@@ -1,5 +1,5 @@
 <?
-$host="192.168.0.14:RC";
+$host="192.168.0.249:rc";
 $username="SYSDBA";
 $password="cdrecord";
 $db = ibase_connect($host, $username, $password)

@@ -51,8 +51,8 @@ class Test extends DBController
                     $res2 = $this->queryDB($query);
                 }
             }
-        }*/
-       /* if(Input::hasFile('img')){
+        }
+        if(Input::hasFile('img')){
             $img = [];
             $e = Excel::load(Input::file('img'), function($reader) use ($img) {});
             $objExcel = $e->getExcel();
@@ -77,8 +77,8 @@ class Test extends DBController
                     $this->queryDB($query);
                 }
             }
-        }*/
-        if(Input::hasFile('preanPlusRules')){
+        }
+       if(Input::hasFile('preanPlusRules')){
             Excel::selectSheetsByIndex(0)->load(Input::file('preanPlusRules')
                 , function($sheet) {
                     $sheet->each(function($row){
@@ -122,7 +122,6 @@ class Test extends DBController
                     });
                 });
         }
-        /*
         if(Input::hasFile('groups')){
             Excel::load(Input::file('groups'), function($reader) {
                 foreach($reader->all() as $sheet) {
@@ -188,6 +187,89 @@ class Test extends DBController
                 }
             });
         }*/
+        /**
+         * Восстановление связей в P_C с таблицы LOGS
+         */
+        $query = "select description from logs where LOG_TIME>'2016-10-11 11:52:58.801' and LOG_TIME<'2016-10-11 11:52:58.803' and theme='DELETE pc'";
+        $rows = $this->getResult($this->queryDB($query));
+        $contno = 1;
+        foreach($rows as $val){
+            if($val['DESCRIPTION']){
+                if(isset($panel) && $panel==substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6))
+                    $contno++;
+                else $contno = 1;
+                $panel = substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6);
+                $cid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'c_id=')+5,3);
+                $mid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'m_id=')+5,3);
+                $sid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'s_id=')+5,3);
+                $pid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'p_id=')+5,3);
+                $pid = ($pid==0)?'null':$pid;
+                $sid = ($sid==0)?'null':$sid;
+                //$query = "update panel_containers set mattype_id=$mid,contgroupid=$cid,preanalitic_id=$pid,samplingsrules_id=$sid where panel='$panel'";
+                $query = "insert into panel_containers(containerno,mattype_id,contgroupid,preanalitic_id,samplingsrules_id,panel) values ($contno,$mid,$cid,$pid,$sid,'$panel')";
+                $this->queryDB($query);
+            }
+        }
+        /**
+         * Восстановление контейнеров в P_C
+         */
+        /*$query = "select description, theme from logs where log_time > '2016-09-15 15:55' and log_time < '2016-10-01 15:55'";
+        $rows = $this->getResult($this->queryDB($query));
+        $panel = '';
+        $del = 0;
+        $ins = 0;
+        $a = [];
+        foreach($rows as $val){
+            if($panel==substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6)){
+                if($val['THEME']=='DELETE pc')
+                    $del++;
+                elseif($val['THEME']=='insert pc')
+                    $ins++;
+            } else {
+                if($val['THEME']=='DELETE pc' && $panel!='')
+                    $del++;
+                elseif($val['THEME']=='insert pc' && $panel!='')
+                    $ins++;
+                if($del!=$ins)
+                    $a[$panel] = ['del'=>$del,'ins'=>$ins];
+                $panel = substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6);
+                $del = 0;
+                $ins = 0;
+            }
+        }
+        //
+        foreach($a as $k=>$val){
+            $query = "select PREANALITIC_ID, SAMPLINGSRULES_ID from panel_containers where panel='$k'";
+            $res = $this->getResult($this->queryDB($query));
+            if(isset($res[0])) {
+                $p = ($res[0]);
+                $pId = $p['PREANALITIC_ID'];
+                $sId = $p['SAMPLINGSRULES_ID'];
+            }
+            $query = "delete from panel_containers where panel='$k'";
+            $this->queryDB($query);
+            $query = "select description,theme from logs where description like '%$k%'";
+            $rows = $this->getResult($this->queryDB($query));
+            $i = 1;
+            foreach ($rows as $row) {
+                if($row['THEME']=='DELETE pc'){
+                    $cid = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'c_id=')+5,3);
+                    $mid = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'m_id=')+5,3);
+                    if(!isset($pId)){
+                        $sId = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'s_id=')+5,3);
+                        $pId = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'p_id=')+5,3);
+                    }
+                    $query = "insert into panel_containers(MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO, PREANALITIC_ID, SAMPLINGSRULES_ID) values($mid,$cid,'$k',$i,$pId,$sId)";
+                    $this->queryDB($query);
+                    $i++;
+                } elseif($row['THEME']=='insert pc') {
+                    $i = 1;
+                    break;
+                }
+            }
+            ibase_commit();
+        }
+        dd($a);*/
         return \View::make('test')->with([
 
         ]);

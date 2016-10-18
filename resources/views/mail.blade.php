@@ -8,7 +8,17 @@
         <input type="hidden" name="mode" value="sent">
         <input type="hidden" name="folderno" value="<?php echo $folderno; ?>">
         <table id="frm_mail">
-            <tr><td style="width:150px;">Отправитель:</td><td><input style="width:250px;background-color:rgb(240,240,240);border:1px inset" type="text" name="from" value="<?php echo htmlspecialchars($c); ?>" readonly></td></tr>
+            <tr><td style="width:150px;">Отправитель:</td><td>
+                    @if(is_array($c))
+                        <select name="from" class="form-control">
+                            @foreach($c as $val)
+                            <option value="{{$val['DEPT']}}">{{$val['DEPT']}}</option>
+                                @endforeach
+                        </select>
+                    @else
+                    <input style="width:250px;background-color:rgb(240,240,240);border:1px inset" type="text" name="from" value="<?php echo htmlspecialchars($c[0]['DEPT']); ?>" readonly>
+                        @endif
+                </td></tr>
             <tr><td colspan="2"><p style="font-size:11px;color:gray;">* Для изменения поля "Отправитель", пожалуйста, обратитесь в клиентский отдел ООО "НАКФФ".</p></td></tr>
             <tr><td style="width:150px;">Получатель:</td><td><input style="width:250px" type="text" name="to" value="" required></td></tr>
             <tr><td style="width:150px;">Тема письма:</td><td><input style="width:250px" type="text" name="theme" value="Результаты исследований" required></td></tr>

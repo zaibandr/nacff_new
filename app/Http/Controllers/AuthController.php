@@ -51,7 +51,7 @@ class AuthController extends Controller
                 $a[$row[0]][$row[2]] = $row[1];
             }
             \Session::put('menu',$a);
-            return \Redirect::route('main');
+            return \Redirect::intended('/');
         }
     }
 }

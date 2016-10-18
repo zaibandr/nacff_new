@@ -492,10 +492,10 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
+        /*if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
             alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
             return false;
-        }
+        }*/
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {

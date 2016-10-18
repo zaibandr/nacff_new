@@ -86,38 +86,41 @@ class PanelSettings extends DBController
         $samp = trim($request['samp']);
         $query = "select id from preanalytics where description='$prean'";
         $id = $this->getResult($this->queryDB($query));
-        if (empty($id)) {
+        if (!isset($id[0])) {
             $query = "insert into preanalytics(description) VALUES ('$prean') returning id";
             $id = $this->getResult($this->queryDB($query));
         }
         $query = "select id from samplingrules where samplingrule='$samp'";
         $Sid = $this->getResult($this->queryDB($query));
-        if (empty($Sid)) {
+        if (!isset($Sid[0])) {
             $query = "insert into samplingrules(samplingrule) VALUES ('$samp') returning id";
             $Sid = $this->getResult($this->queryDB($query));
         }
-        while($request->has($cont)){
-            $container = (trim($request[$cont]));
-            $mattype = mb_strtoupper(trim($request[str_replace('cont1','matt1',$cont)]));
-            $counter = trim($request[str_replace('cont1','count1',$cont)]);
-            $query = "select id from contgroups where contgroup='$container'";
-            $Contid = $this->getResult($this->queryDB($query));
-            if (empty($Contid)) {
-                $query = "insert into contgroups(contgroup) VALUES ('$container') returning id";
+        $j=1;
+        while($j<10){
+            if($request->has('cont'.$j)) {
+                $container = (trim($request['cont'.$j]));
+                $mattype = mb_strtoupper(trim($request['matt'.$j]));
+                $counter = trim($request['count'.$j]);
+                $query = "select id from contgroups where contgroup='$container'";
                 $Contid = $this->getResult($this->queryDB($query));
-            }
-            $query = "select id from mattypes where mattype='$mattype'";
-            $Matid = $this->getResult($this->queryDB($query));
-            if (empty($Matid)) {
-                $query = "insert into mattypes(mattype) VALUES ('$mattype') returning id";
+                if (!isset($Contid[0])) {
+                    $query = "insert into contgroups(contgroup) VALUES ('$container') returning id";
+                    $Contid = $this->getResult($this->queryDB($query));
+                }
+                $query = "select id from mattypes where mattype='$mattype'";
                 $Matid = $this->getResult($this->queryDB($query));
+                if (!isset($Matid[0])) {
+                    $query = "insert into mattypes(mattype) VALUES ('$mattype') returning id";
+                    $Matid = $this->getResult($this->queryDB($query));
+                }
+                for ($i = 0; $i < $counter; $i++) {
+                    $query = "insert into panel_containers(panel,containerno, mattype_id, contgroupid, preanalitic_id, samplingsrules_id) ";
+                    $query .= "values('$panel', $i," . $Matid[0]['ID'] . "," . $Contid[0]['ID'] . " ," . $id[0]['ID'] . ", " . $Sid[0]['ID'] . ")";
+                    $this->queryDB($query);
+                }
             }
-            for($i=0; $i<$counter; $i++) {
-                $query = "insert into panel_containers(panel,containerno, mattype_id, contgroupid, preanalitic_id, samplingsrules_id) ";
-                $query .= "values('$panel', $i,".$Matid[0]['ID'].",".$Contid[0]['ID']." ," . $id[0]['ID'] . ", " . $Sid[0]['ID'] . ")";
-                $this->queryDB($query);
-            }
-            $cont.='1';
+            $j++;
         }
         if($request->get('checked')=='yes')
             $this->queryDB("update panels set checked='".\Session::get('login')."' where code='$panel'");
@@ -166,6 +169,12 @@ class PanelSettings extends DBController
      */
     public function destroy($id)
     {
-        //
+        $query = "delete from panel_containers where panel='$id'";
+        $this->queryDB($query);
+        $query = "delete from panels where code='$id'";
+        $this->queryDB($query);
+        $query = "insert into logs(log_time, theme, description) VALUES (CURRENT_TIMESTAMP ,'Panel delete','Deleting panel=$id')";
+        $this->queryDB($query);
+        return \Redirect::route('page70.index');
     }
 }

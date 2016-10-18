@@ -30,7 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page67','AdminFolders', array('only'=>['index','store']));
         Route::resource('page68','AdminDep');
         Route::resource('page69','MenuSettings',array('only'=>['index','store', 'edit']));
-        Route::resource('page70','PanelSettings',array('only'=>['index','store','create']));
+        Route::resource('page70','PanelSettings',array('only'=>['index','store','create','destroy']));
         Route::resource('page71','TestSettings',array('only'=>['index','edit']));
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
