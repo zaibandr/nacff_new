@@ -7,7 +7,7 @@
     var max=0;
     var rules = [];
     var kp = 0;
-    var kpMas = ['[10.100]','[12.100]'];
+    var kpMas = ['46.100','46.101','46.105'];
     $(function ()
     {
         var form = $("#RegAll");
@@ -300,7 +300,7 @@
                 if(!$("#tree-dest").dynatree('getRoot').hasChildren()) {
                     @foreach($panels as $val)
                      obj = <? echo htmlspecialchars_decode($val,ENT_QUOTES) ?>;
-                    //console.log(obj);
+                    console.log(obj);
                     if (!findDuplicate(obj.id)) {
                         if (kpMas.indexOf(obj.code) !== -1)
                             kp = 1;
@@ -478,9 +478,11 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
-            alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
-            return false;
+        if(kp==1){
+            if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
+                alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
+                return false;
+            }
         }
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)

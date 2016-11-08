@@ -12,12 +12,14 @@ use App\Http\Controllers\DBController;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\View;
 use sngrl\SphinxSearch\SphinxSearch;
+use App\Letter;
 
 class InfoController extends DBController
 {
     public function index()
     {
-        $error = '';
+        $error = ''; $count = 0; $key = '';
+        $re = '/<style type="text\/css">[a-zA-Z0-9:;.\s\(\)\-\,{}]*<\/style>/';
         if(Input::has('search')) {
             $sphinx = new SphinxSearch();
             $string = "'*" . trim(Input::get('search')) . "*'";
@@ -25,26 +27,20 @@ class InfoController extends DBController
             $error = "Результат поиска пуст";
             $b = [];
             if (isset($result['matches'])) {
+                $count = count($result['matches']);
                 foreach ($result['matches'] as $k => $v) {
-                    $res = $this->queryDB("select logdate, username, caption, body from letters where flag=1 and id=$k");
-                    $row = $this->getResult($res);
-                    if (count($row) > 0) {
-                        $b[] = $row[0];
-                        $b[count($b) - 1]['BODY'] = strip_tags($row[0]['BODY'], '<p><li><ul><b><i>');
-                        $error = '';
-                    }
+                    $key .= "$k,";
                 }
+                $key = substr($key,0,-1);
+                $request = Letter::search($key)->active()->paginate(3);
             }
         } else {
-            $res = $this->queryDB("select logdate, username, caption, body from letters where flag=1 order by logdate");
-            while($row=ibase_fetch_assoc($res)) {
-                $row['BODY'] = strip_tags($row['BODY'], '<ul><b><i>');
-                $b[] = $row;
-            }
+            $request = Letter::active()->paginate(3);
         }
         return View::make('info')->with([
             'error' => $error,
-            'res' => $b
+            'res' => $request,
+            're' => $re
         ]);
     }
 }

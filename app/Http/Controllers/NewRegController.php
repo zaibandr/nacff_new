@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Http\Controllers\DBController;
 use Illuminate\Support\Facades\Input;
 use App\Http\Controllers\FuncController as Func;
+use Symfony\Component\Console\Tests\Input\InputTest;
 
 class NewRegController extends DBController
 {
@@ -138,9 +139,13 @@ class NewRegController extends DBController
                 $res = $this->getResult($this->queryDB($query));
                 if(count($res)>0) {
                     $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
-                    $stmt = $this->queryDB($query);
-                    while ($row = ibase_fetch_assoc($stmt))
-                        $c = $row['COMMENTS'];
+                    $stmt = $this->getResult($this->queryDB($query));
+                    $c = $stmt[0]['COMMENTS'];
+                    if(Input::has(str_replace('.','_',$value)))
+                    {
+                        $res2 = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.apprsts!='R' and ord.folderno='$folderno' and ord.panel='$value'"));
+                        $this->queryDB("update foldercontainers set mattypeid=".Input::get(str_replace('.','_',$value))." where id=".$res2[0]['CONTAINERID']);
+                    }
                 } else {
                     $res = $this->getResult($this->queryDB("select id, price from services where code='$value' and deptid=$department"));
                     $costA = $res[0]['PRICE']*(100-$dis2)/100;
@@ -150,7 +155,7 @@ class NewRegController extends DBController
             }
             if(isset($c) && $c=='OK'){
                 $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
-                $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes',$folderno)";
+                $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes','$folderno')";
                 $this->queryDB($query);
                 echo "<script>$('#folderno').html('" . $folderno . "');</script>";
                 echo "<img style=\"vertical-align: inherit; margin:0px; border:0\" src=\"images/ok.jpg\" /><b>Заявка была успешно сохранена под номером #" . $folderno . "</b>";
@@ -180,6 +185,7 @@ class NewRegController extends DBController
         }
         $pat = substr($pat, 0, -1);
         //dd($pat);
+        $a = [];
         $depts = $this->getDepts();
         $panels = $this->editPanels($id);
         foreach($panels as $val)

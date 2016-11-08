@@ -17,11 +17,11 @@ class AuthController extends Controller
 {
     function check(){
         $username = trim(strtoupper(Input::get('login')));
-        $password = md5(Input::get('password'));
+        $password = crypt(trim(Input::get('password')),'$1$nacffnew');
         $con = new DB;
         $a = $con->getUser($username, $password);
         //dd($a);
-        if(count($a)==0){
+        if($a[0]['PASSWORD2']===false){
             $error = 'Ошибка авторизации';
             return \View::make('auth')->with([
                'error'=>$error

@@ -56,14 +56,6 @@ class PrintController extends DBController
                     return $pdf->stream();
                     break;
                 case 'save':
-                    header("Pragma: public"); // required
-                    header('Expires: 0');
-                    header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-                    header('Cache-Control: private', false);
-                    header('Content-type: application/pdf');
-                    header('Content-Disposition: attachment; filename="report#' . $id . '.pdf"');
-                    header('Content-Transfer-Encoding: binary');
-
                     $folderno = htmlspecialchars($id);
                     if (isset($_GET["logo"])) $logo = "1"; else $logo = "0";
                     if (isset($_GET["signature"])) $signature = "1"; else $signature = '';
@@ -105,7 +97,14 @@ class PrintController extends DBController
                     if (isset($_GET["logo"])) $params['params']['logo'] = "1";
                     $json = Func::getJsonMainList($params);
                     $obj = json_decode($json, true);
-                    echo base64_decode($obj["data"][0]["pdf"]);
+                    return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
+                        'Pragma'=>'public',
+                        'Expires'=> 0,
+                        'Cache-Control'=> 'must-revalidate, post-check=0, pre-check=0,private=false',
+                        'Content-type'=>'application/pdf',
+                        'Content-Disposition'=> 'attachment; filename="report#'.$id.'.pdf"',
+                        'Content-Transfer-Encoding'=> 'binary'
+                    ]);
                     break;
                 case 'print':
                         $folderno = htmlspecialchars($id);
@@ -115,7 +114,8 @@ class PrintController extends DBController
                             'params'=>array(
                                 'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno'=>$folderno,
-                                'client-id'=>2420,
+                                'client-id'=>2161,
+                                'block'=>1
                             )
                         );
 
@@ -130,15 +130,14 @@ class PrintController extends DBController
                     if(isset($obj["status"]) && ($obj["status"]=='fail')) {
                             if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
                         } else {
-                            header('Content-Disposition: filename=report#' . $folderno . '.pdf');
-                            header('Content-Type: application/pdf');
-                            echo base64_decode($obj["data"][0]["pdf"]);
+                        return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
+                            'Content-Type' => 'application/pdf',
+                            'Content-Disposition' => 'inline; filename=report#' . $folderno .'.pdf"'
+                        ]);
                         }
                     break;
                 case 'massPrint':
                         $ids = explode(",", htmlspecialchars($id));
-                        header('Content-Disposition: filename=направление.pdf');
-                        header('Content-Type: application/pdf');
                         $params = array('domain'=>'https://192.168.0.17:1028/api/report.json',
                             'cookies'=>'cookies.txt',
                             'params'=>array(
@@ -154,7 +153,10 @@ class PrintController extends DBController
                         if (isset($_GET["logo"])) $params['params']['logo'] = "1";
                         $json = Func::getJsonMainList($params);
                         $obj = json_decode($json, true);
-                        echo base64_decode($obj["data"][0]["pdf"]);
+                    return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'inline; filename=направление.pdf"'
+                    ]);
 
                     break;
             }

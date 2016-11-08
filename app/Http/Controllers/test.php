@@ -78,50 +78,51 @@ class Test extends DBController
                 }
             }
         }
-       if(Input::hasFile('preanPlusRules')){
-            Excel::selectSheetsByIndex(0)->load(Input::file('preanPlusRules')
-                , function($sheet) {
-                    $sheet->each(function($row){
-                        $columns = $row->all();
-                        //dd($columns);
-                        if(isset($columns['kod_paneli'])) {
-                            if (isset($columns['otobrazhaemoe_opisanie_preanalitiki']))
-                                \Session::put('prean', trim($columns['otobrazhaemoe_opisanie_preanalitiki']));
-                            if (isset($columns['gruppa_zabora']))
-                                \Session::put('zab', $columns['gruppa_zabora']);
-                            //dd($columns);
-
-                            $panels = explode('-', $columns['kod_paneli']);
-                            if (isset($panels[1])) {
-                                $query = "select code from panels where code>='" . trim($panels[0]) . "' and code<='" . trim($panels[1]) . "'";
-                                $panel = $this->getResult($this->queryDB($query));
-                            } else
-                                $panel = $panels;
-                            foreach ($panel as $val) {
-                                if (is_array($val))
-                                    $val = trim(str_replace(',', '.', $val['CODE']));
-                                $val = trim(str_replace(',', '.', $val));
-                                while (strlen($val) < 6)
-                                    $val .= '0';
-                                $query = "select id from preanalytics where description='" . trim(\Session::get('prean')) . "'";
-                                $id = $this->getResult($this->queryDB($query));
-                                if (empty($id)) {
-                                    $query = "insert into preanalytics(description) VALUES ('" . trim(\Session::get('prean')) . "') returning id";
-                                    $id = $this->getResult($this->queryDB($query));
-                                }
-                                $query = "select id from samplingrules where samplingrule='KDL-" . trim(\Session::get('zab')) . "'";
-                                $Sid = $this->getResult($this->queryDB($query));
-                                if (empty($Sid)) {
-                                    $query = "insert into samplingrules(samplingrule) VALUES ('KDL-" . trim(\Session::get('zab')) . "') returning id";
-                                    $Sid = $this->getResult($this->queryDB($query));
-                                }
-                                $query = "update panel_containers set preanalitic_id=" . $id[0]['ID'] . ",samplingsrules_id=" . $Sid[0]['ID'] . " where panel='$val'";
-                                $res2 = $this->queryDB($query);
-                            }
+*/
+       /*if(Input::hasFile('preanPlusRules')){
+            $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
+           $a = '';
+            $query = "select p.CODE,pc.ID, pc.CONTAINERTYPE_ID, pc.MATTYPE_ID, pc.CONTAINERNO from PANELS p inner join PANEL_CONTAINERS pc on pc.PANEL_ID=p.ID where p.status='A' and p.code='49.132'";
+            $stmt = ibase_query($lims,$query); $panel = '';
+            while($row = ibase_fetch_assoc($stmt)){
+                if($panel!=$row['CODE']) {
+                    $panel = $row['CODE'];
+                    //$query = "delete from panel_containers where panel='$panel'";
+                    //$this->queryDB($query);
+                }
+                $query = "select code from panels where code='$panel'";
+                $res = $this->getResult($this->queryDB($query));
+                if(!isset($res[0]['CODE'])){
+                    $a.= ",".$panel;
+                    $query = "select p.panelcatid, p.due2, p.mat_types, p.img_src, p.panel, p.id from panels p where p.code='$panel'";
+                    $stmt2 = ibase_query($lims,$query);
+                    while($row2 = ibase_fetch_assoc($stmt2)){
+                        $this->queryDB("insert into panels(mats,img,panel,code,modify_time) VALUES ('".$row2['MAT_TYPES']."','".$row2['IMG_SRC']."','".$row2['PANEL']."','$panel', current_timestamp)");
+                        $this->queryDB("insert into prices(pricelistid, panel, pgrp) VALUES (49,'$panel',".$row2['PANELCATID'].")");
+                        $stmt3 = ibase_query($lims,"select pc.id,pc.mattype_id,pc.containertype_id,pc.containerno,t.test_id from panel_containers pc inner join panel_tests t on t.container_id=pc.id where pc.panel_id='".$row['ID']."'");
+                        while($row3 = ibase_fetch_assoc($stmt3)){
+                            $this->queryDB("insert into panel_containers(id,MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO) VALUES (" . $row3['ID'] . "," . $row3['MATTYPE_ID'] . "," . $row3['CONTAINERTYPE_ID'] . ",'" . $row['CODE'] . "'," . $row3['CONTAINERNO'] . ")");
+                            $this->queryDB("insert into panel_tests(testcode, containerid) values(".$row3['TEST_ID'].",".$row3['ID'].")");
                         }
-                    });
-                });
-        }
+                    }
+                }
+                else {
+                    //$query = "insert into panel_containers(ID, MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO) values (" . $row['ID'] . "," . $row['MATTYPE_ID'] . "," . $row['CONTAINERTYPE_ID'] . ",'" . $row['CODE'] . "'," . $row['CONTAINERNO'] . ")";
+                    //$this->queryDB($query);
+                }
+            }
+            //Excel::selectSheetsByIndex(0)->load(Input::file('preanPlusRules')
+            //    , function($sheet) {
+            //        $sheet->each(function($row){
+            //            $columns = $row->all();
+            //            $prean = ($columns['prean']!='[null]')?$columns['prean']:260;
+            //            $samp = ($columns['samp']!='[null]')?$columns['samp']:28;
+            //            $query = "update panel_containers set PREANALITIC_ID=$prean, SAMPLINGSRULES_ID=$samp where panel='".$columns['panel']."'";
+            //            $this->queryDB($query);
+            //        });
+            //    });
+        }*/
+        /*
         if(Input::hasFile('groups')){
             Excel::load(Input::file('groups'), function($reader) {
                 foreach($reader->all() as $sheet) {
@@ -190,7 +191,7 @@ class Test extends DBController
         /**
          * Восстановление связей в P_C с таблицы LOGS
          */
-        $query = "select description from logs where LOG_TIME>'2016-10-11 11:52:58.801' and LOG_TIME<'2016-10-11 11:52:58.803' and theme='DELETE pc'";
+        /*        $query = "select description from logs where LOG_TIME>'2016-10-11 11:52:58.801' and LOG_TIME<'2016-10-11 11:52:58.803' and theme='DELETE pc'";
         $rows = $this->getResult($this->queryDB($query));
         $contno = 1;
         foreach($rows as $val){
@@ -209,7 +210,7 @@ class Test extends DBController
                 $query = "insert into panel_containers(containerno,mattype_id,contgroupid,preanalitic_id,samplingsrules_id,panel) values ($contno,$mid,$cid,$pid,$sid,'$panel')";
                 $this->queryDB($query);
             }
-        }
+        }*/
         /**
          * Восстановление контейнеров в P_C
          */
@@ -268,8 +269,30 @@ class Test extends DBController
                 }
             }
             ibase_commit();
-        }
-        dd($a);*/
+        }*/
+        /**
+         * Вывод тестов в excel
+         */
+/*                Excel::create('tests', function ($excel){
+           $excel->sheet('first', function ($sheet){
+               $tests = $this->getResult($this->queryDB("SELECT a.id, a.testname, a.quantity from tests a where a.outsource='Y' order by a.testname"));
+               $sheet->setOrientation('landscape');
+               $sheet->setPageMargin(0.25);
+               $sheet->setWidth(['A'=>20,'B'=>150]);
+               $sheet->row(1,['ID','Название','Количество, мкл']);
+               $sheet->rows($tests);
+           });
+        })->export('xls');*/
+        /**
+         * Копирование колонки аутсорс из lims.tests -> rc.tests
+         */
+        /*  $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
+        $query = "select id,outsource from tests";
+        $stmt = ibase_query($lims,$query);
+        while($row = ibase_fetch_assoc($stmt)){
+            $query = "update tests set outsource='".$row['OUTSOURCE']."' where id =".$row['ID'];
+            $this->queryDB($query);
+        }*/
         return \View::make('test')->with([
 
         ]);

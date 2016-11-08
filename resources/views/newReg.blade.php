@@ -60,7 +60,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <label for="otd">ЛПУ</label>
-                            <select name="otd" class="form-control" id="otd" onchange="selectPrice(this); return false;">
+                            <select name="otd" class="form-control" id="otd" onchange="selectPrice(this); return false;" required>
                                 @foreach($depts as $val)
                                     <option value="{{$val['ID']}}">{{$val['DEPT']}}</option>
                                 @endforeach
@@ -439,7 +439,7 @@
                         </div>
                         <div class="col-md-3">
                             <label for="Rdiscount">Скидочная группа </label>
-                            <input id="Rdiscount" name="discount3" type="text" class="form-control" readonly>
+                            <input id="Rdiscount" name="discount2" type="text" class="form-control" readonly>
                         </div>
                         <div class="col-md-3">
                             <label for="Rprob">Препарат</label>

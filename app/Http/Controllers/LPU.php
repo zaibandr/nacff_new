@@ -57,7 +57,7 @@ class LPU extends DBController
         //dd($request->all());
         $login = trim(mb_strtoupper($request->login));
         $password = trim($request->password);
-        $this->queryDB("insert into users(usernam,fullname,password2,password3) VALUES ('$login', '$request->name','".md5($password)."', '$password')");
+        $this->queryDB("insert into users(usernam,fullname,password2,password3) VALUES ('$login', '$request->name','".crypt($password,'$1$nacffnew')."', '$password')");
         $this->queryDB("insert into userroles(usernam,roleid) values('$login',$request->role)");
 
         foreach($request->all() as $key=>$val){
@@ -108,7 +108,7 @@ class LPU extends DBController
         }
         //dd($a);
         $password = trim($request->password);
-        $this->queryDB("update users set password2='".md5($password)."', password3 = '$password' where usernam='$request->name'");
+        $this->queryDB("update users set password2='".crypt($password,'$1$nacffnew')."', password3 = '$password' where usernam='$request->name'");
         $query = "select d.dept from departments d inner join userdept ud on d.id=ud.dept where ud.usernam='$request->name'";
         $b = $this->getResult($this->queryDB($query));
         if(!empty($b)) {
@@ -128,8 +128,8 @@ class LPU extends DBController
                 $this->queryDB("insert into userdept(dept,usernam) VALUES ((select d.id from departments d where d.dept='$val'), '$request->name')");
             }
         }
-        $role = ($request->role=='M')?7:15;
-        $this->queryDB("update userroles set roleid=$role where usernam = '$request->name'");
+        //$role = ($request->role=='M')?7:15;
+        //$this->queryDB("update userroles set roleid=$role where usernam = '$request->name'");
         return redirect()->action('LPU@index');
     }
 

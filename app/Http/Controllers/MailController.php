@@ -83,6 +83,9 @@ class MailController extends DBController
                 case 'med-det':
                     $host = 'ssl://smtp.yandex.ru';  // Specify main and backup SMTP servers
                     break;
+                case 'eko-sodeistvie':
+                    $host = 'ssl://smtp.timeweb.ru';  // Specify main and backup SMTP servers
+                    break;
                 default:
                     $host = 'ssl://smtp.mail.ru';  // Specify main and backup SMTP servers
                     break;

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class TestSettings extends DBController
+class NetController extends DBController
 {
     /**
      * Display a listing of the resource.
@@ -16,8 +16,8 @@ class TestSettings extends DBController
      */
     public function index()
     {
-        return \View::make('adminPanel.tests')->with([
-            'tests' => $this->getTests(\Input::get('testname',''))
+        return view('adminPanel.nets',[
+            'nets' => $this->getNets()
         ]);
     }
 
@@ -28,7 +28,7 @@ class TestSettings extends DBController
      */
     public function create()
     {
-        //
+        return view('adminPanel.netAdd');
     }
 
     /**
@@ -39,7 +39,9 @@ class TestSettings extends DBController
      */
     public function store(Request $request)
     {
-        //
+        $query = "insert into nets(netname,comments) VALUES ('$request->name','$request->comment')";
+        $this->queryDB($query);
+        return \Redirect::route('page72.index');
     }
 
     /**
@@ -61,8 +63,10 @@ class TestSettings extends DBController
      */
     public function edit($id)
     {
-        $this->queryDB("update tests set quantity='".(int)trim(\Input::get('quantity'))."' where id=$id");
-        return \Redirect::route('page71.index');
+        $net = $this->getResult($this->queryDB("select * from nets where id=$id"));
+        return view('adminPanel.netEdit',[
+            'net' => $net
+        ]);
     }
 
     /**
@@ -85,6 +89,8 @@ class TestSettings extends DBController
      */
     public function destroy($id)
     {
-        //
+        $query = "delete from nets where id=$id";
+        $this->queryDB($query);
+        return \Redirect::route('page72.index');
     }
 }

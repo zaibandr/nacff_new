@@ -87,8 +87,8 @@ return [
 
         'firebird' => [
             'driver'   => 'firebird',
-            'host'     => '192.168.0.14/3050',
-            'database' => 'RC',
+            'host'     => '192.168.0.249/3050',
+            'database' => 'rc',
             'username' => env('DB_USERNAME', 'sysdba'),
             'password' => env('DB_PASSWORD', 'cdrecord'),
             'charset'  => env('DB_CHARSET', 'UNICODE_FSS'),

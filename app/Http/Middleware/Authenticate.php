@@ -40,7 +40,7 @@ class Authenticate
         }
         $login = trim(strtoupper($request->get('login')));
         $password = trim($request->get('password'));
-        if (!$this->basic_validate($login, $password)) {
+        if (empty($request->all()) || !$this->basic_validate($login, $password)) {
             return redirect('messages');
         }
         return $next($request);
@@ -48,9 +48,9 @@ class Authenticate
     private function basic_validate($login, $password)
     {
         $con = new DB();
-        $password = md5($password);
+        $password = crypt($password,'$1$nacffnew');
         $a = $con->getUser($login, $password);
-        if(count($a)==0){
+        if($a[0]['PASSWORD2']===false){
             return false;
         } else {
             \Session::put('userCheck',1);

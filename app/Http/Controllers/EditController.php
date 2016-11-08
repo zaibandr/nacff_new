@@ -127,9 +127,7 @@ class EditController extends DBController
                 $res = $this->getResult($this->queryDB($query));
                 if (count($res) > 0) {
                     $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
-                    $stmt = $this->queryDB($query);
-                    while ($row = ibase_fetch_assoc($stmt))
-                        $c = $row['COMMENTS'];
+                    $stmt = $this->getResult($this->queryDB($query));
                     if(Input::has(str_replace('.','_',$value)))
                     {
                         $res = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.folderno='$folderno' and ord.panel='$value'"));
@@ -142,8 +140,6 @@ class EditController extends DBController
                     $res = $this->queryDB($query);
                 }
             }
-            if ($res !== 'OK')
-                $c = false;
         } else {
            foreach($panels as $value){
                if(Input::has(str_replace('.','_',$value)))
@@ -163,7 +159,7 @@ class EditController extends DBController
         }
         if($c!==false) {
             $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
-            $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Редактирование направления','$mes',$folderno)";
+            $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Редактирование направления','$mes','$folderno')";
             $this->queryDB($query);
             echo "<script>$('#folderno').html('" . $folderno . "');</script>";
             echo "<img style=\"vertical-align: inherit; margin:0px; border:0\" src=\"images/ok.jpg\" /><b>Заявка была успешно сохранена под номером #" . $folderno . "</b>";

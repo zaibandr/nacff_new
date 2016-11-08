@@ -27,13 +27,14 @@ class DBController extends Controller
 
     function getUser($l, $p)
     {
-        $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid from users u ";
+        $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid, u.password2 from users u ";
         $query.="left join userdept ud on ud.usernam = u.usernam ";
         $query.="left join departments d on ud.dept = d.id ";
         $query.="inner join userroles ur on ur.usernam = u.usernam ";
-        $query.="where u.status='A' and u.usernam='".$l."' and u.password2 = '".$p."'";
+        $query.="where u.status='A' and u.usernam='".$l."'";
         $result = $this->queryDB($query);
         $a =  $this->getResult($result);
+        $a[0]['PASSWORD2'] = hash_equals($a[0]['PASSWORD2'],$p);
         return $a;
     }
 
@@ -83,8 +84,12 @@ class DBController extends Controller
         $query = "select a.testcode, a.analyte, a.units from analytes a ORDER by a.sorter";
         return $this->getResult($this->queryDB($query));
     }
-    function getTests(){
-        $query = "SELECT a.id, a.testname, a.quantity from tests a order by a.testname";
+    function getTests($testname){
+        $query = "SELECT a.id, a.testname, a.quantity from tests a where a.testname like '%$testname%' order by a.testname";
+        return $this->getResult($this->queryDB($query));
+    }
+    function getNets(){
+        $query = "select id,netname,comments from nets";
         return $this->getResult($this->queryDB($query));
     }
     function getPrices(){
@@ -256,7 +261,7 @@ class DBController extends Controller
         if(\Session::has('isAdmin') && \Session::get('isAdmin'))
             $query = "select d.id, d.dept from departments d order by d.dept";
         else
-            $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.primary_dept = 'Y' and u.usernam='".\Session::get('login')."'";
+            $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -457,10 +462,10 @@ class DBController extends Controller
         $query = "SELECT distinct r.FINALRESULT,r.CHARLIMITS,r.UNIT,r.STATUS, p.PANEL, p.CODE, ord.APPRSTS, a.ANALYTE, s.STATUSCOLOR, s.STATUSNAME, t.testname ";
         $query.= "from ORDERS ord ";
         $query.= "inner join ORDTASK o on ord.ID=o.ORDERSID ";
-        $query.= "inner join RESULTS r on o.ID=r.ORDTASKID ";
+        $query.= "left join RESULTS r on o.ID=r.ORDTASKID ";
         $query.= "inner join PANELS p on p.CODE=ord.PANEL ";
-        $query.= "inner join tests t on t.id=o.testcode and r.testid=t.id ";
-        $query.= "inner join ANALYTES a on a.testcode=t.id and a.id=r.analyteid ";
+        $query.= "left join tests t on t.id=o.testcode and r.testid=t.id ";
+        $query.= "left join ANALYTES a on a.testcode=t.id and a.id=r.analyteid ";
         $query.= "inner join STATUSES s on s.STATUS=ord.APPRSTS ";
         $query.= "where ord.apprsts!='R' and ord.FOLDERNO='$id' ";
         $query.= "order by a.ANALYTE ";

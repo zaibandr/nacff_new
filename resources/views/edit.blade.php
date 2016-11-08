@@ -441,7 +441,7 @@
                         </div>
                         <div class="col-md-3">
                             <label for="Rdiscount">Скидочная группа </label>
-                            <input id="Rdiscount" name="discount3" type="text" class="form-control" readonly>
+                            <input id="Rdiscount" name="discount2" type="text" class="form-control" readonly>
                         </div>
                         <div class="col-md-3">
                             <label for="Rprob">Препарат</label>

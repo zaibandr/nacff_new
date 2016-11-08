@@ -10,7 +10,7 @@
         <div id="infoFrm"></div>
         <table width="100%">
             <tr><td align="left" width="30%"><h3>Направление №: <span id="folderno"><abbr title="Номер заявки не будет присвоен, пока она не будет сохранена">N/A</abbr></span></h3></td>
-                <td align="right" width="35%"><h3>Дата и время сбора: <input type="text" id="dt_catched" name="dt_catched" style="font-weight: bold; text-align:center; width:150px;" value="<?php echo date("d.m.Y H:i"); ?>" readonly /></h3></td></tr>
+                <td align="right" width="35%"><h3>Дата и время регистрации: <input type="text" id="dt_catched" name="dt_catched" style="font-weight: bold; text-align:center; width:150px;" value="<?php echo date("d.m.Y H:i"); ?>" readonly /></h3></td></tr>
         </table>
         <form id="RegAll" action="#">
             <div>
@@ -60,7 +60,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <label for="otd">ЛПУ</label>
-                            <select name="otd" class="form-control" id="otd" onchange="selectPrice(this); return false;">
+                            <select name="otd" class="form-control" id="otd" onchange="selectPrice(this); return false;" required>
                                 @foreach($depts as $val)
                                     <option value="{{$val['ID']}}">{{$val['DEPT']}}</option>
                                 @endforeach
@@ -439,7 +439,7 @@
                         </div>
                         <div class="col-md-3">
                             <label for="Rdiscount">Скидочная группа </label>
-                            <input id="Rdiscount" name="discount3" type="text" class="form-control" readonly>
+                            <input id="Rdiscount" name="discount2" type="text" class="form-control" readonly>
                         </div>
                         <div class="col-md-3">
                             <label for="Rprob">Препарат</label>

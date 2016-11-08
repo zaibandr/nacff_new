@@ -210,7 +210,6 @@ class MainController extends DB
     //  Регистратура
     public function page45(){
         if(Input::has('save')) {
-            //dd(Input::all());
             if (Input::has("surname")) {
                 $surname = mb_strtoupper(Func::m_quotes(Input::get("surname")));
                 //$surname = preg_replace("/([\s\x{0}\x{0B}]+)/i", " ", trim($surname));
@@ -287,7 +286,7 @@ class MainController extends DB
             if (Input::has("cash")) $cash = (int) Input::get("cash");
             if (Input::has("kk")) $kk = (int)Input::get("kk"); else $kk = 'null';
             if (Input::has("panels")) $panels = explode(",",substr(Input::get("panels"),0,-1)); else $panels= 'null';
-            //dd($panels);
+
             $age = Func::age($dt_bday); $fullcost = $cost + $dis;
             $pid = Input::get('pid','');
          /*   if (Input::has('pid') && Input::get('pid')!='')
@@ -327,15 +326,18 @@ class MainController extends DB
             $query.= "$ncost, $fullcost, $dis2, '$cash', '$docc', '$issued', '$card', $backref, '$diuresis', '$diagnosis', ";
             $query.= "'$phase', $ais, '$org', '$insurer', '$cito',  $weight, $height, $policy, '$antibiot', '$antibiotics', $dt_biostart,$dt_bioend, $kk)";
             $stmt = $this->queryDB($query);
+            if($pid==''){
+                $res = $this->getResult($this->queryDB("select pid from folders where folderno='$folderno'"));
+                $pid = $res[0]['PID'];
+            }
             if ($stmt === false) echo "Error in executing query.</br>"; else {
                 foreach($panels as $value){
                     $query = "select p.panel from prices p inner join pricelists pr on pr.id=p.pricelistid where p.panel='$value' and pr.id=".$priceid;
                     $res = $this->getResult($this->queryDB($query));
                     if(count($res)>0) {
                         $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
-                        $stmt = $this->queryDB($query);
-                        while ($row = ibase_fetch_assoc($stmt))
-                            $c = $row['COMMENTS'];
+                        $stmt = $this->getResult($this->queryDB($query));
+                        $c = $stmt[0]['COMMENTS'];
                         if(Input::has(str_replace('.','_',$value)))
                         {
                             $res2 = $this->getResult($this->queryDB("select o.containerid from ordtask o inner join orders ord on ord.id=o.ordersid where ord.apprsts!='R' and ord.folderno='$folderno' and ord.panel='$value'"));
@@ -346,13 +348,12 @@ class MainController extends DB
                         $costA = $res[0]['PRICE']*(100-$dis2)/100;
                         $query = "insert into orders(discount, loguser, folderno, serviceid, price, cost) VALUES ($dis2,'".\Session::get('login')."', '$folderno', ".$res[0]['ID'].",".$res[0]['PRICE'].", $costA )";
                         $res = $this->queryDB($query);
-
                     }
                 }
-                if(isset($c) && $c=='OK'){
-                    $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
-                    $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes',$folderno)";
-                    $this->queryDB($query);
+            if(isset($c) && $c=='OK'){
+                $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
+                $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes','$folderno')";
+                $this->queryDB($query);
                     echo "<script>$('#folderno').html('" . $folderno . "');</script>";
                     echo "<img style=\"vertical-align: inherit; margin:0px; border:0\" src=\"images/ok.jpg\" /><b>Заявка была успешно сохранена под номером #" . $folderno . "</b>";
                 }
@@ -393,7 +394,7 @@ class MainController extends DB
     public function page49()
     {
         if(Input::has('folderno')){
-            $this->queryDB("update folders set apprsts='L' where folderno='".Input::get('folderno')."'");
+            $this->queryDB("update folders set apprsts='L', regdate=CURRENT_TIMESTAMP where folderno='".Input::get('folderno')."'");
         }
         $proc = $this->getProc();
         $a = [];

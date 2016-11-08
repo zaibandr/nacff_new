@@ -26,7 +26,7 @@
                     <td>{{$val['DEPT']}}</td>
                     <td>{{$val['DESCRIPTION']}}</td>
                     <td><a href="{{url('page68/'.$val['ID'])}}">Прайс</a></td>
-                    <td></td>
+                    <td><a href="{{url('page68/'.$val['ID'])}}">Редактировать</a></td>
                 </tr>
                 @endforeach
             </tbody>

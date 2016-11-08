@@ -69,19 +69,19 @@
                             <tr>
                                 <td>
                                     <div style="margin-bottom:2%; margin-left: 10%; margin-top:1%; line-height: 25px; " class="{{str_replace('.','',$key)}}">
-                                        <table width="100%" id="b">
+                                        <table width="100%" id="b" class="table-bordered">
                                             <tr>
-                                                <th>Исследование</th>
-                                                <th>Результат</th>
-                                                <th>Предельные значения</th>
-                                                <th>Ед. изм.</th>
+                                                <th width="70%" style="padding-left: 2%">Исследование</th>
+                                                <th width="10%" style="padding-left: 2%; padding-right: 2%">Результат</th>
+                                                <th width="10%" style="padding-left: 2%; padding-right: 2%">Предельные значения</th>
+                                                <th width="10%" style="padding-left: 2%; padding-right: 2%">Ед. изм.</th>
                                             </tr>
                                             @for($i=0; $i<count($v['ANALYTE']);$i++)
                                                 <tr style="background: @if($v['STATUS'][$i]=='O') rgba(204, 115, 87, 0.28); @endif">
-                                                    <td>{{$v['ANALYTE'][$i]}}</td>
-                                                    <td>{{$v['FINALRESULT'][$i]}}</td>
-                                                    <td>{{$v['CHARLIMITS'][$i]}}</td>
-                                                    <td>{{$v['UNIT'][$i]}}</td>
+                                                    <td style="padding-left: 2%">{{$v['ANALYTE'][$i]}}</td>
+                                                    <td style="padding-left: 2%; padding-right: 2%">{{$v['FINALRESULT'][$i]}}</td>
+                                                    <td style="padding-left: 2%; padding-right: 2%">{{$v['CHARLIMITS'][$i]}}</td>
+                                                    <td style="padding-left: 2%; padding-right: 2%">{{$v['UNIT'][$i]}}</td>
                                                 </tr>
                                             @endfor
                                         </table>

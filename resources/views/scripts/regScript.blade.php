@@ -7,7 +7,7 @@
     var max=0;
     var rules = [];
     var kp = 0;
-    var kpMas = ['[10.100]','[12.100]'];
+    var kpMas = ['[46.100]','[46.101]','[46.105]'];
     $(function ()
     {
         var form = $("#RegAll");
@@ -92,13 +92,15 @@
                             tabl = "<tr><th>Код панели</th><th>Наименование</th><th>Цена</th></tr>";
                             $("#orderP table").append(tabl);
                             for (var i = 1; i < (b.length - 2); i += 3) {
-                                if(kpMas.indexOf(b[i])!==-1)
-                                    kp=1;
+                                if(kpMas.indexOf($.trim(b[i]))!==-1) {
+                                    kp = 1;
+                                }
                                 tabl = "<tr><td>" + b[i] + "</td><td>" + b[i + 1] + "</td><td>" + b[i + 2] + "</td></tr>";
                                 $("#orderP table").append(tabl);
                             }
                             tabl = "<tr><td></td><td style='text-align: right; color: darkred;'><b>Стоимость с учетом скидки</b></td><td><b>" + $('#cost').val() + "</b></td></tr>";
                             $("#orderP table").append(tabl);
+                            //console.log(kp);
                         }
                     Rshow('phone');
                     Rshow('namepatr');
@@ -194,7 +196,7 @@
                     $('#cost').val(oldcost*(100-max)/100);
                     $("#tree-source").dynatree({
                         initAjax: {
-                            url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode=<?php echo Session::get('clientcode');?>&t=1"
+                            url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&t=1"
                         },
                         ajaxDefaults: {
                             timeout: 0
@@ -251,13 +253,13 @@
                         },
                         onLazyRead: function (node) {
                             node.appendAjax({
-                                url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode=<?php echo Session::get('clientcode')."&";?>t=1",
+                                url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&t=1",
                                 data: {"p": node.data.id, "g": node.data.parent}
                             });
                         }
                     });
                     $("#searchp").autocomplete({
-                        source: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode=<?php echo Session::get('clientcode')."&";?>s=1",
+                        source: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&s=1",
                         minLength: 2,
                         search: function (event, ui) {
                             this.value = this.value.replace(",", ".");
@@ -323,7 +325,7 @@
         });
         var projects = [<?=$patients?>];
         $( "#surname" ).autocomplete({
-                    minLength: 1,
+                    minLength: 3,
                     source: projects,
                     select: function( event, ui ){
                     //console.log(ui);
@@ -466,7 +468,7 @@
         event = event || window.event //For IE
         if (event == undefined) { event = window.event; }
         if (event.keyCode == 13 && o.value!='') {
-            $.get("app/Http/Controllers/tree.php?dept=" + dept + "&clientcode=<?php echo Session::get('clientcode')."&";?>a=1", {"term":o.value.replace(",",".") }, function(data) {
+            $.get("app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&a=1", {"term":o.value.replace(",",".") }, function(data) {
                 if (data!="") {
                     var obj = jQuery.parseJSON(data);
                     var title = obj.label;
@@ -492,10 +494,12 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        /*if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
-            alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
-            return false;
-        }*/
+        if(kp==1){
+            if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
+                alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
+                return false;
+            }
+        }
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {

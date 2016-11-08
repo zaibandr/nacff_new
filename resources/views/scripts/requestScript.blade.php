@@ -91,12 +91,13 @@
     });
     function formReset(){
         var now = new Date();
-
-        var day = ("0" + (now.getDate()-3)).slice(-2);
+        var last = new Date(now.getTime()-3*3600*24*1000);
+        var day = ("0" + (last.getDate())).slice(-2);
         var day2 = ("0" + (now.getDate())).slice(-2);
-        var month = ("0" + (now.getMonth() + 1)).slice(-2);
-        var yesterday = day+'.'+month+'.'+now.getFullYear();
-        var today = day2+'.'+month+'.'+now.getFullYear();
+        var month = ("0" + (last.getMonth() + 1)).slice(-2);
+        var month2 = ("0" + (now.getMonth() + 1)).slice(-2);
+        var yesterday = day+'.'+month+'.'+last.getFullYear();
+        var today = day2+'.'+month2+'.'+now.getFullYear();
 
         $('#date_st').val(yesterday);
         $('#date_en').val(today);

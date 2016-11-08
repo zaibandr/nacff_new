@@ -73,7 +73,9 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                             $img.="<img src='/nacff_new/images/".$iVal."' />";
                         }
                     }
-                    $a[] = ['prean'=>$row[5], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . '  (' . $row[1] . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $row[1], 'ncost'=>$row[2]];
+                    $ncost = isset($row[2])?$row[2]:0;
+                    $cost = isset($row[1])?$row[1]:0;
+                    $a[] = ['prean'=>$row[5], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . '  (' . $cost . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $cost, 'ncost'=>$ncost];
                 }
             }
         } else {
@@ -147,7 +149,9 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                         $img.="<img src='/nacff_new/images/".$iVal."' />";
                     }
                 }
-                $a[] = ['prean'=>$row[5], 'color'=>'','cost' => $row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$row[1] ];
+                $cost = isset($row[2])?$row[2]:0;
+                $ncost = isset($row[1])?$row[1]:0;
+                $a[] = ['prean'=>$row[5], 'color'=>'','cost' => $cost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$ncost ];
             }
             $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where p.status='A' and s.status='A' and p.id=".$_GET['dept']." and s.code like '%".$_GET['term']."%'";
             $stmt = ibase_query($db,$query);
@@ -199,7 +203,9 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                         $img.="<img src='/nacff_new/images/".$iVal."' />";
                     }
                 }
-                $a = ['prean'=>$row[5],'color'=>'','cost' => $row[1], 'ncost'=>$row[2], 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] .'  ('.$row[1].')'.$mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
+                $ncost = isset($row[2])?$row[2]:0;
+                $cost = isset($row[1])?$row[1]:0;
+                $a = ['prean'=>$row[5],'color'=>'','cost' => $cost, 'ncost'=>$ncost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] .'  ('.$cost.' руб.)'.$mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
             }
             if(empty($a)) {
                 $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and p.id=".$_GET['dept']." and s.code ='".$_GET['term']."'";

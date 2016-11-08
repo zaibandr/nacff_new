@@ -29,8 +29,10 @@ class AdminDep extends DBController
     public function create()
     {
         $price = $this->getDeptPrice();
+        $nets = $this->getNets();
         return \View::make('adminPanel.newDept')->with([
-            'prices'=>$price
+            'prices'=>$price,
+            'nets' => $nets
         ]);
     }
 
@@ -45,9 +47,10 @@ class AdminDep extends DBController
         //dd(\Input::all());
         $lpu = (int)trim($request->lpu);
         $name = mb_strtoupper(trim($request->name));
-        $desc = addslashes(trim($request->name));
+        $desc = addslashes(trim($request->desc));
         $priceId = $request->price;
-        $query = "insert into departments(deptcode,dept,description,status) VALUES ('$lpu','$name','$desc','A') returning id";
+        $netId = isset($request->net)?$request->net:'null';
+        $query = "insert into departments(deptcode,dept,description,status,net_id) VALUES ('$lpu','$name','$desc','A', $netId) returning id";
         $deptId = $this->getResult($this->queryDB($query));
         $deptId = $deptId[0]['ID'];
         if(isset($request->dateend))

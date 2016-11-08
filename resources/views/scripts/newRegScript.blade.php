@@ -328,7 +328,7 @@
             },
             onFinished: function (event, currentIndex)
             {
-                submitRegForm('page45?save=1')
+                submitRegForm("{{url('page45?save=1')}}");
                 //alert("Submitted!");
             }
         });
@@ -340,7 +340,7 @@
         });
         var projects = [<?=$patients?>];
         $( "#surname" ).autocomplete({
-            minLength: 1,
+            minLength: 3,
             source: projects,
             select: function( event, ui ){
                 //console.log(ui);
@@ -510,10 +510,10 @@
     function validateFrm() {
         var b = true;
         var o = true;
-        if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
-            alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
-            return false;
-        }
+        //if($('#n_p').val()=='' || $('#s_p').val()=='' || $('#issued').val()=='' || $('#namepatr').val()=='' || $('#kk').val()=='') {
+        //    alert('Необходимо заполнить поля: НОМЕР И СЕРИЯ ПАСПОРТА, КЕМ И КОГДА ВЫДАН, ФИО, КОД ПОДРАЗДЕЛЕНИЯ');
+        //    return false;
+        //}
         $("#tree-dest").dynatree("getRoot").visit(function (node) {
             if (!node.data.isFolder)
                 if (($("#tree-dest #m" + node.data.id).val() == '1') && ($("input#comments").val() == '')) {

@@ -33,7 +33,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4 col-lg-offset-8" style="margin-top: 20px">
-                    <a href="{{url("page0022?folderno=$id")}}" ><button class="btn btn-info"> Анализы взяты!</button></a>
+                    <a href="{{url("page49?folderno=$id")}}" ><button class="btn btn-info"> Анализы взяты!</button></a>
                 </div>
             </div>
         </div>

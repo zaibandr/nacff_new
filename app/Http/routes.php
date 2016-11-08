@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page69','MenuSettings',array('only'=>['index','store', 'edit']));
         Route::resource('page70','PanelSettings',array('only'=>['index','store','create','destroy']));
         Route::resource('page71','TestSettings',array('only'=>['index','edit']));
+        Route::resource('page72','NetController',['only'=>['index','edit','create','store','destroy']]);
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
     Route::get('/', function () {
@@ -73,7 +74,9 @@ Route::any('/logout', function () {
     Session::forget('menu');
     Session::forget('isAdmin');
     Session::forget('clientid');
+    Session::forget('clientcode');
     Session::forget('dept');
+    Session::forget('name');
     return Redirect::route('main');
 });
 Route::group(['middleware' => ['web']], function () {
