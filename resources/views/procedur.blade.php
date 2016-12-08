@@ -3,6 +3,9 @@
     <link href="{{asset('resources/assets/css/procedure.css')}}" rel="stylesheet">
     <div id="procedure">
         <h1>ПРОЦЕДУРНЫЙ КАБИНЕТ</h1>
+        @if(count($proc)<1)
+            <i>Все аназизы взяты!</i>
+        @endif
         @foreach($proc as $id=>$val)
         <div class="procs">
             <p>Пациент: <b>{{$val['NAME']}}</b></p>

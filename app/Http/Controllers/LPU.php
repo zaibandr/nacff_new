@@ -128,8 +128,8 @@ class LPU extends DBController
                 $this->queryDB("insert into userdept(dept,usernam) VALUES ((select d.id from departments d where d.dept='$val'), '$request->name')");
             }
         }
-        //$role = ($request->role=='M')?7:15;
-        //$this->queryDB("update userroles set roleid=$role where usernam = '$request->name'");
+        $role = ($request->role=='M')?7:15;
+        $this->queryDB("update userroles set roleid=$role where usernam = '$request->name'");
         return redirect()->action('LPU@index');
     }
 

@@ -34,7 +34,10 @@ class DBController extends Controller
         $query.="where u.status='A' and u.usernam='".$l."'";
         $result = $this->queryDB($query);
         $a =  $this->getResult($result);
-        $a[0]['PASSWORD2'] = hash_equals($a[0]['PASSWORD2'],$p);
+        if(!empty($a))
+            $a[0]['PASSWORD2'] = hash_equals($a[0]['PASSWORD2'],$p);
+        else
+            $a[] = ['PASSWORD2' => false];
         return $a;
     }
 
@@ -84,7 +87,7 @@ class DBController extends Controller
         $query = "select a.testcode, a.analyte, a.units from analytes a ORDER by a.sorter";
         return $this->getResult($this->queryDB($query));
     }
-    function getTests($testname){
+    function getTests($testname=''){
         $query = "SELECT a.id, a.testname, a.quantity from tests a where a.testname like '%$testname%' order by a.testname";
         return $this->getResult($this->queryDB($query));
     }
@@ -394,9 +397,17 @@ class DBController extends Controller
         $query.= "left join MATTYPES m on m.ID=fc.MATTYPEID ";
         $query.= "left join CONTGROUPS c on c.ID=fc.CONTAINERTYPEID ";
         $query.= "left join PANELS p on p.CODE=o.PANEL ";
-        $query.= "where o.STATUS!='R' and f.apprsts='D' and f.clientid=".\Session::get('dept');
+        $query.= "where o.APPRSTS!='R' and f.apprsts='D' and f.clientid=".\Session::get('dept');
         $query.= "order by p.panel";
         return $this->getResult($this->queryDB($query));
+    }
+
+    public function getCourier()
+    {
+        $query = "select c.contgroup from foldercontainers f inner join contgroups c on c.id=f.containertypeid ";
+        $query.= "inner join folders fl on fl.folderno=f.folderno where fl.apprsts='K' and fl.clientid=".\Session::get('dept');
+        $res = $this->getResult($this->queryDB($query));
+        return $res;
     }
 
     public function editReg($id)

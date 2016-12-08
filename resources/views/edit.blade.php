@@ -81,9 +81,9 @@
                             <select id="f_c" name="f_c" class="form-control">
                                 <option value="">-</option>
                                 <option value="M" {{$folders[0]['PREGNANCY']=='M'?'selected':''}}>Менопауза</option>
-                                <option value="L" {{$folders[0]['PREGNANCY']=='L'?'selected':''}}>Лютеин</option>
+                                <option value="L" {{$folders[0]['PREGNANCY']=='L'?'selected':''}}>Лютеиновая фаза</option>
                                 <option value="O" {{$folders[0]['PREGNANCY']=='O'?'selected':''}}>Овуляция</option>
-                                <option value="F" {{$folders[0]['PREGNANCY']=='F'?'selected':''}}>Фоликулин</option>
+                                <option value="F" {{$folders[0]['PREGNANCY']=='F'?'selected':''}}>Фоликулиновая фаза</option>
                             </select>
                         </div>
                         <div class="col-md-3">

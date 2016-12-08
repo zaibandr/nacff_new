@@ -80,9 +80,9 @@
                             <select id="f_c" name="f_c" class="form-control">
                                 <option value="">-</option>
                                 <option value="M">Менопауза</option>
-                                <option value="L">Лютеин</option>
+                                <option value="L">Лютеиновая фаза</option>
                                 <option value="O">Овуляция</option>
-                                <option value="F">Фоликулин</option>
+                                <option value="F">Фоликулиновая фаза</option>
                             </select>
                         </div>
                         <div class="col-md-3">

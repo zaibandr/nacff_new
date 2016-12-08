@@ -20,19 +20,21 @@ class InfoController extends DBController
     {
         $error = ''; $count = 0; $key = '';
         $re = '/<style type="text\/css">[a-zA-Z0-9:;.\s\(\)\-\,{}]*<\/style>/';
+        $request = NULL;
         if(Input::has('search')) {
             $sphinx = new SphinxSearch();
             $string = "'*" . trim(Input::get('search')) . "*'";
             $result = $sphinx->search($string)->get();
-            $error = "Результат поиска пуст";
             $b = [];
             if (isset($result['matches'])) {
                 $count = count($result['matches']);
                 foreach ($result['matches'] as $k => $v) {
-                    $key .= "$k,";
+                    $key[]= $k;
                 }
-                $key = substr($key,0,-1);
+                //$key = substr($key,0,-1);
                 $request = Letter::search($key)->active()->paginate(3);
+            } else {
+                $error = "Результат поиска пуст";
             }
         } else {
             $request = Letter::active()->paginate(3);

@@ -11,10 +11,10 @@
                 {!! Form::submit('Поиск',['class'=>'btn btn-primary']) !!}
                 {!! Form::close() !!}
             </div>
-            <div class="col-lg-12" style="text-align: center; margin-top: 1%;">
-                {!! $res->render() !!}
-            </div>
-            @if(isset($error))
+            @if(isset($res))
+                <div class="col-lg-12" style="text-align: center; margin-top: 1%;">
+                    {!! $res->render() !!}
+                </div>
                 @foreach($res as $val)
                     <div class="col-lg-12">
                         <div class="row" style="padding:1%; border: 1px solid grey; border-radius: 15px; background: rgba(168, 218, 226, 0.45);">
@@ -28,10 +28,8 @@
             </div>
                 @endforeach
             @else
-                <div class="col-lg-12">
-                    <pre>
-                        <b style="color: #2b669a">{{$error}}</b>
-                    </pre>
+                <div class="col-lg-12 alert-danger" style="margin-top: 2%; text-align: center">
+                    <b style="color: #2b669a">{{$error}}</b>
                 </div>
                 @endif
         </div>

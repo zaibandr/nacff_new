@@ -273,24 +273,26 @@ class Test extends DBController
         /**
          * Вывод тестов в excel
          */
-/*                Excel::create('tests', function ($excel){
+                Excel::create('tests', function ($excel){
            $excel->sheet('first', function ($sheet){
-               $tests = $this->getResult($this->queryDB("SELECT a.id, a.testname, a.quantity from tests a where a.outsource='Y' order by a.testname"));
+               $tests = $this->getResult($this->queryDB("SELECT a.ID, a.TESTNAME, a.QUANTITY FROM tests a where a.OUTSOURCE='N' and a.QUANTITY is null order by a.id"));
                $sheet->setOrientation('landscape');
                $sheet->setPageMargin(0.25);
                $sheet->setWidth(['A'=>20,'B'=>150]);
                $sheet->row(1,['ID','Название','Количество, мкл']);
                $sheet->rows($tests);
            });
-        })->export('xls');*/
+        })->export('xls'); 
         /**
          * Копирование колонки аутсорс из lims.tests -> rc.tests
          */
-        /*  $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
-        $query = "select id,outsource from tests";
+/*          $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
+        $query = "select code,panelcatid from panels";
         $stmt = ibase_query($lims,$query);
         while($row = ibase_fetch_assoc($stmt)){
-            $query = "update tests set outsource='".$row['OUTSOURCE']."' where id =".$row['ID'];
+            if(is_null($row['PANELCATID']))
+                $row['PANELCATID'] = 'null';
+            $query = "update panels set pgrp=".$row['PANELCATID']." where code ='".$row['CODE']."'";
             $this->queryDB($query);
         }*/
         return \View::make('test')->with([

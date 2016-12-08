@@ -6,19 +6,20 @@
     <link href="{{asset('resources/assets/css/requests.css')}}" rel="stylesheet">
     @include('scripts.requestScript')
     <div id="requests">
-        <h1>СПИСОК НАПРАВЛЕНИЙ</h1>
         <div class="row">
-            <div class="col-lg-12">
-                <div class="btn-group">
-                    <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#filter"><span class="glyphicon glyphicon-cog" style="margin-right: 5px"></span>Фильтр</button>
-                    <button class="btn btn-default btn-lg" id="print" onclick="printAll()"><span class="glyphicon glyphicon-print" style="margin-right: 5px"></span>Печать</button>
-                    <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#excel"><span class="glyphicon glyphicon-floppy-save" style="margin-right: 5px"></span>Скачать</button>
-                    <button class="btn btn-default btn-lg" id="popover" type="button"><i class="fa fa-filter"></i>Фильтр столбцов</button>
-
-                    <div class="hidden">
-                        <div id="popover-target"></div>
-                    </div>
+            <div class="col-lg-4">
+                <h1>СПИСОК НАПРАВЛЕНИЙ</h1>
+            </div>
+            <div class="col-lg-8" style="margin: 5% 0 2% 0; text-align: right">
+                <button class="btn btn-default btn-lg" id="popover" type="button"><i class="fa fa-filter"></i>Фильтр столбцов</button>
+                <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#filter"><span class="glyphicon glyphicon-cog" style="margin-right: 5px"></span>Фильтр</button>
+                <button class="btn btn-default btn-lg" id="print" onclick="printAll()"><span class="glyphicon glyphicon-print" style="margin-right: 5px"></span>Печать</button>
+                <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#excel"><span class="glyphicon glyphicon-floppy-save" style="margin-right: 5px"></span>Скачать в Excel</button>
+                <div class="hidden">
+                    <div id="popover-target"></div>
                 </div>
+            </div>
+            <div class="col-lg-12" style="float: left">
                 <div class="pager">
                     Страница: <select class="gotoPage"></select>
                     <span class="first glyphicon glyphicon-step-backward" alt="First" title="First page" ></span>
@@ -33,7 +34,17 @@
                         <option value="40">40</option>
                     </select>
                 </div>
-                <table class="tablesorter bootstrap-popup">
+                <style>
+                    table.tablesorter tbody tr.normal-row td {
+                        background: #888;
+                        color: #fff;
+                    }
+                    table.tablesorter tbody tr.alt-row td {
+                        background: #555;
+                        color: #fff;
+                    }
+                </style>
+                <table class="tablesorter bootstrap-popup table-striped">
                     <thead>
                     <tr>
                         <th data-priority="critical">Статус</th>
@@ -138,7 +149,7 @@
                                                 <option value="T" @if(Input::has('status') && Input::get('status')=='T') {{'selected'}} @endif>Выполнен</option>
                                                 <option value="L" @if(Input::has('status') && Input::get('status')=='L') {{'selected'}} @endif>Зарегистрирован</option>
                                                 <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Черновик</option>
-                                                <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Отменен</option>
+                                                <option value="R" @if(Input::has('status') && Input::get('status')=='R') {{'selected'}} @endif>Отменен</option>
                                                 <option value="K" @if(Input::has('status') && Input::get('status')=='K') {{'selected'}} @endif>Курьер</option>
                                                 <option value="A" @if(Input::has('status') && Input::get('status')=='A') {{'selected'}} @endif>Выполняется</option>
                                                 <option value="P" @if(Input::has('status') && Input::get('status')=='P') {{'selected'}} @endif>Отправлен</option>

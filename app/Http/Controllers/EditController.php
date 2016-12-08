@@ -126,7 +126,7 @@ class EditController extends DBController
                 $query = "select p.panel from prices p inner join pricelists pr on pr.id=p.pricelistid where pr.status='A' and p.panel='$value' and pr.id=" . $priceid;
                 $res = $this->getResult($this->queryDB($query));
                 if (count($res) > 0) {
-                    $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
+                    $query = "select comments from ADD_PANEL_TEST('$folderno','$value','" . \Session::get('login') . "',$dis2)";
                     $stmt = $this->getResult($this->queryDB($query));
                     if(Input::has(str_replace('.','_',$value)))
                     {

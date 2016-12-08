@@ -17,13 +17,13 @@ class MailController extends DBController
         $folderno = $id;
         $c = '';
         if(!(\Session::has('isAdmin') && \Session::get('isAdmin')==1)) {
-            $stmt = $this->getDepts();
-            $res = ibase_fetch_row($stmt);
+            $res = $this->getDepts();
+            //$res = ibase_fetch_row($stmt);
             if ($res === false) {
                 echo "Error in executing query.<br/>";
                 die(0);
             }
-            $c = $res[0];
+            $c = $res;
         } else {
             $c = $this->getDepts();
         }

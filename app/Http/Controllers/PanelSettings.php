@@ -29,7 +29,7 @@ class PanelSettings extends DBController
     public function create(Request $request)
     {
         $cont = 'cont1';
-        dd($request->all);
+        //dd($request->all);
         $panel = trim(str_replace(',','.',$request['code']));
         $name = trim($request['name']);
         $query = "delete from panel_containers where panel='".$request['code']."'";
@@ -80,8 +80,8 @@ class PanelSettings extends DBController
         //dd($request['samp']);
         $panel = trim(str_replace(',','.',$request['code']));
         $name = trim($request['name']);
-        $query = "delete from panel_containers where panel='$panel'";
-        $this->queryDB($query);
+        //$query = "delete from panel_containers where panel='$panel'";
+        //$this->queryDB($query);
         $prean = trim($request['prean']);
         $samp = trim($request['samp']);
         $query = "select id from preanalytics where description='$prean'";
@@ -96,7 +96,12 @@ class PanelSettings extends DBController
             $query = "insert into samplingrules(samplingrule) VALUES ('$samp') returning id";
             $Sid = $this->getResult($this->queryDB($query));
         }
-        $j=1;
+	$query = "update panel_containers set preanalitic_id=".$id[0]['ID'].", samplingsrules_id=".$Sid[0]['ID']." where panel='$panel'";
+	$this->queryDB($query);
+	if($request->get('checked')=='yes')
+            $this->queryDB("update panels set checked='".\Session::get('login')."' where code='$panel'");
+        return \Redirect::route('page70.index');
+        /* $j=1;
         while($j<10){
             if($request->has('cont'.$j)) {
                 $container = (trim($request['cont'.$j]));
@@ -121,7 +126,7 @@ class PanelSettings extends DBController
                 }
             }
             $j++;
-        }
+        } */
         if($request->get('checked')=='yes')
             $this->queryDB("update panels set checked='".\Session::get('login')."' where code='$panel'");
         return \Redirect::route('page70.index');

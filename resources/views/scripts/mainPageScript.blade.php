@@ -7,12 +7,25 @@
         $('#menu ul').each(function(){
             var i=0;
             $(this).find("li").each(function(){
-                if($(this).find("a").attr("href")==window.location.href)
+                if($(this).find("a").attr("href")==window.location.href){
+                    $(this).addClass('active-row');
                     i=1;
+                }
             })
             if(i==1)
                 $(this).show();
         });
         $("#menu li span").click(function() { $(this).next().slideToggle("normal"); });
+        $(window).scroll(function() {
+            if($(this).scrollTop() != 0) {
+                $('#scrollup').fadeIn();
+            } else {
+                $('#scrollup').fadeOut();
+            }
+        });
+        $('#scrollup').click(function() {
+            $('body,html').animate({scrollTop:0},800);
+
+        });
     });
 </script>

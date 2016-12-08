@@ -22,8 +22,8 @@ Route::get('phpinfo',function(){
     return phpinfo();
 });
 Route::get('messages','InfoController@index');
-Route::get('integration','InfoController@index');
-Route::get('help','InfoController@index');
+Route::get('integration','IntegrationController@index');
+Route::get('help','HelpController@index');
 Route::group(['middleware' => 'auth'], function () {
     Route::group(['middleware' => 'isAdmin'], function () {
         Route::resource('page66','LPU');
@@ -43,6 +43,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('page47', 'DiscountController', array('except'=>['show', 'create']));
     Route::resource('page6', 'UserController', array('except'=>['show', 'create']));
     Route::resource('page20', 'DepController', array('except'=>['show', 'create']));
+    Route::resource('page73', 'CourierController', array('only'=>['index', 'store']));
     foreach ($arr as $v) {
         Route::any("page$v", ['as' => "page$v", 'uses' => "MainController@page$v"]);
     }

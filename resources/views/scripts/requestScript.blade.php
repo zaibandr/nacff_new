@@ -36,7 +36,7 @@
                     widthFixed: true,
                     dateFormat: 'dd.mm.yy',
                     headers: { 4: { sorter: 'shortDate'} },
-                    widgets: ['zebra', 'filter', 'columnSelector'],
+                    widgets: ['filter', 'columnSelector'],
                     widgetOptions: {
                         // target the column selector markup
                         columnSelector_container : $('#popover-target'),
@@ -83,7 +83,7 @@
                 .tablesorterPager(pagerOptions);
         $('#popover')
                 .popover({
-                    placement: 'right',
+                    placement: 'left',
                     html: true, // required if content has HTML
                     content: $('#popover-target')
                 });

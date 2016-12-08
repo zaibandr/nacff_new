@@ -46,8 +46,6 @@ class PrintController extends DBController
                         $res['cgroup'][] = $val['CONTGROUP'];
                         $res['due'][] = $val['DUE'];
                     }
-
-
                     $view = \View::make('pdfs.act')->with([
                         'id' => $id,
                         'act' => $res

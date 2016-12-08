@@ -4,6 +4,10 @@
     background: rgba(233, 237, 240, 0.42);
     overflow-x: auto;
 }
+button.btn.btn-default.btn-lg:hover{
+    background: #49B1C2;
+    color: white;
+}
 .tablesorter
 {
     overflow: auto;
@@ -36,4 +40,8 @@
 .arrow
 {
     top:7% !important;
+}
+input[type=checkbox].prn-cbox {
+    width: 20px;
+    height: 20px;
 }

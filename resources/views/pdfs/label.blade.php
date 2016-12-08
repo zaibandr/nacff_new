@@ -23,7 +23,7 @@
         <tr align="center" >
             <td style="padding-top: 10px"><b>{{Session::get('clientcode')}}</b></td>
             <td style="padding-top: 10px; font-size: 7px"><b>{{substr($val['CONTGROUP'],0,20)}}</b></td>
-            <td style="padding-top: 10px"><b>{{$val['CONTAINERNO']}}</b></td>
+            <td style="padding-top: 10px"><b>{{substr($val['CONTAINERNO'],0,10)}}</b></td>
             </tr>
         <tr>
             <td colspan="3" align="center" style="padding-left: 40px;"><? echo DNS1D::getBarcodeHTML($val['CONTAINERNO'], "C128",1.4,65); ?></td>
@@ -39,6 +39,6 @@
 <script type="text/javascript">
     var pp = this.getPrintParams();
     pp.interactive = pp.constants.interactionLevel.silent;
-    pp.printerName = "TTP225";
+    pp.printerName = "NAKFF";
     this.print(pp);
 </script>

@@ -60,7 +60,7 @@ html, body
 }
 .menu
 {
-    margin-left: -3%;
+    margin-left: 5%;
     margin-right: 6%;
     background: white;
     box-shadow: 0 0 15px 5px rgba(0,0,0,0.1);
@@ -70,18 +70,19 @@ html, body
     -moz-box-shadow: 0 0 15px 5px rgba(0,0,0,0.1);
 }
 ul#menu {
-    text-align: center;
+    text-align: left;
     padding: 5%;
 }
 #menu li span
 {
     cursor: pointer;
-    font-size: 1.2em;
+    font-size: 1em;
     width: 100%;
     height: 100%;
     display: block;
     padding-top: 5%;
     padding-bottom: 5%;
+    padding-left: 5%;
     background: #49b1c2;
 }
 #menu > li
@@ -99,26 +100,44 @@ ul#menu {
 #menu li ul
 {
     display: none;
-    margin-left: 20px;
+    //margin-left: 20px;
 }
 #menu li li
 {
-    margin-top: 15px;
+    margin-top: 1%;
     list-style: none;
+}
+#menu li li:last-child a
+{
+    box-shadow: 0 -15px 25px -10px white inset;
+    -moz-box-shadow: 0 -15px 25px -10px white inset;
+    -webkit-box-shadow: 0 -15px 25px -10px white inset;
+    -o-box-shadow: 0 -15px 25px -10px white inset;
+}
+#menu li li:first-child a
+{
+    box-shadow: 0 15px 25px -10px white inset;
+    -moz-box-shadow: 0 15px 25px -10px white inset;
+    -webkit-box-shadow: 0 15px 25px -10px white inset;
+    -o-box-shadow: 0 15px 25px -10px white inset;
 }
 #menu li li a
 {
     display: block;
-    padding-top: 5%;
-    padding-bottom: 5%;
-    font-size: 1.2em;
+    padding: 5% 10%;
+    font-size: 1em;
     font-weight: bold;
-    background: rgba(73, 177, 194, 0.48);
+    background: rgba(73, 177, 194, 0.2);
+}
+.active-row a
+{
+    border-left: 10px solid #49B1C2;
+    background: rgba(90, 173, 187, 0.37) !important;
 }
 #menu li li a:hover
 {
     text-decoration: none;
-    background: rgba(73, 177, 194, 0.8);
+    background: rgba(73, 177, 194, 0.4);
 }
 
 .cont
@@ -131,6 +150,7 @@ ul#menu {
     -moz-box-shadow: 0 0 15px 5px rgba(0,0,0,0.1);
     background: white;
     padding: 15px;
+    right: 1%;
 }
 #Login, #out
 {
@@ -195,4 +215,16 @@ ul#menu {
     padding: 2%;
     background: rgba(233, 237, 240, 0.42);
     margin-bottom: 3%;
+}
+#scrollup {
+    position: fixed; /* фиксированная позиция */
+    opacity: 0.4; /* прозрачность */
+    padding: 15px 10px 10px; /* отступы */
+    left: 1%; /* отступ слева */
+    bottom: 1%; /* отступ снизу */
+    display: none; /* спрятать блок */
+    cursor: pointer;
+}
+#scrollup:hover {
+    opacity: 0.8;
 }

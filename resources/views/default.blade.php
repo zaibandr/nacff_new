@@ -49,7 +49,7 @@
         </div>
     </div>
     <div class="row" style="margin-top: 1%;">
-        <div class="col-md-offset-1 col-md-2">
+        <div class="col-md-3">
             <div class="menu">
                 <ul id="menu">
                     <?
@@ -79,7 +79,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-md-8 cont">
+        <div class="col-md-9 cont">
             @include('scripts.mainPageScript')
             @yield('content')
         </div>
@@ -90,10 +90,12 @@
         <div class="col-lg-12">
             <p>&copy; НАКФФ, 2007-{{date('Y')}} laboratory@nacpp.ru <br>
                 Россия, 115088, Москва, ул. Угрешская, д.2, стр. 8. <br>
-                +7 495  259-44-44, схема проезда</p>
+                +7 495  259-44-44<br> Тех.поддержка it@nacpp.ru
+            </p>
         </div>
     </div>
 </div>
+<div id="scrollup"><i class="fa fa-sort-asc fa-4x"></i></div>
 </body>
 
 

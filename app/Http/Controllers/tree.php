@@ -31,12 +31,11 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                 }
             } else {
                 $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-                $query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
                 $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
                 $query .= "inner join PRICELISTS pl on pl.id=p.pricelistid ";
                 $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
                 $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
-                $query .= "where pl.status='A' and pg.id=" . $_GET['p'] . " and p.pricelistid=" . $_GET['dept'];
+                $query .= "where pl.status='A' and pan.pgrp=" . $_GET['p'] . " and p.pricelistid=" . $_GET['dept'];
                 $stmt = ibase_query($db, $query);
                 while ($row = ibase_fetch_row($stmt)) {
                     $row[3] = str_replace('  ',' ',$row[3]);
@@ -70,7 +69,7 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                     if(isset($row[6])){
                         $imgs = explode(";",$row[6]);
                         foreach($imgs as $iVal){
-                            $img.="<img src='/nacff_new/images/".$iVal."' />";
+                            $img.="<img src='images/".$iVal."' />";
                         }
                     }
                     $ncost = isset($row[2])?$row[2]:0;
@@ -107,7 +106,9 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
                 $a[1]['children'][] = [ "icon"=> "false", "title"=> "<i>Нет данных | N/A</i>", "id"=> 'none'];
             //print_r($a);
         }
+        if(isset($a))
         echo(json_encode($a, JSON_UNESCAPED_UNICODE));
+        else echo json_encode(['title'=>'<i>Нет панелей</i>']);
     }
     if(isset($_GET['s'])) {
         if (isset($_GET['term'])) {

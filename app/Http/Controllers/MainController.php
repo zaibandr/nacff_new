@@ -335,7 +335,7 @@ class MainController extends DB
                     $query = "select p.panel from prices p inner join pricelists pr on pr.id=p.pricelistid where p.panel='$value' and pr.id=".$priceid;
                     $res = $this->getResult($this->queryDB($query));
                     if(count($res)>0) {
-                        $query = "select comments from ADD_PANEL('$folderno','$value','" . \Session::get('login') . "',$dis2)";
+                        $query = "select comments from ADD_PANEL_TEST('$folderno','$value','" . \Session::get('login') . "',$dis2)";
                         $stmt = $this->getResult($this->queryDB($query));
                         $c = $stmt[0]['COMMENTS'];
                         if(Input::has(str_replace('.','_',$value)))
@@ -394,7 +394,9 @@ class MainController extends DB
     public function page49()
     {
         if(Input::has('folderno')){
-            $this->queryDB("update folders set apprsts='L', regdate=CURRENT_TIMESTAMP where folderno='".Input::get('folderno')."'");
+            $this->queryDB("update folders set apprsts='K', regdate=CURRENT_TIMESTAMP where folderno='".Input::get('folderno')."'");
+            $this->queryDB("insert into logs(log_time,theme, description) VALUES (CURRENT_TIMESTAMP ,'Взятие анализов','LPU-".\Session::get('clientcode').", folderno-".\Input::get('folderno')."')");
+            return \Redirect::to('page49');
         }
         $proc = $this->getProc();
         $a = [];

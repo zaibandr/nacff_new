@@ -256,6 +256,7 @@
                                 url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&t=1",
                                 data: {"p": node.data.id, "g": node.data.parent}
                             });
+                            console.log(node.data.id,node.data.parent);
                         }
                     });
                     $("#searchp").autocomplete({
