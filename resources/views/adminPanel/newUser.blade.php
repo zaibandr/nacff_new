@@ -36,6 +36,8 @@
                             <input type="radio" name="role" id="roleD" value="15" required>
                             <label for="roleM">Администратор</label>
                             <input type="radio" name="role" id="role" value="16" required>
+                            <label for="roleM">IT</label>
+                            <input type="radio" name="role" id="role" value="19" required>
                         </div>
                         <div class="modal-footer">
                             <a href="javascript:history.go(-1)" class="btn btn-default" >Отмена</a>

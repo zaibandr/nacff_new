@@ -2,10 +2,14 @@
 @section('content')
     <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
     <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
+    <link href="{{asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
     @include('scripts.deptAdminScript')
     <div id="lpu">
         <h1>Прайс-лист #{{$id}}</h1>
+        {!! Form::open(['method'=>'get', 'url'=>'page68/'.$id.'/edit', 'style'=>'margin:2% 0']) !!}
+        {!! Form::hidden('update', $id) !!}
+        {!! Form::submit('Обновить прайс', ['class'=>'btn btn-warning']) !!}
+        {!! Form::close() !!}
         <table class="tablesorter">
             <thead>
             <tr>

@@ -110,7 +110,7 @@
         $('#code').val(a.cells[0].innerHTML);
         $('#panel').val(a.cells[1].innerHTML);
         $('#cost').val(a.cells[2].innerHTML);
-        $('#ncost').val(a.cells[3].innerHTML);
+        $('#costn').val(a.cells[3].innerHTML);
         $('#due').val(a.cells[4].innerHTML);
     }
     </script>

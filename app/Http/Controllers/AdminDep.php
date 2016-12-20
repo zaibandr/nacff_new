@@ -44,8 +44,10 @@ class AdminDep extends DBController
      */
     public function store(Request $request)
     {
-        //dd(\Input::all());
+        //dd($request->all());
         $lpu = (int)trim($request->lpu);
+        while(strlen($lpu)<4)
+            $lpu = '0'.$lpu;
         $name = mb_strtoupper(trim($request->name));
         $desc = addslashes(trim($request->desc));
         $priceId = $request->price;
@@ -55,18 +57,25 @@ class AdminDep extends DBController
         $deptId = $deptId[0]['ID'];
         if(isset($request->dateend))
             $dateend = date('Y-m-d',strtotime($request->dateend));
-        else $dateend = date('Y-m-d',strtotime(time()+3600*24*365));
+        else $dateend = date('Y-m-d',time()+3600*24*365);
         if(isset($request->datestart))
             $datestart = date('Y-m-d',strtotime($request->datestart));
         else $datestart = date('Y-m-d');
         $query = "insert into pricelists(status,datebegin,dateend,by_user,dept) VALUES ('A','$datestart','$dateend','ADMIN',$deptId) returning id";
         $newPriceId = $this->getResult($this->queryDB($query));
         $newPriceId = $newPriceId[0]['ID'];
-        $query = "INSERT INTO PRICES (PRICELISTID, COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN) ";
-        $query.= "select $newPriceId,COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN from prices where PRICELISTID=$priceId";
-        if($this->queryDB($query))
-            return \Redirect::route('page68.index');
-
+        $db = ibase_connect("192.168.0.8:lims","sysdba","cdrecord");
+        $query = "select p.code, pr.cost from prices pr inner join pricelists ps on ps.id=pr.pricelistid ";
+        $query.= "inner join panels p on p.id=pr.panelid ";
+        $query.= "inner join clients c on c.id=ps.clientid where ps.status='A' and c.clientcode='$lpu'";
+        $stmt = ibase_query($db,$query);
+        while($res = ibase_fetch_assoc($stmt)){
+            $query = "INSERT INTO PRICES (PRICELISTID, COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN) ";
+            $query.= "select $newPriceId,COST, PANEL, COMMENTS,".$res['COST'].", MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN from prices ";
+            $query.= "where PRICELISTID=$priceId and panel='".$res['CODE']."'";
+            $this->queryDB($query);
+        }
+        return \Redirect::route('page68.index');
     }
 
     /**
@@ -104,6 +113,26 @@ class AdminDep extends DBController
             $query.= "pricelistid = (select id from pricelists where dept=$id)";
             //dd($query);
             $this->queryDB($query);
+        }
+        if(\Input::has('update')){
+            $lpu = $this->getResult($this->queryDB("select deptcode from departments where id=$id"));
+            $lpu = $lpu[0]['DEPTCODE'];
+            $priceid = $this->getResult($this->queryDB("select id from pricelists where dept=$id"));
+            $priceid = $priceid[0]['ID'];
+            $db = ibase_connect("192.168.0.8:lims","sysdba","cdrecord");
+            $query = "select p.code, pr.cost from prices pr inner join pricelists ps on ps.id=pr.pricelistid ";
+            $query.= "inner join panels p on p.id=pr.panelid ";
+            $query.= "inner join clients c on c.id=ps.clientid where ps.status='A' and c.clientcode='$lpu'";
+            $stmt = ibase_query($db,$query);
+            while($res = ibase_fetch_assoc($stmt)){
+                $check = $this->getResult($this->queryDB("select panel from prices where pricelistid=$priceid and panel='".$res['CODE']."'"));
+                if(isset($check[0])){
+                    $this->queryDB("update prices set nacph=".$res['COST']." where pricelistid=$priceid and panel='".$res['CODE']."'");
+                } else {
+                    $this->queryDB("insert into prices(pricelistid, panel, nacph) VALUES ($priceid,".$res['CODE'].",".$res['COST'].")");
+                }
+            }
+
         }
         return \Redirect::route('page68.show', [$id]);
     }

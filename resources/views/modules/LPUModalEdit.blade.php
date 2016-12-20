@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Редактировать панель</h4>
+                <h4 class="modal-title" id="myModalLabel">Редактировать пользователя</h4>
             </div>
             <form action="page66/{page66}" method="post">
                 {{csrf_field()}}

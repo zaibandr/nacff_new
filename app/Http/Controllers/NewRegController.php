@@ -121,7 +121,7 @@ class NewRegController extends DBController
         $query = "delete from pool rows 1 returning folderno ";
         $stmt = ibase_query($query);
         $res = ibase_fetch_assoc($stmt);
-        $folderno = $res['FOLDERNO'];
+        $folderno = $res['FOLDERNO']==''?'null':$res['FOLDERNO'];
         $query = "INSERT INTO FOLDERS (FOLDERNO, LOGUSER, PID, SURNAME, NAME, PATRONYMIC, DATE_BIRTH, ";
         $query.= "ADDRESS, PASSPORT_SERIES, PASSPORT_NUMBER, PHONE, EMAIL, GENDER, CLIENTID, DOCTOR, COMMENTS, ";
         $query.= "PREGNANCY, AGE, PRICELISTID, S_SMS, S_EMAIL, COST, PRIME,NACPH, PRICE, DISCOUNT, CASH, DOC, ";

@@ -22,7 +22,7 @@
     <table style="width: 100%; height: 100px; padding-left:10px; text-align: center">
         <tr align="center" >
             <td style="padding-top: 10px"><b>{{Session::get('clientcode')}}</b></td>
-            <td style="padding-top: 10px; font-size: 7px"><b>{{substr($val['CONTGROUP'],0,20)}}</b></td>
+            <td style="padding-top: 10px; font-size: 7px"><b>{{str_replace(' ','',substr($val['CONTGROUP'],0,20))}}</b></td>
             <td style="padding-top: 10px"><b>{{substr($val['CONTAINERNO'],0,10)}}</b></td>
             </tr>
         <tr>

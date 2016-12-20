@@ -65,7 +65,7 @@ class PrintController extends DBController
                                 'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno' => $folderno,
                                 'seal' => '1',
-                                'client-id' => \Session::get('clientcode')
+                                'client-id' => 11111
                             )
                         );
 
@@ -112,7 +112,7 @@ class PrintController extends DBController
                             'params'=>array(
                                 'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno'=>$folderno,
-                                'client-id'=>2161,
+                                'client-id'=>21611,
                                 'block'=>1
                             )
                         );
@@ -141,7 +141,7 @@ class PrintController extends DBController
                             'params'=>array(
                                 'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folders'=>'Array',
-                                'client-id'=>\Session::get('clientcode')
+                                'client-id'=>11111
                             )
                         );
                         foreach ($ids as $k => $v) {

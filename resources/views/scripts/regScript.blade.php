@@ -8,11 +8,11 @@
     var rules = [];
     var kp = 0;
     var kpMas = ['[46.100]','[46.101]','[46.105]'];
+    var deptid = $('#otd').val();
     $(function ()
     {
         var form = $("#RegAll");
         var dept;
-        var deptid = $('#otd').val();
         $('#discount').empty();
         $.get("app/Http/Controllers/docAndRule.php", {
                     'dept': deptid,
@@ -256,7 +256,7 @@
                                 url: "app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&t=1",
                                 data: {"p": node.data.id, "g": node.data.parent}
                             });
-                            console.log(node.data.id,node.data.parent);
+                            //console.log(node.data.id,node.data.parent);
                         }
                     });
                     $("#searchp").autocomplete({
@@ -416,15 +416,17 @@
         }
     }
     function checkCito() {
-        var x=0;
+        var x=1;
         $("#tree-dest").dynatree("getRoot").visit(function(node){
-            if (node.data.icon.search("l-10.png")!==-1) { $("#cito").removeAttr('disabled','disabled'); x = 1; }
+            if (node.data.title.search("l-10.png")==-1) { $("#cito").removeAttr('disabled','disabled'); x = 0; }
             return true;
         });
         if (x==0) {
             $("select#cito :first").attr('selected','selected');
             $("select#cito").attr('disabled','disabled');
             return false;
+        } else {
+            $("select#cito").removeAttr('disabled');
         }
     }
     function getLegend(i) {

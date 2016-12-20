@@ -14,7 +14,7 @@
         </table>
         <form id="RegAll" action="#">
             <div>
-                <h3>Шаг 2</h3>
+                <h3>Шаг 1</h3>
                 <section>
                     <div class="row">
                         <div class="col-md-3">
@@ -261,7 +261,7 @@
                     </div>
                     <p>(*) Обязательно к заполнению</p>
                 </section>
-                <h3>Шаг 3</h3>
+                <h3>Шаг 2</h3>
                 <section>
                     <div class="row">
                         <div class="col-md-6">
@@ -307,7 +307,7 @@
                         </div>
                     </div>
                 </section>
-                <h3>Шаг 4</h3>
+                <h3>Шаг 3</h3>
                 <section>
                     <div class="row">
                                 <div class="col-md-3">

@@ -59,9 +59,9 @@
                             <sup style="color: {{$val['STATUSCOLOR']}}">{{$val['STATUSNAME']}}</sup>
                         </td>
                     </tr>
-                        @if(count($val['TESTNAME'])<1))
+                        @if(isset($val['TESTNAME']) && count($val['TESTNAME'])<1))
                             <tr><td>Результатов еще нет</td></tr>
-                    @else
+                    @elseif(isset($val['TESTNAME']))
                         @foreach($val['TESTNAME'] as $k=>$v)
                             <tr>
                                 <td colspan="4" ><div class="{{str_replace('.','',$key)}}" style="font-weight: bold; font-size: 1.1em">{{$k}}</div></td>

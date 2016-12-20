@@ -273,7 +273,7 @@ class Test extends DBController
         /**
          * Вывод тестов в excel
          */
-                Excel::create('tests', function ($excel){
+/*                Excel::create('tests', function ($excel){
            $excel->sheet('first', function ($sheet){
                $tests = $this->getResult($this->queryDB("SELECT a.ID, a.TESTNAME, a.QUANTITY FROM tests a where a.OUTSOURCE='N' and a.QUANTITY is null order by a.id"));
                $sheet->setOrientation('landscape');
@@ -282,7 +282,7 @@ class Test extends DBController
                $sheet->row(1,['ID','Название','Количество, мкл']);
                $sheet->rows($tests);
            });
-        })->export('xls'); 
+        })->export('xls'); */
         /**
          * Копирование колонки аутсорс из lims.tests -> rc.tests
          */
@@ -295,6 +295,7 @@ class Test extends DBController
             $query = "update panels set pgrp=".$row['PANELCATID']." where code ='".$row['CODE']."'";
             $this->queryDB($query);
         }*/
+        dd(crypt(trim(Input::get('password')),'$1$nacffnew'));
         return \View::make('test')->with([
 
         ]);

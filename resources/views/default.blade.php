@@ -45,7 +45,7 @@
     <div class="row" style="padding-left: 3%; padding-right: 3%;">
         <div class="col-md-offset-3 col-md-8 xx">
             <p style="float: left;"><a href="http://www.nacpp.ru/">Главная</a>&nbsp;>&nbsp;<a href="https://nacpp.info/">Удаленная регистрация образцов</a></p>
-            <p style="float: right;">Пользователь:  <i><b style="color: #00989e;">{{Session::get('login')}}</b></i></p>
+            <p style="float: right;">Пользователь:  <i><b style="color: #00989e;">{{Session::get('login')}}/{{Session::get('clientcode')}}</b></i></p>
         </div>
     </div>
     <div class="row" style="margin-top: 1%;">

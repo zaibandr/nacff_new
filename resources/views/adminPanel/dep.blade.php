@@ -7,7 +7,7 @@
     <div id="lpu">
         <h1>Отделения</h1>
         <div class="col-lg-12">
-            <a href="{{route("page68.create")}}" class="btn btn-primary" style="margin: 2%">Добавить пользователя</a>
+            <a href="{{route("page68.create")}}" class="btn btn-primary" style="margin: 2%">Добавить отделение</a>
         </div>
         <table class="tablesorter">
             <thead>

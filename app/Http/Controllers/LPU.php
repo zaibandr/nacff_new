@@ -19,7 +19,7 @@ class LPU extends DBController
         $lpu = [];
         //dd($this->getLPU());
         foreach($this->getLPU() as $val){
-            $lpu[$val['USERNAM']]['pass'] = $val['PASSWORD3'];
+            $lpu[$val['USERNAM']]['pass'] = $val['PASS'];
             if($val['ROLEID']==7) {
                 $lpu[$val['USERNAM']]['role']['Гл.врач'][] = ['dept'=>$val['DEPT'], 'number'=>$val['DEPTCODE']];
             }
@@ -57,14 +57,15 @@ class LPU extends DBController
         //dd($request->all());
         $login = trim(mb_strtoupper($request->login));
         $password = trim($request->password);
-        $this->queryDB("insert into users(usernam,fullname,password2,password3) VALUES ('$login', '$request->name','".crypt($password,'$1$nacffnew')."', '$password')");
+        $this->queryDB("insert into users(usernam,fullname,password2) VALUES ('$login', '$request->name','".crypt($password,'$1$nacffnew')."')");
         $this->queryDB("insert into userroles(usernam,roleid) values('$login',$request->role)");
-
+        $this->queryDB("insert into userpass(usernam,pass) VALUES ('$login','$password')");
         foreach($request->all() as $key=>$val){
             if(strpos($key,'dept') || strpos($key,'dept')===0){
                 $this->queryDB("insert into userdept(dept,usernam) VALUES ((select id from departments d where d.dept='$val'), '$login')");
             }
         }
+        $this->queryDB("insert into logs(log_time,theme,description) VALUES (CURRENT_TIMESTAMP ,'Новый пользователь','login-$login,role-$request->role')");
         return redirect()->action('LPU@index');
     }
 

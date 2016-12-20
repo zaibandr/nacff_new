@@ -560,10 +560,11 @@ class DBController extends Controller
 
     public function getLPU()
     {
-        $query = "select d.dept, d.deptcode, ur.roleid, us.usernam, us.password3 from users us ";
+        $query = "select d.dept, d.deptcode, ur.roleid, us.usernam, up.pass from users us ";
         $query.= "left join userdept u on us.usernam=u.usernam ";
         $query.= "left join departments d on u.dept=d.id ";
         $query.= "inner join userroles ur on us.usernam=ur.usernam ";
+        $query.= "inner join userpass up on us.usernam=up.usernam ";
         $query.= "where us.status='A' order by d.deptcode";
         return $this->getResult($this->queryDB($query));
     }
