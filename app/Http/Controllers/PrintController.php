@@ -75,7 +75,7 @@ class PrintController extends DBController
                             'params' => array(
                                 'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
                                 'folderno' => $folderno,
-                                'signature' => '1',
+                                'doctor-signature' => '1',
                                 'client-id' => \Session::get('clientcode')
                             )
                         );
@@ -122,6 +122,7 @@ class PrintController extends DBController
                         if (isset($_GET["logo"])) $params['params']['logo'] = "1";
                         if (isset($_GET["a5"])) $params['params']['a5'] = "1";
                         if (isset($_GET["seal"])) $params['params']['nacpp-seal'] = "1";
+                        if (isset($_GET["signature"])) $params['params']['doctor-signature'] = "1";
                         $json = Func::getJsonMainList($params);
                         $obj = json_decode($json, true);
 

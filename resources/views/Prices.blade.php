@@ -41,7 +41,8 @@
                             <td>{{$val[0]}}</td>
                             <td>{{$val[3]}}</td>
                             <td>{{$val[5]}}</td>
-                            <td><i class="fa fa-edit" data-toggle="modal" data-target="#edit" onclick="modal(this, '{{$val[1]}}')"></i></td>
+                            <td><i class="fa fa-edit" data-toggle="modal" data-target="#edit" onclick="modal(this, '{{$val[1]}}')" style="cursor: pointer"></i>
+                                <a href="{{route('page50.show',['dept'=>Input::get('dept',''),'id'=>$val[1]])}}" target="_blank" aria-label="Преаналитика"><i class="fa fa-search" ></i></a></td>
                         </tr>
 
                         @endforeach

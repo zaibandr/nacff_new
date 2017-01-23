@@ -169,6 +169,10 @@
             </div>
         </div>
     </div>
-
+    <style>
+        .tablesorter-icon{
+            display: block !important;
+        }
+    </style>
     @include('modules.folderExcel')
     @stop

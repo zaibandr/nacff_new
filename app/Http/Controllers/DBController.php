@@ -66,10 +66,13 @@ class DBController extends Controller
         //dd($a);
         return $a;
     }
-    function getPanel2(){
-        $query = "SELECT p.CODE, p.PANEL, p.CHECKED from panels p ";
+    function getPanel2($dept){
+        $query = "SELECT p.CODE, COALESCE (pr.medan,p.PANEL), pn.description from panels p ";
         $query.= "inner join panel_containers pc on pc.panel = p.code ";
-        $query.= "where pc.SAMPLINGSRULES_ID in (25,26,27,28) or pc.SAMPLINGSRULES_ID is null order by p.code";
+        $query.= "inner join preanalytics pn on pn.id=pc.preanalitic_id ";
+        $query.= "inner join prices pr on pr.panel = p.code ";
+        $query.= "inner join pricelists pl on pl.id = pr.pricelistid ";
+        $query.= "where pl.dept=$dept and p.code='".\Input::get('id','')."'";
         $a = $this->getResult($this->queryDB($query));
         return $a;
     }
@@ -254,7 +257,7 @@ class DBController extends Controller
     }
     public function getDeptsAdmin()
     {
-        $query = "select d.id, d.dept, d.deptcode, d.description from departments d";
+        $query = "select d.id, d.dept, d.deptcode, d.description from departments d order by d.deptcode";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -271,7 +274,7 @@ class DBController extends Controller
     }
     public function getDeptPrice()
     {
-        $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A' and deptcode='".\Session::get('clientcode')."'";
+        $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A' and deptcode='".\Session::get('clientcode')."' order by d.dept";
         if(\Session::has('isAdmin') && \Session::get('isAdmin')==1)
             $query = "select d.dept, p.id from departments d inner join pricelists p on p.dept=d.id where p.status='A'";
         $stmt = $this->queryDB($query);
@@ -550,8 +553,9 @@ class DBController extends Controller
 
     public function getUsers()
     {
-        $query = "select u.usernam, ur.roleid, u.fullname, u.status, u.password3, d.dept from users u ";
+        $query = "select u.usernam, ur.roleid, u.fullname, u.status, up.pass, d.dept from users u ";
         $query.= "inner join userdept ud on ud.usernam=u.usernam ";
+        $query.= "inner join userpass up on up.usernam=u.usernam ";
         $query.= "inner join userroles ur on ur.usernam=u.usernam ";
         $query.= "inner join departments d on ud.dept=d.id ";
         $query.= "where d.id in (select udp.dept from userdept udp where udp.usernam='".\Session::get('login')."')";

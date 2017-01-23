@@ -117,7 +117,7 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
             $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' and pl.id=".$_GET['dept']." ";
             $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
             $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
-            $query .= "where p.panel like '%".$_GET['term']."%' or COALESCE (p.medan, pan.PANEL) like '%".$_GET['term']."%'";
+            $query .= "where p.panel like '%".$_GET['term']."%' or upper(COALESCE (p.medan, pan.PANEL)) like '%".mb_strtoupper($_GET['term'])."%'";
             $stmt = ibase_query($db, $query);
             while ($row = ibase_fetch_row($stmt)) {
                 $row[3] = str_replace('  ',' ',$row[3]);

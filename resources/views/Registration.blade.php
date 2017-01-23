@@ -59,7 +59,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3">
-                            <label for="otd">ЛПУ</label>
+                            <label for="otd">Отделение</label>
                             <select name="otd" class="form-control" id="otd" onchange="selectPrice(this); return false;" required>
                                 @foreach($depts as $val)
                                     <option value="{{$val['ID']}}">{{$val['DEPT']}}</option>
@@ -234,7 +234,7 @@
                                             </div>
                                         </div>
                                         <div class="col-md-3">
-                                            <label for="antib">Антибиотики</label>
+                                            <label for="antib">Лекарственный препарат</label>
                                             <input id="antib" name="antib" type="checkbox" onchange="toggleBio(this); return false;" style="display: block; margin: auto; width: 20px; height: 20px;">
                                             <br> Применялись
                                             <div class="row">
@@ -406,7 +406,7 @@
                             <input id="Rn_p" type="text" class="form-control" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label for="Rissued">Кем и когда выдали</label>
+                            <label for="Rissued">Кем и когда выдан</label>
                             <input type="text" id="Rissued" class="form-control" readonly>
                         </div>
                         <div class="col-md-3">

@@ -10,7 +10,10 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="lpu">Номер ЛПУ</label>
-                            <input type="number" name="lpu" class="form-control" required>
+                            <input type="text" name="lpu" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <p>Взять инфу из лимса</p><input type="checkbox" name="lims" id="lims" onchange="a()" />
                         </div>
                         <div class="form-group">
                             <label for="name">Отделение</label>
@@ -18,7 +21,25 @@
                         </div>
                         <div class="form-group">
                             <label for="desc">Описание</label>
-                            <input type="text" id='desc' name="desc" class="form-control" required>
+                            <input type="text" id='desc' name="desc" class="form-control">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="contact">Контактное лицо</label>
+                                <input type="text" id='contact' name="contact" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="manager">Менеджер</label>
+                                <input type="text" id='manager' name="manager" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email">Почта</label>
+                                <input type="text" id='email' name="email" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone">Телефон</label>
+                                <input type="text" id='phone' name="phone" class="form-control">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="price">Использовать прайс</label>
@@ -49,4 +70,23 @@
             </div>
         </div>
     </div>
+    <script>
+        function a() {
+            if ($('#lims').prop('checked')) {
+                $('#manager').attr('disabled', 'disabled');
+                $('#email').attr('disabled', 'disabled');
+                $('#phone').attr('disabled', 'disabled');
+                $('#contact').attr('disabled', 'disabled');
+                $('#name').attr('disabled', 'disabled');
+                $('#desc').attr('disabled', 'disabled');
+            } else {
+                $('#manager').removeAttr('disabled');
+                $('#email').removeAttr('disabled');
+                $('#phone').removeAttr('disabled');
+                $('#contact').removeAttr('disabled');
+                $('#name').removeAttr( 'disabled');
+                $('#desc').removeAttr( 'disabled');
+            }
+        }
+    </script>
 @stop

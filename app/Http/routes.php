@@ -39,11 +39,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/', function () {
         return View::make('main');
     });
-    $arr = [1,2,18,19,38,43,44,45,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63];
+    $arr = [1,2,18,19,38,43,44,45,48,49,51,52,53,54,55,56,57,58,59,60,61,62,63];
     Route::get('/main', ['as' => 'main', 'uses' => 'MainController@index']);
     Route::resource('page47', 'DiscountController', array('except'=>['show', 'create']));
     Route::resource('page6', 'UserController', array('except'=>['show', 'create']));
     Route::resource('page20', 'DepController', array('except'=>['show', 'create']));
+    Route::resource('page50', 'PanelController');
     Route::resource('page73', 'CourierController', array('only'=>['index', 'store']));
     foreach ($arr as $v) {
         Route::any("page$v", ['as' => "page$v", 'uses' => "MainController@page$v"]);

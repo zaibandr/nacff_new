@@ -55,6 +55,10 @@ class LPU extends DBController
     public function store(Request $request)
     {
         //dd($request->all());
+        if(isset($request->lims)){
+            $db = ibase_connect("192.168.0.8:lims","sysdba","cdrecord");
+            $query = "select a.usernam, a.passtext from n_users inner join clients c on c.id=a.clientid where c.clientcode = ";
+        }
         $login = trim(mb_strtoupper($request->login));
         $password = trim($request->password);
         $this->queryDB("insert into users(usernam,fullname,password2) VALUES ('$login', '$request->name','".crypt($password,'$1$nacffnew')."')");
@@ -69,35 +73,6 @@ class LPU extends DBController
         return redirect()->action('LPU@index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
          $a = []; $c = [];
@@ -109,7 +84,8 @@ class LPU extends DBController
         }
         //dd($a);
         $password = trim($request->password);
-        $this->queryDB("update users set password2='".crypt($password,'$1$nacffnew')."', password3 = '$password' where usernam='$request->name'");
+        $this->queryDB("update users set password2='".crypt($password,'$1$nacffnew')."' where usernam='$request->name'");
+        $this->queryDB("update userpass set pass='$password' where usernam='$request->name'");
         $query = "select d.dept from departments d inner join userdept ud on d.id=ud.dept where ud.usernam='$request->name'";
         $b = $this->getResult($this->queryDB($query));
         if(!empty($b)) {

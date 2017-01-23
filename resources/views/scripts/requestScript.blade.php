@@ -74,7 +74,7 @@
                         // class name added to checked checkboxes - this fixes an issue with Chrome not updating FontAwesome
                         // applied icons; use this class name (input.checked) instead of input:checked
                         columnSelector_cssChecked : 'checked',
-                        filter_hideFilters:true
+                        filter_hideFilters:false
                     }
                 })
 

@@ -45,35 +45,62 @@ class AdminDep extends DBController
     public function store(Request $request)
     {
         //dd($request->all());
-        $lpu = (int)trim($request->lpu);
-        while(strlen($lpu)<4)
-            $lpu = '0'.$lpu;
-        $name = mb_strtoupper(trim($request->name));
-        $desc = addslashes(trim($request->desc));
-        $priceId = $request->price;
-        $netId = isset($request->net)?$request->net:'null';
-        $query = "insert into departments(deptcode,dept,description,status,net_id) VALUES ('$lpu','$name','$desc','A', $netId) returning id";
-        $deptId = $this->getResult($this->queryDB($query));
-        $deptId = $deptId[0]['ID'];
-        if(isset($request->dateend))
-            $dateend = date('Y-m-d',strtotime($request->dateend));
-        else $dateend = date('Y-m-d',time()+3600*24*365);
-        if(isset($request->datestart))
-            $datestart = date('Y-m-d',strtotime($request->datestart));
-        else $datestart = date('Y-m-d');
-        $query = "insert into pricelists(status,datebegin,dateend,by_user,dept) VALUES ('A','$datestart','$dateend','ADMIN',$deptId) returning id";
-        $newPriceId = $this->getResult($this->queryDB($query));
-        $newPriceId = $newPriceId[0]['ID'];
         $db = ibase_connect("192.168.0.8:lims","sysdba","cdrecord");
-        $query = "select p.code, pr.cost from prices pr inner join pricelists ps on ps.id=pr.pricelistid ";
-        $query.= "inner join panels p on p.id=pr.panelid ";
-        $query.= "inner join clients c on c.id=ps.clientid where ps.status='A' and c.clientcode='$lpu'";
-        $stmt = ibase_query($db,$query);
-        while($res = ibase_fetch_assoc($stmt)){
-            $query = "INSERT INTO PRICES (PRICELISTID, COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN) ";
-            $query.= "select $newPriceId,COST, PANEL, COMMENTS,".$res['COST'].", MARGA, DUE, CONTTYPES, PCAT, PGRP, MEDAN from prices ";
-            $query.= "where PRICELISTID=$priceId and panel='".$res['CODE']."'";
-            $this->queryDB($query);
+        $lpus = explode(',',trim($request->lpu));
+        foreach($lpus as $lpu) {
+            while (strlen($lpu) < 4)
+                $lpu = '0' . $lpu;
+            if (isset($request->lims)) {
+                $query = "select a.manager, a.contact, a.email, a.phone, c.medname, c.clientname from n_users a ";
+                $query .= "inner join clients c on c.id=a.clientid where c.clientcode='$lpu'";
+                $stmt = ibase_query($db, $query);
+                $row = ibase_fetch_assoc($stmt);
+                if(strlen(trim($row['CLIENTNAME']))>30){
+                    $desc = addslashes(trim($row['CLIENTNAME']));
+                    $name = addslashes(trim($row['MEDNAME']));
+                } else {
+                    $name = addslashes(trim($row['CLIENTNAME']));
+                    $desc = addslashes(trim($row['MEDNAME']));
+                }
+                $contact = trim($row['CONTACT']);
+                $email = trim($row['EMAIL']);
+                $phone = trim($row['PHONE']);
+                $manager = trim($row['MANAGER']);
+                //dd($row);
+            } else {
+                $name = mb_strtoupper(trim($request->name));
+                $desc = addslashes(trim($request->desc));
+                $contact = addslashes(trim($request->contact));
+                $phone = addslashes(trim($request->phone));
+                $email = addslashes(trim($request->email));
+                $manager = addslashes(trim($request->manager));
+            }
+            $priceId = $request->price;
+            $netId = isset($request->net) ? $request->net : 'null';
+            $query = "insert into departments(deptcode,dept,description,status,net_id,email,phone,manager,contact) VALUES ('$lpu','$name','$desc','A', $netId,'$email','$phone','$manager','$contact') returning id";
+            $deptId = $this->getResult($this->queryDB($query));
+            $deptId = $deptId[0]['ID'];
+            if (isset($request->dateend))
+                $dateend = date('Y-m-d', strtotime($request->dateend));
+            else $dateend = date('Y-m-d', time() + 3600 * 24 * 365);
+            if (isset($request->datestart))
+                $datestart = date('Y-m-d', strtotime($request->datestart));
+            else $datestart = date('Y-m-d');
+            $query = "insert into pricelists(status,datebegin,dateend,by_user,dept) VALUES ('A','$datestart','$dateend','ADMIN',$deptId) returning id";
+            $newPriceId = $this->getResult($this->queryDB($query));
+            $newPriceId = $newPriceId[0]['ID'];
+
+            $query = "select p.code, pr.cost from prices pr inner join pricelists ps on ps.id=pr.pricelistid ";
+            $query .= "inner join panels p on p.id=pr.panelid ";
+            $query .= "inner join clients c on c.id=ps.clientid where ps.status='A' and c.clientcode='$lpu'";
+            $stmt = ibase_query($db, $query);
+            while ($res = ibase_fetch_assoc($stmt)) {
+                $cost = ($res['COST']) ? $res['COST'] : 0;
+                $query = "INSERT INTO PRICES (PRICELISTID, COST, PANEL, COMMENTS, NACPH, MARGA, DUE, CONTTYPES,MEDAN) ";
+                $query .= "select $newPriceId,COST, PANEL, COMMENTS," . $cost . ", MARGA, DUE, CONTTYPES, MEDAN from prices ";
+                $query .= "where PRICELISTID=$priceId and panel='" . $res['CODE'] . "'";
+                $this->queryDB($query);
+            }
         }
         return \Redirect::route('page68.index');
     }
