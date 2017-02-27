@@ -12,7 +12,7 @@
             autoclose: true,
             clearBtn: true
         });
-           var pagerOptions = {
+/*           var pagerOptions = {
             // target the pager markup - see the HTML block below
             container: $(".pager"),
             // output string - default is '{page}/{totalPages}'; possible variables: {page}, {totalPages}, {startRow}, {endRow} and {totalRows}
@@ -25,7 +25,7 @@
             removeRows: false,
             // go to page selector - select dropdown that sets the current page
             cssGoto: '.gotoPage'
-        };
+        };*/
 
         // Initialize tablesorter
         // ***********************
@@ -80,7 +80,7 @@
 
                 // initialize the pager plugin
                 // ****************************
-                .tablesorterPager(pagerOptions);
+                // .tablesorterPager(pagerOptions);
         $('#popover')
                 .popover({
                     placement: 'left',

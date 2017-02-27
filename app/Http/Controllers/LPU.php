@@ -57,16 +57,29 @@ class LPU extends DBController
         //dd($request->all());
         if(isset($request->lims)){
             $db = ibase_connect("192.168.0.8:lims","sysdba","cdrecord");
-            $query = "select a.usernam, a.passtext from n_users inner join clients c on c.id=a.clientid where c.clientcode = ";
-        }
-        $login = trim(mb_strtoupper($request->login));
-        $password = trim($request->password);
-        $this->queryDB("insert into users(usernam,fullname,password2) VALUES ('$login', '$request->name','".crypt($password,'$1$nacffnew')."')");
-        $this->queryDB("insert into userroles(usernam,roleid) values('$login',$request->role)");
-        $this->queryDB("insert into userpass(usernam,pass) VALUES ('$login','$password')");
-        foreach($request->all() as $key=>$val){
-            if(strpos($key,'dept') || strpos($key,'dept')===0){
-                $this->queryDB("insert into userdept(dept,usernam) VALUES ((select id from departments d where d.dept='$val'), '$login')");
+            $lpus = explode(',',$request->lpu);
+            foreach($lpus as $lpu) {
+                while (strlen($lpu) < 4)
+                    $lpu = '0' . $lpu;
+                $query = "select a.usernam, a.passtext from n_users a inner join clients c on c.id=a.clientid where c.clientcode = '$lpu'";
+                $row = ibase_fetch_assoc(ibase_query($db,$query));
+                $login = $row['USERNAM'];
+                $password = $row['PASSTEXT'];
+                $this->queryDB("insert into users(usernam,fullname,password2) VALUES ('$login', '$login','".crypt($password,'$1$nacffnew')."')");
+                $this->queryDB("insert into userroles(usernam,roleid) values('$login',$request->role)");
+                $this->queryDB("insert into userpass(usernam,pass) VALUES ('$login','$password')");
+                $this->queryDB("insert into userdept(dept,usernam) VALUES ((select id from departments d where d.deptcode='$lpu'), '$login')");
+            }
+        } else {
+            $login = trim(mb_strtoupper($request->login));
+            $password = trim($request->password);
+            $this->queryDB("insert into users(usernam,fullname,password2) VALUES ('$login', '$request->name','" . crypt($password, '$1$nacffnew') . "')");
+            $this->queryDB("insert into userroles(usernam,roleid) values('$login',$request->role)");
+            $this->queryDB("insert into userpass(usernam,pass) VALUES ('$login','$password')");
+            foreach ($request->all() as $key => $val) {
+                if (strpos($key, 'dept') || strpos($key, 'dept') === 0) {
+                    $this->queryDB("insert into userdept(dept,usernam) VALUES ((select id from departments d where d.dept='$val'), '$login')");
+                }
             }
         }
         $this->queryDB("insert into logs(log_time,theme,description) VALUES (CURRENT_TIMESTAMP ,'Новый пользователь','login-$login,role-$request->role')");

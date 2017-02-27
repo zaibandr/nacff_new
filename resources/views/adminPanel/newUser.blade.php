@@ -9,6 +9,10 @@
                     {{csrf_field()}}
                     <div class="modal-body">
                         <div class="form-group">
+                            <label for="lims">Взять данные с лимса</label>
+                            <input type="checkbox" id='lims' name="lims" onchange="a()">
+                        </div>
+                        <div class="form-group">
                             <label for="login">Логин</label>
                             <input type="text" id='login' name="login" class="form-control" onblur="validateLogin(this.value)" required>
                         </div>
@@ -23,7 +27,7 @@
                         <div class="lpu-group">
                             <div class="form-group">
                                 <label for="lpu">Номер ЛПУ</label>
-                                <input type="number" name="lpu" class="form-control lpuItem" required>
+                                <input type="text" name="lpu" class="form-control lpuItem" required>
                             </div>
                             <div class="form-group" id="deps"></div>
                         </div>
@@ -102,6 +106,17 @@
                             }
                         }, 'json');
                     return false;
+            }
+            function a() {
+                if ($('#lims').prop('checked')) {
+                    $('#login').attr('disabled', 'disabled');
+                    $('#name').attr('disabled', 'disabled');
+                    $('#password').attr('disabled', 'disabled');
+                } else {
+                    $('#login').removeAttr('disabled');
+                    $('#name').removeAttr('disabled');
+                    $('#password').removeAttr('disabled');
+                }
             }
         </script>
     @stop

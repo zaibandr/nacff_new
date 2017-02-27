@@ -211,14 +211,14 @@ class DBController extends Controller
 
     }
 
-    public function getFoldersAdmin(){
-        if (\Input::has('date_st'))
-            $date_st = \Input::get('date_st');
-        else $date_st = date('Y-m-d', strtotime("-1 days"));
-        if (\Input::has('date_en'))
-            $date_en = date('Y-m-d 23:59:59', strtotime(\Input::get('date_en')));
-        else $date_en = date('Y-m-d 23:59:59');
-        $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
+    public function getFoldersAdmin($request){
+        $date_st = $request->input('date_st',date('Y-m-d', strtotime("-1 days")));
+        $date_en = $request->input('date_en',date('Y-m-d 23:59:59'));
+        //dd($date_en);
+        $step = $request->input('step',1);
+        $step_length = $request->input('step_length',10);
+        $skip = $step_length*($step-1);
+        $query = "select first $step_length skip $skip f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
         $query.= "inner join departments d on d.id=f.clientid ";
         $query.= "inner join statuses a on a.status=f.apprsts ";
         $query.= "where f.apprsts!='R'";

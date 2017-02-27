@@ -11,18 +11,21 @@
             <div class="col-lg-offset-1 col-lg-10">
                 <form action="" method="post" class="form-inline">
                     {{csrf_field()}}
-                    <div class="input-daterange input-group datepicker" >
-                        <span class="input-group-addon">за период с </span>
-                        <input type="text" class="form-control" name="date_st" value="{{Input::get('date_st',date('d.m.Y',strtotime("-3 days")))}}"/>
-                        <span class="input-group-addon">по</span>
-                        <input type="text" class="form-control" name="date_en" value="{{Input::get('date_en',date('d.m.Y'))}}"/>
-                    </div>
-                    <label for="client">Отделение</label>
-                    <input type="text" name="client" class="form-control" value="{{Input::get('client','')}}">
-                    <label for="lpu">ЛПУ</label>
-                    <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
-                    <button type="submit" class="btn btn-primary">Обновить</button>
-                    <div class="row" style="margin: 2% 0">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="input-daterange input-group datepicker" >
+                                <span class="input-group-addon">за период с </span>
+                                <input type="text" class="form-control" name="date_st" value="{{Input::get('date_st',date('d.m.Y',strtotime("-3 days")))}}"/>
+                                <span class="input-group-addon">по</span>
+                                <input type="text" class="form-control" name="date_en" value="{{Input::get('date_en',date('d.m.Y'))}}"/>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <label for="client">Отделение</label>
+                            <input type="text" name="client" class="form-control" value="{{Input::get('client','')}}">
+                            <label for="lpu">ЛПУ</label>
+                            <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
+                        </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="positive"> Фильтр по результатам</label>
@@ -48,26 +51,31 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-lg-12">
+                            <button type="submit" class="btn btn-primary">Обновить</button>
+                        </div>
+                        <div class="col-lg-6 col-lg-offset-3">
+                            <div class="pager">
+                                Страница: <select class="gotoPage"></select>
+                                <span class="first glyphicon glyphicon-step-backward" alt="First" title="First page" ></span>
+                                <span class="prev glyphicon glyphicon-chevron-left" alt="Prev" title="Previous page" ></span>
+                                <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+                                <span class="next glyphicon glyphicon-chevron-right" alt="Next" title="Next page" ></span>
+                                <span class="last glyphicon glyphicon-step-forward" alt="Last" title= "Last page" ></span>
+                                <select class="pagesize">
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                    <option value="30">30</option>
+                                    <option value="40">40</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
         @if(isset($error)) <b style="color: red">Error</b> @endif
         @if(isset($folders))
-        <div class="pager">
-            Страница: <select class="gotoPage"></select>
-            <span class="first glyphicon glyphicon-step-backward" alt="First" title="First page" ></span>
-            <span class="prev glyphicon glyphicon-chevron-left" alt="Prev" title="Previous page" ></span>
-            <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-            <span class="next glyphicon glyphicon-chevron-right" alt="Next" title="Next page" ></span>
-            <span class="last glyphicon glyphicon-step-forward" alt="Last" title= "Last page" ></span>
-            <select class="pagesize">
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="30">30</option>
-                <option value="40">40</option>
-            </select>
-        </div>
         <table class="tablesorter bootstrap-popup">
             <thead>
             <tr>
