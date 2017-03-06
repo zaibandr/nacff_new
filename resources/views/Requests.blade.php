@@ -73,7 +73,7 @@
                             <td>{{$val['GENDER']=='F' ? 'Ж' : 'М'}}</td>
                             <td>{{date('d.m.Y',strtotime($val['LOGDATE']))}}</td>
                             <td>{{date('d.m.Y',strtotime($val['DATE_BIRTH']))}}</td>
-                            <td>{{$val['DEPT']}}</td>
+                            <td>{{stripslashes($val['DEPT'])}}</td>
                             <td>{{$val['ORG']}}</td>
                             <td>{{$val['DOCTOR']}}</td>
                             <td>{{$val['STR']}}</td>
@@ -145,8 +145,8 @@
                                         <div class="form-group">
                                             <label for="status">Фильтр по статусу выполнения</label>
                                             <select name="status" id="status" class="form-control">
-                                                <option disabled selected></option>
-                                                <option value="T" @if(Input::has('status') && Input::get('status')=='T') {{'selected'}} @endif>Выполнен</option>
+                                                <option selected></option>
+                                                <option value="T" @if(Input::has('status') && Input::get('status')=='T') {{'selected'}} @endif>Завершен</option>
                                                 <option value="L" @if(Input::has('status') && Input::get('status')=='L') {{'selected'}} @endif>Зарегистрирован</option>
                                                 <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Черновик</option>
                                                 <option value="R" @if(Input::has('status') && Input::get('status')=='R') {{'selected'}} @endif>Отменен</option>
@@ -154,6 +154,12 @@
                                                 <option value="A" @if(Input::has('status') && Input::get('status')=='A') {{'selected'}} @endif>Выполняется</option>
                                                 <option value="P" @if(Input::has('status') && Input::get('status')=='P') {{'selected'}} @endif>Отправлен</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="panel">С панелью</label>
+                                            <input type="text" name="panel" class="form-control" value="{{Input::get('panel','')}}">
                                         </div>
                                     </div>
                             </div>

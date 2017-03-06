@@ -20,10 +20,11 @@
                         @endif
                 </td></tr>
             <tr><td colspan="2"><p style="font-size:11px;color:gray;">* Для изменения поля "Отправитель", пожалуйста, обратитесь в клиентский отдел ООО "НАКФФ".</p></td></tr>
-            <tr><td style="width:150px;">Получатель:</td><td><input style="width:250px" type="text" name="to" value="" required></td></tr>
+            <tr><td style="width:150px;">Получатель:</td><td><input style="width:250px" type="email" name="to" value="" required></td></tr>
             <tr><td style="width:150px;">Тема письма:</td><td><input style="width:250px" type="text" name="theme" value="Результаты исследований" required></td></tr>
             <tr><td style="width:150px;">Текст письма:</td><td><textarea name="body" cols="60" rows="10" required>В приложении - результаты исследований по заявке №<?php echo $folderno.chr(13).chr(13)?>Пациент: <?php echo $row[0]['SURNAME']." ".$row[0]['NAME']." ".$row[0]['PATRONYMIC']; ?>, год рождения <?php echo date("Y", strtotime($row[0]['DATE_BIRTH'])); ?></textarea></td></tr>
-            <tr><td colspan="2"><input type="submit" value="Отправить" class="btn btn-default"></td></tr>
+            <tr><td style="width:150px;">С печатью НАКФФ:</td><td><input type="checkbox" name="seal" style="width: 20px; height: 20px"></td></tr>
+            <tr><td colspan="2" style="padding-top: 2%"><input type="submit" value="Отправить" class="btn btn-default"></td></tr>
         </table>
     </form>
     </div>

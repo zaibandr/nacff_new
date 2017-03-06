@@ -46,3 +46,11 @@ input[type=checkbox].prn-cbox {
     width: 20px;
     height: 20px;
 }
+.form-control
+{
+    border: 2px solid #ddd;
+}
+.pager2 span
+{
+    cursor: hand;
+}

@@ -6,7 +6,7 @@
     <link href="{{asset('resources/assets/css/requests.css')}}" rel="stylesheet">
     @include('scripts.requestScript')
     <div id="requests">
-        <h1>СПИСОК НАПРАВЛЕНИЙ</h1>
+        <h1 style="margin-bottom: 2%">СПИСОК НАПРАВЛЕНИЙ</h1>
         <div class="row">
             <div class="col-lg-offset-1 col-lg-10">
                 <form action="" method="post" class="form-inline">
@@ -21,14 +21,18 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <label for="client">Отделение</label>
-                            <input type="text" name="client" class="form-control" value="{{Input::get('client','')}}">
-                            <label for="lpu">ЛПУ</label>
-                            <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
-                        </div>
-                        <div class="col-lg-6">
                             <div class="form-group">
-                                <label for="positive"> Фильтр по результатам</label>
+                                <label for="client">Отделение</label>
+                                <input type="text" name="client" class="form-control" value="{{Input::get('client','')}}">
+                            </div>
+                            <div class="form-group" style="margin-left: 5%">
+                                <label for="lpu">ЛПУ</label>
+                                <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
+                            </div>
+                        </div>
+                        <div class="col-lg-3" style="margin-top: 2%;">
+                            <div class="form-group">
+                                <label for="positive"> Фильтр по результатам:</label>
                                 <select name="positive" id="positive" class="form-control">
                                     <option selected></option>
                                     <option value="O" {{(Input::get('positive')=='O')?"selected":''}}>с патологией</option>
@@ -36,40 +40,75 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-3" style="margin-top: 2%;">
                             <div class="form-group">
-                                <label for="status">Фильтр по статусу выполнения</label>
+                                <label for="status">Фильтр по статусу выполнения:</label>
                                 <select name="status" id="status" class="form-control">
-                                    <option disabled selected></option>
+                                    <option selected></option>
                                     <option value="T" @if(Input::has('status') && Input::get('status')=='T') {{'selected'}} @endif>Выполнен</option>
                                     <option value="L" @if(Input::has('status') && Input::get('status')=='L') {{'selected'}} @endif>Зарегистрирован</option>
                                     <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Черновик</option>
-                                    <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Отменен</option>
+                                    <option value="R" @if(Input::has('status') && Input::get('status')=='R') {{'selected'}} @endif>Отменен</option>
                                     <option value="K" @if(Input::has('status') && Input::get('status')=='K') {{'selected'}} @endif>Курьер</option>
                                     <option value="A" @if(Input::has('status') && Input::get('status')=='A') {{'selected'}} @endif>Выполняется</option>
                                     <option value="P" @if(Input::has('status') && Input::get('status')=='P') {{'selected'}} @endif>Отправлен</option>
                                 </select>
                             </div>
                         </div>
+                        <div class="col-lg-3" style="margin-top: 2%;">
+                            <div class="form-group">
+                                <label for="panel"> С панелью:</label>
+                                <input type="text" name="panel" id="panel" class="form-control">
+                            </div>
+                        </div>
                         <div class="col-lg-12">
                             <button type="submit" class="btn btn-primary">Обновить</button>
                         </div>
+                        @if(isset($folders))
                         <div class="col-lg-6 col-lg-offset-3">
-                            <div class="pager">
-                                Страница: <select class="gotoPage"></select>
+                            <div class="pager2">
+                                <select class="form-control" name="step" id="step">
+                                    @for($i=0;$i*(int)Input::get('step_length',10)<$count;$i++)
+                                            <option value="{{$i}}" {{Input::get('step',0)==$i?'selected':''}}>Страниц {{$i+1}}</option>
+                                        @endfor
+                                </select>
                                 <span class="first glyphicon glyphicon-step-backward" alt="First" title="First page" ></span>
                                 <span class="prev glyphicon glyphicon-chevron-left" alt="Prev" title="Previous page" ></span>
-                                <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+                                <span class="pagedisplay">{{Input::get('step',0)*Input::get('step_length',10) + 1}} - {{((Input::get('step',0)+1)*Input::get('step_length',10))>$count?$count:(Input::get('step',0)+1)*Input::get('step_length',10)}}/{{$count}}</span> <!-- this can be any element, including an input -->
                                 <span class="next glyphicon glyphicon-chevron-right" alt="Next" title="Next page" ></span>
-                                <span class="last glyphicon glyphicon-step-forward" alt="Last" title= "Last page" ></span>
-                                <select class="pagesize">
-                                    <option value="10">10</option>
-                                    <option value="20">20</option>
-                                    <option value="30">30</option>
-                                    <option value="40">40</option>
+                                <span class="last glyphicon glyphicon-step-forward" alt="Last" title= "Последняя страница" ></span>
+                                <select class="form-control" name="step_length" id="step_length">
+                                    @for($i=10;40>=$i;$i+=10)
+                                        <option value="{{$i}}" {{Input::get('step_length',10)==$i?'selected':''}}>{{$i}}</option>
+                                    @endfor
                                 </select>
                             </div>
                         </div>
+                            <script>
+                                $(function(){
+                                    $('.first').click(function(){
+                                        $('#step').val(0);
+                                        $(this).closest('form').submit();
+                                    });
+                                    $('.last').click(function(){
+                                        $('#step').val({{floor($count/Input::get('step_length',10))}});
+                                        $(this).closest('form').submit();
+                                    });
+                                    @if(Input::get('step',0)!=(floor($count/Input::get('step_length',10))))
+                                    $('.next').click(function(){
+                                        $('#step').val(parseInt($('#step').val())+1);
+                                        $(this).closest('form').submit();
+                                    });
+                                    @endif
+                                    @if(Input::has('step') && Input::get('step')!=0)
+                                    $('.prev').click(function(){
+                                        $('#step').val(parseInt($('#step').val())-1);
+                                        $(this).closest('form').submit();
+                                    });
+                                    @endif
+                                });
+                            </script>
+                            @endif
                     </div>
                 </form>
             </div>

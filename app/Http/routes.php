@@ -34,6 +34,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page70','PanelSettings',array('only'=>['index','store','create','destroy']));
         Route::resource('page71','TestSettings',array('only'=>['index','edit']));
         Route::resource('page72','NetController',['only'=>['index','edit','create','store','destroy']]);
+        Route::resource('page74','PretenceController',['only'=>['index','edit','create','store','destroy']]);
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
     Route::get('/', function () {

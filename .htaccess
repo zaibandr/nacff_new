@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Options +FollowSymLinks -Indexes
 
 RewriteEngine on
@@ -8,4 +9,16 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
 RewriteRule ^(.*)$ index.php [L,QSA]
+=======
+Options +FollowSymLinks -Indexes
+
+RewriteEngine on
+
+#RewriteRule ^aaa ./config [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^(.*)$ index.php [L,QSA]
+>>>>>>> origin/master
 php_value max_execution_time 60
