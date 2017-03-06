@@ -55,20 +55,6 @@ class MailController extends DBController
             )
         );
 
-<<<<<<< HEAD
-        if (\Input::has('seal')) $params['params']['seal'] = "1";
-        //if (isset($_GET["signature"])) $params['params']['signature'] = "1";
-        $params['params']['logo'] = "1";
-        $json = Func::getJsonMainList($params);
-        $obj = json_decode($json, true);
-        $file = '';
-        $query = "select mail_from, mail_password from departments where dept='$from'";
-        $stmt = $this->getResult($this->queryDB($query));
-        $mail_from = $_ENV['MAIL_USERNAME'].'@nacpp.ru';
-        $mail_user = $_ENV['MAIL_USERNAME'];
-        $mail_pass = $_ENV['MAIL_PASSWORD'];
-        $host = $_ENV['MAIL_HOST'];
-=======
         if (\Input::has('seal')) $params['params']['nacpp-seal'] = "1";
         //if (isset($_GET["signature"])) $params['params']['signature'] = "1";
         $params['params']['logo']   = "1";
@@ -81,7 +67,6 @@ class MailController extends DBController
         $mail_user                  = $_ENV['MAIL_USERNAME'];
         $mail_pass                  = $_ENV['MAIL_PASSWORD'];
         $host                       = $_ENV['MAIL_HOST'];
->>>>>>> origin/master
         if(isset($stmt[0]['MAIL_FROM'])){
             $mail_from = $stmt[0]['MAIL_FROM'];
             $mail_user = $stmt[0]['MAIL_FROM'];
@@ -117,12 +102,8 @@ class MailController extends DBController
             'username' => $mail_user,
             'password' => $mail_pass,
         ]);
-<<<<<<< HEAD
-	(new \Illuminate\Mail\MailServiceProvider(app()))->register();
-=======
 
         (new \Illuminate\Mail\MailServiceProvider(app()))->register();
->>>>>>> origin/master
 
         if(isset($obj["status"]) && ($obj["status"]=='fail')) {
             if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
