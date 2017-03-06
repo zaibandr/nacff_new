@@ -38,7 +38,8 @@ class AdminFolders extends DBController
     public function store(Request $request)
     {
         return \View::make('adminPanel.folders')->with([
-            'folders' => $this->getFoldersAdmin($request)
+            'folders'   => $this->getFoldersAdmin($request)[0],
+            'count'     => $this->getFoldersAdmin($request)[1],
         ]);
     }
 

@@ -7,15 +7,14 @@
  */
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\DBController;
 use App\Http\Controllers\FuncController as Func;
 
 class MailController extends DBController
 {
     public function index($id)
     {
-        $folderno = $id;
-        $c = '';
+        $folderno   = $id;
+        $c          = '';
         if(!(\Session::has('isAdmin') && \Session::get('isAdmin')==1)) {
             $res = $this->getDepts();
             //$res = ibase_fetch_row($stmt);
@@ -40,7 +39,7 @@ class MailController extends DBController
     }
     public function indexPost($id){
         if(\Input::has('from'))
-            $from = str_replace("\"", "'", \Input::get('from'));
+            $from = \Input::get('from');
         if(\Input::has('to'))
             $to = htmlspecialchars(\Input::get('to'));
         if(\Input::has('theme'))
@@ -56,18 +55,21 @@ class MailController extends DBController
             )
         );
 
-        //if (isset($_GET["seal"])) $params['params']['seal'] = "1";
+        if (\Input::has('seal')) $params['params']['nacpp-seal'] = "1";
         //if (isset($_GET["signature"])) $params['params']['signature'] = "1";
-        $params['params']['logo'] = "1";
-        $json = Func::getJsonMainList($params);
-        $obj = json_decode($json, true);
-        $file = '';
-        $query = "select mail_from, mail_password from departments where dept='$from'";
-        $stmt = $this->getResult($this->queryDB($query));
-        $mail_from = 'laboratory@nacpp.ru';
-        $mail_pass = 'ABCabc123';
-        if(isset($stmt[0])){
+        $params['params']['logo']   = "1";
+        $json                       = Func::getJsonMainList($params);
+        $obj                        = json_decode($json, true);
+        $file                       = '';
+        $query                      = "select mail_from, mail_password from departments where dept='$from'";
+        $stmt                       = $this->getResult($this->queryDB($query));
+        $mail_from                  = $_ENV['MAIL_USERNAME'].'@nacpp.ru';
+        $mail_user                  = $_ENV['MAIL_USERNAME'];
+        $mail_pass                  = $_ENV['MAIL_PASSWORD'];
+        $host                       = $_ENV['MAIL_HOST'];
+        if(isset($stmt[0]['MAIL_FROM'])){
             $mail_from = $stmt[0]['MAIL_FROM'];
+            $mail_user = $stmt[0]['MAIL_FROM'];
             $mail_pass = $stmt[0]['MAIL_PASSWORD'];
             preg_match('/@([^.]*)/', $mail_from, $a);
             $mail = $a[1];
@@ -90,27 +92,30 @@ class MailController extends DBController
                     $host = 'ssl://smtp.mail.ru';  // Specify main and backup SMTP servers
                     break;
             }
-            \Config::set('mail',[
-                'driver' => 'smtp',
-                'host' => $host,
-                'port' => 25,
-                'from' => array('address' => $mail_from, 'name' => $from),
-                'encryption' => 'tls',
-                'username' => $mail_from,
-                'password' => $mail_pass,
-            ]);
         }
+        config()->set('mail',[
+            'driver' => 'smtp',
+            'host' => $host,
+            'port' => 25,
+            'from' => array('address' => $mail_from, 'name' => $from),
+            'encryption' => '',
+            'username' => $mail_user,
+            'password' => $mail_pass,
+        ]);
+
+        (new \Illuminate\Mail\MailServiceProvider(app()))->register();
+
         if(isset($obj["status"]) && ($obj["status"]=='fail')) {
             if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
         } else {
             $file = base64_decode($obj["data"][0]["pdf"]);
         }
         //$r = Func::send_mail($from, $to, $theme, $body, $file, $id);
-        $r = \Mail::raw($body,function($message) use ($to, $mail_from, $from, $theme, $file){
+        $r = \Mail::raw($body,function($message) use ($id,$to, $mail_from, $from, $theme, $file){
             $message->to($to);
             $message->from($mail_from,$from);
             $message->subject($theme);
-            $message->attachData($file,'attach.pdf');
+            $message->attachData($file,"$id.pdf");
         });
 
         if ($r==false) {
