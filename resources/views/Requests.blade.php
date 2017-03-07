@@ -68,7 +68,7 @@
                     @foreach($folders as $val)
                         <tr>
                             <td style="color:{{$val['STATUSCOLOR']}}; font-weight: bold;">{{$val['STATUSNAME']}}</td>
-                            <td><a target="_blank" href='{{$val['STATUSNAME']=='Черновик' ? url('draft/'.$val['FOLDERNO']) : url('request/'.$val['FOLDERNO'])}}'>{{$val['FOLDERNO']}}</a></td>
+                            <td><a target="_blank" href='{{$val['STATUSNAME']=='Черновик' ? secure_url('draft/'.$val['FOLDERNO']) : secure_url('request/'.$val['FOLDERNO'])}}'>{{$val['FOLDERNO']}}</a></td>
                             <td>{{$val['SURNAME']." ".$val['NAME']." ".$val['PATRONYMIC']}}</td>
                             <td>{{$val['GENDER']=='F' ? 'Ж' : 'М'}}</td>
                             <td>{{date('d.m.Y',strtotime($val['LOGDATE']))}}</td>

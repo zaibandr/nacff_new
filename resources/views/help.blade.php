@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
     <div id="lpu">
         <h1>Справка</h1>
         <ul style="margin: 3% 0">

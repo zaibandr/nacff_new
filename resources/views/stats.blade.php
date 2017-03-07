@@ -1,9 +1,9 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/stat.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/stat.css')}}" rel="stylesheet">
     @include('scripts.statScript')
     <div id="stat">
         <h1>СТАТИСТИКА</h1>

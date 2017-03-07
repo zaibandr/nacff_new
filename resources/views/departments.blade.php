@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/departments.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/departments.css')}}" rel="stylesheet">
     <div id="departments">
         <h1>ОТДЕЛЕНИЯ ЦЕНТРА</h1>
         <div class="row">

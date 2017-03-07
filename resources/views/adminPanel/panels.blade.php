@@ -1,9 +1,9 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/price.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/price.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
     <div id="pricePage">
         <h1>НАСТРОЙКА ПАНЕЛЕЙ</h1>
         <button class="btn btn-primary" data-toggle="modal" data-target="#add" style="margin: 2%">Добавить панель</button>

@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/discount.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/discount.css')}}" rel="stylesheet">
     <div id="discount">
         <h1>ПРОГРАММЫ СКИДОК</h1>
         <div class="row">

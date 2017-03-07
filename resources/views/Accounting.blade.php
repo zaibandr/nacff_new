@@ -1,10 +1,10 @@
 @extends('default')
 @section('content')
 
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/accounting.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/accounting.css')}}" rel="stylesheet">
     <div id="accounting">
         <h1 style="margin-bottom: 2%;">КАССОВЫЙ ОТЧЕТ</h1>
         <div class="row">

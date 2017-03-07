@@ -29,7 +29,7 @@
 </style>
 <table style="padding: 40px; padding-top: 80px;">
     <tr>
-        <td colspan="1"><img src="{{asset('images/03.png')}}" alt="" width="250"></td>
+        <td colspan="1"><img src="{{secure_asset('images/03.png')}}" alt="" width="250"></td>
         <td colspan="3" align="center"><b>НАЦИОНАЛЬНОЕ АГЕНТСТВО КЛИНИЧЕСКОЙ ФАРМАКОЛОГИИ И ФАРМАЦИИ<br>
                 РОССИЯ, 109099, МОСКВА, УЛ. УГРЕШСКАЯ, Д.2, СТР.8<br>
                 ТЕЛ.: +7-(495)-933-96-96, WWW.NACPP.RU</b></td>

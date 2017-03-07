@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/price.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/price.css')}}" rel="stylesheet">
     <div id="pricePage">
         <h1>Панель {{Input::get('id','')}}</h1>
         <div class="row">

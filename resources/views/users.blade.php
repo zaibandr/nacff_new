@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/user.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/user.css')}}" rel="stylesheet">
     <div id="user">
         <H1>АДМИНИСТРИРОВАНИЕ ПОЛЬЗОВАТЕЛЕЙ</H1>
         <div class="row">

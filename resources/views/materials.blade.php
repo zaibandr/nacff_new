@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/materials.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/materials.css')}}" rel="stylesheet">
     <div id="materials">
         <h1>МАТЕРИАЛЫ</h1>
         <div class="row">

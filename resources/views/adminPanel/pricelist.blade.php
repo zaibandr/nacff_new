@@ -1,8 +1,8 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
     @include('scripts.deptAdminScript')
     <div id="lpu">
         <h1>Прайс-лист #{{$id}}</h1>

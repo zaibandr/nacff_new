@@ -1,6 +1,6 @@
-<script src="{{asset('resources/assets/scripts/jquery.tablesorter.js')}}"></script>
-<script src="{{asset('resources/assets/scripts/jquery.tablesorter.widgets.js')}}"></script>
-<script src="{{asset('resources/assets/scripts/widgets/widget-scroller.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.tablesorter.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.tablesorter.widgets.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/widgets/widget-scroller.js')}}"></script>
 <script>
     $(function(){
         $('.tablesorter').tablesorter({

@@ -20,7 +20,7 @@ Route::get('auth',function(){
     return View::make('auth');
 });
 Route::get('phpinfo',function(){
-    return phpinfo();
+    //return phpinfo();
 });
 Route::get('messages','InfoController@index');
 Route::get('integration','IntegrationController@index');

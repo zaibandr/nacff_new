@@ -1,9 +1,9 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/slis.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/slis.css')}}" rel="stylesheet">
     @include('scripts.tablesorterScriptTab')
 <div id="tabs">
     <h1>СПРАВОЧНИКИ ЛИС</h1>

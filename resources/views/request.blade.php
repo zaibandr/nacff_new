@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/request.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/request.css')}}" rel="stylesheet">
 <div id="request">
             <h1>Информация по заявке: {{$id}}</h1>
     <div class="row" style="background: #49B1C2; margin-top: 2%; margin-bottom: 2%">
@@ -44,10 +44,10 @@
                 </tr>
             </table>
             <br>
-            <a href="{{url("print/$id?action=save&logo=1")}}" class="lnk"><span class="fa fa-file-pdf-o"></span> Сохранить в <b>PDF</b><br></a>
-            <a href="{{url("print/$id?action=print&logo=1")}}" class="lnk"><span class="fa fa-print"></span> Распечатать<br></a>
-            <a href="{{url("print/$id?action=print&logo=1&a5=1")}}" class="lnk"><span class="fa fa-print"> </span>Распечатать в формате А5<br></a>
-            <a href="{{url("mail/$id?logo=1")}}" ><span class="fa fa-envelope-o"> </span>Отправить по почте<br></a>
+            <a href="{{secure_url("print/$id?action=save&logo=1")}}" class="lnk"><span class="fa fa-file-pdf-o"></span> Сохранить в <b>PDF</b><br></a>
+            <a href="{{secure_url("print/$id?action=print&logo=1")}}" class="lnk"><span class="fa fa-print"></span> Распечатать<br></a>
+            <a href="{{secure_url("print/$id?action=print&logo=1&a5=1")}}" class="lnk"><span class="fa fa-print"> </span>Распечатать в формате А5<br></a>
+            <a href="{{secure_url("mail/$id?logo=1")}}" ><span class="fa fa-envelope-o"> </span>Отправить по почте<br></a>
             <input type="checkbox" id="sign"> С печатью НАКФФ<br>
             <input type="checkbox" id="signature"> С подписью врача<br>
         </div>

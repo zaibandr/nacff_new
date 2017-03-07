@@ -1,8 +1,8 @@
-<script src="{{asset('resources/assets/scripts/jquery.steps.js')}}"></script>
-<script src="{{asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
-<script src="{{asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
-<script src="{{asset('public/js/bootstrap-datepicker.js')}}"></script>
-<script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.steps.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
+<script src="{{secure_asset('public/js/bootstrap-datepicker.js')}}"></script>
+<script src="{{secure_asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     var max=0;
     var rules = [];

@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/procedure.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/procedure.css')}}" rel="stylesheet">
     <div id="procedure">
         <h1>ПРОЦЕДУРНЫЙ КАБИНЕТ</h1>
         @if(count($proc)<1)
@@ -36,7 +36,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4 col-lg-offset-8" style="margin-top: 20px">
-                    <a href="{{url("page49?folderno=$id")}}" ><button class="btn btn-info"> Анализы взяты!</button></a>
+                    <a href="{{secure_url("page49?folderno=$id")}}" ><button class="btn btn-info"> Анализы взяты!</button></a>
                 </div>
             </div>
         </div>

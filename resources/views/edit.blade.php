@@ -1,11 +1,11 @@
 
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/ui.dynatree.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery.steps.css')}}" rel="stylesheet">
-    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/edit.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/ui.dynatree.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery.steps.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/edit.css')}}" rel="stylesheet">
     <div id="edit">
         <h1>РЕДАКТИРОВАНИЕ НАПРАВЛЕНИЯ</h1>
         <div id="infoFrm"></div>

@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/mail.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/mail.css')}}" rel="stylesheet">
     <div id="mail">
         <h1>ОТПРАВКА РЕЗУЛЬТАТОВ НА ПОЧТУ</h1>
     <form action="" method="post">

@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
     <div id="lpu">
         <h1>НАстройка Меню</h1>
         <button class="btn btn-primary" data-toggle="modal" data-target="#add" style="margin: 2%">Добавить меню</button>

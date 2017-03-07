@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/patient.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/patient.css')}}" rel="stylesheet">
     <div id="patient">
         <h1 style="margin-bottom: 2%">ПЕРСОНАЛЬНЫЙ НОМЕР {{$id}}</h1>
         <div class="row">
@@ -46,9 +46,9 @@
                     @foreach($patient as $val)
                         <tr>
                             @if($val['APPRSTS']!=='D')
-                            <td><a href="{{url('request/'.$val['FOLDERNO'])}}">{{$val['FOLDERNO']}}</a></td>
+                            <td><a href="{{secure_url('request/'.$val['FOLDERNO'])}}">{{$val['FOLDERNO']}}</a></td>
                             @else
-                                <td><a href="{{url('draft/'.$val['FOLDERNO'])}}">{{$val['FOLDERNO']}}</a></td>
+                                <td><a href="{{secure_url('draft/'.$val['FOLDERNO'])}}">{{$val['FOLDERNO']}}</a></td>
                             @endif
                             <td>{{$val['STATUSNAME']}}</td>
                             <td>{{date('d.m.Y', strtotime($val['LOGDATE']))}}</td>

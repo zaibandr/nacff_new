@@ -1,10 +1,10 @@
 @extends('default')
 @section('content')
 
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/detal.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/detal.css')}}" rel="stylesheet">
     <div id="detal">
         <h1>Детальный отчет</h1>
         <div class="row">

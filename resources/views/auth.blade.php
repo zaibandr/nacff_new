@@ -43,7 +43,7 @@
                             <div class="col-md-6 col-md-offset-4">
                                 <button type="submit" class="btn btn-primary">Войти</button>
 
-                                <!--a class="btn btn-link" href="{{ url('/password/email') }}">Забыли пароль?</a-->
+                                <!--a class="btn btn-link" href="{{ secure_url('/password/email') }}">Забыли пароль?</a-->
                             </div>
                         </div>
                     </form>

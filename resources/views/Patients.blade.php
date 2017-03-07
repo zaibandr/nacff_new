@@ -1,8 +1,8 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/patients.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/patients.css')}}" rel="stylesheet">
     @include('scripts.patientScript')
     <div id="patients">
         <h1>Список пациентов</h1>
@@ -18,7 +18,7 @@
             </thead>
             <tbody>
             @foreach($patients as $val)
-                <tr><td><a href="{{url('pid/'.$val['PID'])}}">{{$val['PID']}}</a></td>
+                <tr><td><a href="{{secure_url('pid/'.$val['PID'])}}">{{$val['PID']}}</a></td>
                 <td>{{date('d.m.Y', strtotime($val['LOGDATE']))}}</td>
                 <td>{{$val['SURNAME'].' '.$val['NAME'].' '.$val['PATRONYMIC']}}</td>
                 <td>{{$val['GENDER']=='F' ?'Жен' : 'Муж'}}</td>

@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/lpu.css')}}" rel="stylesheet">
     <div id="lpu">
         <h1>Добавить ЛПУ</h1>
         <div class="row">

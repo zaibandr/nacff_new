@@ -1,10 +1,10 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/ui.dynatree.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery.steps.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
-    <link href="{{asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
-    <link href="{{asset('resources/assets/css/registration.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/ui.dynatree.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery.steps.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/jquery-ui.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/registration.css')}}" rel="stylesheet">
     <div id="registration">
         <h1>РЕГИСТРАЦИЯ НАПРАВЛЕНИЯ</h1>
         <div id="infoFrm"></div>

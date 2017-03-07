@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/LPU.css')}}" rel="stylesheet">
     <div id="lpu">
         <h1>Интеграция ЛИС ООО НАКФФ со сторонними программами</h1>
         <div class="row">

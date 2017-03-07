@@ -1,7 +1,7 @@
-<script src="{{asset('resources/assets/scripts/jquery.tablesorter.js')}}"></script>
-<script src="{{asset('resources/assets/scripts/jquery.tablesorter.widgets.js')}}"></script>
-<script src="{{asset('public/js/bootstrap-datepicker.js')}}"></script>
-<script src="{{asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.tablesorter.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.tablesorter.widgets.js')}}"></script>
+<script src="{{secure_asset('public/js/bootstrap-datepicker.js')}}"></script>
+<script src="{{secure_asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
 <script>
     $(function(){
         $('.input-daterange').datepicker({

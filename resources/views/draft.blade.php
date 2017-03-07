@@ -1,6 +1,6 @@
 @extends('default')
 @section('content')
-    <link href="{{asset('resources/assets/css/draft.css')}}" rel="stylesheet">
+    <link href="{{secure_asset('resources/assets/css/draft.css')}}" rel="stylesheet">
 <div id="draft">
     <h1>Информация по заявке  {{$folder['FOLDERNO']}}</h1>
     <div class="row" style="background: #49B1C2">
@@ -12,7 +12,7 @@
             <table id="a" class="table">
                 <tr>
                     <td class="grey">PID</td>
-                    <td><b><a href="{{url('pid/'.$folder['PID'])}}">{{$folder['PID']}}</a></b></td>
+                    <td><b><a href="{{secure_url('pid/'.$folder['PID'])}}">{{$folder['PID']}}</a></b></td>
                 </tr>
                 <tr>
                     <td class="grey">Фамилия</td>
@@ -44,10 +44,10 @@
             <table class="table" id="c">
                 <tr>
                     <td><a href="" data-target="#label" data-toggle="modal"><i class="fa fa-barcode">&nbsp;Штрих-код</i></a></td>
-                    <td><a href="{{url("print/$id?action=act")}}" ><i class="fa fa-file-pdf-o">&nbsp;Акт</i></a></td>
-                    <td><a href="{{url("edit/$id")}}" ><i class="fa fa-pencil-square-o">&nbsp;Редактировать</i></a></td>
-                    <td><a href="{{url("delete/$id")}}" ><i class="fa fa-trash-o">&nbsp;Удалить</i></a></td>
-                    <td><a href="{{url("new/$id")}}" ><i class="fa fa-copy">&nbsp;Копировать</i></a></td>
+                    <td><a href="{{secure_url("print/$id?action=act")}}" ><i class="fa fa-file-pdf-o">&nbsp;Акт</i></a></td>
+                    <td><a href="{{secure_url("edit/$id")}}" ><i class="fa fa-pencil-square-o">&nbsp;Редактировать</i></a></td>
+                    <td><a href="{{secure_url("delete/$id")}}" ><i class="fa fa-trash-o">&nbsp;Удалить</i></a></td>
+                    <td><a href="{{secure_url("new/$id")}}" ><i class="fa fa-copy">&nbsp;Копировать</i></a></td>
                 </tr>
             </table>
             <table id="b">
