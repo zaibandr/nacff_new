@@ -14,7 +14,7 @@
 //Route::get('404', function () {
 //    return View::make('errors.404');
 //});
-//URL::forceRootUrl('https://nacpp.info/new'); // all your routes are declared below this point.
+URL::forceRootUrl('https://nacpp.info/new'); // all your routes are declared below this point.
 Route::post('auth',['as'=>'auth', 'uses'=>'AuthController@check']);
 Route::get('auth',function(){
     return View::make('auth');
