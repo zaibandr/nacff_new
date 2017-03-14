@@ -44,12 +44,13 @@
                 </tr>
             </table>
             <br>
-            <a href="{{secure_url("print/$id?action=save&logo=1")}}" class="lnk"><span class="fa fa-file-pdf-o"></span> Сохранить в <b>PDF</b><br></a>
-            <a href="{{secure_url("print/$id?action=print&logo=1")}}" class="lnk"><span class="fa fa-print"></span> Распечатать<br></a>
-            <a href="{{secure_url("print/$id?action=print&logo=1&a5=1")}}" class="lnk"><span class="fa fa-print"> </span>Распечатать в формате А5<br></a>
-            <a href="{{secure_url("mail/$id?logo=1")}}" ><span class="fa fa-envelope-o"> </span>Отправить по почте<br></a>
+            <a href="{{secure_url("print/$id?action=save&logo=1")}}" class="lnk" target="_blank"><span class="fa fa-file-pdf-o"></span> Сохранить в <b>PDF</b><br></a>
+            <a href="{{secure_url("print/$id?action=print&logo=1")}}" class="lnk" target="_blank"><span class="fa fa-print"></span> Распечатать<br></a>
+            <a href="{{secure_url("print/$id?action=print&logo=1&a5=1")}}" class="lnk" target="_blank"><span class="fa fa-print"> </span>Распечатать в формате А5<br></a>
+            <a href="{{secure_url("mail/$id?logo=1")}}" ><span class="fa fa-envelope-o" target="_blank"> </span>Отправить по почте<br></a>
             <input type="checkbox" id="sign"> С печатью НАКФФ<br>
             <input type="checkbox" id="signature"> С подписью врача<br>
+            <input type="checkbox" id="person_blank"> На индивидуальном бланке<br>
         </div>
         <div class="col-lg-9">
             <table width="100%">
@@ -105,7 +106,6 @@
                         $(this).attr('href', href.concat('&seal=1'));
                     });
                 } else {
-                    console.log('un-checked');
                     $('a.lnk').each(function() {
                         href = $(this).attr('href');
                         $(this).attr('href', href.replace(/&?seal=\d+/, ''));
@@ -119,10 +119,22 @@
                         $(this).attr('href', href.concat('&signature=1'));
                     });
                 } else {
-                    console.log('un-checked');
                     $('a.lnk').each(function() {
                         href = $(this).attr('href');
                         $(this).attr('href', href.replace(/&?signature=\d+/, ''));
+                    });
+                }
+            });
+            $('input#person_blank').on('click', function() {
+                if( $(this).is(':checked') ) {
+                    $('a.lnk').each(function() {
+                        href = $(this).attr('href');
+                        $(this).attr('href', href.concat('&person_blank=1'));
+                    });
+                } else {
+                    $('a.lnk').each(function() {
+                        href = $(this).attr('href');
+                        $(this).attr('href', href.replace(/&?person_blank=\d+/, ''));
                     });
                 }
             })

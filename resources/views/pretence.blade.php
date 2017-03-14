@@ -2,7 +2,10 @@
 @section('content')
     <div id="pretence">
         <h1>Претензии</h1>
-
+        @foreach ($posts as $post)
+            {{ $post->id }}
+        @endforeach
+        {!! $posts->render() !!}
     </div>
     <style>
         #pretence

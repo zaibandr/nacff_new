@@ -55,44 +55,24 @@ class PrintController extends DBController
                     break;
                 case 'save':
                     $folderno = htmlspecialchars($id);
-                    if (isset($_GET["logo"])) $logo = "1"; else $logo = "0";
-                    if (isset($_GET["signature"])) $signature = "1"; else $signature = '';
-                    if (isset($_GET["seal"])) $seal = "1"; else $seal = "0";
-                    if ($seal == "1") {
-                        $params = array('domain' => 'https://192.168.0.17:1028/api/report.json',
-                            'cookies' => 'cookies.txt',
-                            'params' => array(
-                                'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
-                                'folderno' => $folderno,
-                                'seal' => '1',
-                                'client-id' => 11111
-                            )
-                        );
-
-                    } else if ($signature == "1") {
-                        $params = array('domain' => 'https://192.168.0.17:1028/api/report.json',
-                            'cookies' => 'cookies.txt',
-                            'params' => array(
-                                'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
-                                'folderno' => $folderno,
-                                'doctor-signature' => '1',
-                                'client-id' => \Session::get('clientcode')
-                            )
-                        );
-                    } else {
-                        $params = array('domain' => 'https://192.168.0.17:1028/api/report.json',
-                            'cookies' => 'cookies.txt',
-                            'params' => array(
-                                'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
-                                'folderno' => $folderno,
-                                'client-id' => \Session::get('clientcode')
-                            )
-                        );
-
+                    $params = array('domain' => 'https://192.168.0.17:1028/api/report.json',
+                        'cookies' => 'cookies.txt',
+                        'params' => array(
+                            'api-key' => '5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
+                            'folderno' => $folderno,
+                            'client-id' => 11111
+                        )
+                    );
+                    if(\Input::has('logo'))
+                        $params['params']['logo'] = "1";
+                    if(\Input::has('signature'))
+                        $params['params']['doctor-signature'] = "1";
+                    if(\Input::has('seal'))
+                        $params['params']['nacpp-seal'] = "1";
+                    if(\Input::has('person_blank')) {
+                        $params['params']['seal'] = "1";
+                        unset($params['params']['nacpp-seal']);
                     }
-                    if (isset($_GET["seal"])) $params['params']['nacpp-seal'] = "1";
-
-                    if (isset($_GET["logo"])) $params['params']['logo'] = "1";
                     $json = Func::getJsonMainList($params);
                     $obj = json_decode($json, true);
                     return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
@@ -105,35 +85,39 @@ class PrintController extends DBController
                     ]);
                     break;
                 case 'print':
-                        $folderno = htmlspecialchars($id);
+                    $folderno = htmlspecialchars($id);
 
-                        $params = array('domain'=>'https://192.168.0.17:1028/api/report.json',
-                            'cookies'=>'cookies.txt',
-                            'params'=>array(
-                                'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
-                                'folderno'=>$folderno,
-                                'client-id'=>21611,
-                                'block'=>1
-                            )
-                        );
+                    $params = array('domain'=>'https://192.168.0.17:1028/api/report.json',
+                        'cookies'=>'cookies.txt',
+                        'params'=>array(
+                            'api-key'=>'5b2e6d61-1bea-4c8f-811e-b95a946a7e46',
+                            'folderno'=>$folderno,
+                            'client-id'=>21611,
+                            'block'=>1
+                        )
+                    );
 
-                        //if (isset($_GET["seal"])) $params['params']['seal'] = "1";
-                        //if (isset($_GET["signature"])) $params['params']['signature'] = "1";
-                        if (isset($_GET["logo"])) $params['params']['logo'] = "1";
-                        if (isset($_GET["a5"])) $params['params']['a5'] = "1";
-                        if (isset($_GET["seal"])) $params['params']['nacpp-seal'] = "1";
-                        if (isset($_GET["signature"])) $params['params']['doctor-signature'] = "1";
+                    //if (isset($_GET["seal"])) $params['params']['seal'] = "1";
+                    //if (isset($_GET["signature"])) $params['params']['signature'] = "1";
+                    if (isset($_GET["logo"])) $params['params']['logo'] = "1";
+                    if (isset($_GET["a5"])) $params['params']['a5'] = "1";
+                    if (isset($_GET["seal"])) $params['params']['nacpp-seal'] = "1";
+                    if (isset($_GET["signature"])) $params['params']['doctor-signature'] = "1";
+                    if(\Input::has('person_blank')) {
+                        $params['params']['seal'] = "1";
+                        unset($params['params']['nacpp-seal']);
+                    }
                         $json = Func::getJsonMainList($params);
                         $obj = json_decode($json, true);
 
                     if(isset($obj["status"]) && ($obj["status"]=='fail')) {
-                            if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
-                        } else {
-                        return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
-                            'Content-Type' => 'application/pdf',
-                            'Content-Disposition' => 'inline; filename=report#' . $folderno .'.pdf"'
-                        ]);
-                        }
+                        if(isset($obj["error_code"])&&isset($obj["message"])) echo $obj["error_code"].": ".$obj["message"];
+                    } else {
+                    return \Response::make(base64_decode($obj["data"][0]["pdf"]), 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'inline; filename=report#' . $folderno .'.pdf"'
+                    ]);
+                    }
                     break;
                 case 'massPrint':
                         $ids = explode(",", htmlspecialchars($id));

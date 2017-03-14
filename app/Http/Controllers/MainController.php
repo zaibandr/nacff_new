@@ -15,13 +15,15 @@ use App\Http\Controllers\FuncController as Func;
 use Maatwebsite\Excel\Facades\Excel;
 use Khill\Lavacharts\Lavacharts;
 use sngrl\SphinxSearch\SphinxSearch;
-
+use App\RegitrationJournal;
 
 class MainController extends DB
 {
     public function index(){
-        //dd($a);
-        return View::make('main');
+        $posts = RegitrationJournal::shown()->answer(\Session::get('clientcode'))->orderBy('id','desc')->paginate(10);
+        return View::make('main',[
+            'posts' => $posts
+        ]);
     }
     //  Справочники ЛИС
     public function page55(){
@@ -69,8 +71,8 @@ class MainController extends DB
             }
         }
         return View::make('info')->with([
-           'error' => $error,
-           'res' => $b
+            'error' => $error,
+            'res' => $b
         ]);
     }
     //  Список пациентов
@@ -256,29 +258,29 @@ class MainController extends DB
 
             $age = Func::age($dt_bday); $fullcost = $cost + $dis;
             $pid = Input::get('pid','');
-         /*   if (Input::has('pid') && Input::get('pid')!='')
-            {
-                $pid = Input::get('pid');
-                $query = "update patient set surname='".$surname."' , name='".$name."' , patronymic='".$namepatr."' ";
-                $query.= ", gender='".$gender."' , DATE_BIRTH='".$dt_bday."' , ADDRESS='".$address."' , ";
-                $query.= "PASSPORT_SERIES='".$passport_series."' , PASSPORT_NUMBER='".$passport_number."' , PHONE='";
-                $query.= $phone."' , EMAIL='".$email."' , LOGUSER='".mb_strtoupper(\Session::get('login'))."' , bill=bill+".$cost." where pid='".$pid."'";
-                $stmt = $this->queryDB($query);
-                if($stmt===false)
-                    return 'Ошибка сохранения пациента';
-            } else {
-                $query = "INSERT INTO PATIENT (SURNAME, NAME, PATRONYMIC, GENDER, DATE_BIRTH, ADDRESS, PASSPORT_SERIES, PASSPORT_NUMBER, PHONE, EMAIL, LOGUSER, BILL) ";
-                $query.= "VALUES('$surname', '$name', '$namepatr', '$gender', '$dt_bday', '$address', '$passport_series', '$passport_series', '$phone', '$email','".\Session::get('login')."', $cost)";
-                $stmt = $this->queryDB($query);
-                if($stmt===false)
-                    return 'Ошибка сохранения пациента';
-                $query = "select first 1 pid from PATIENT order by logdate desc";
-                $stmt = $this->queryDB($query);
-                if($stmt===false)
-                    return 'Ошибка сохранения пациента';
-                $res = $this->getResult($stmt);
-                $pid = $res[0]['PID'];
-            }*/
+            /*   if (Input::has('pid') && Input::get('pid')!='')
+               {
+                   $pid = Input::get('pid');
+                   $query = "update patient set surname='".$surname."' , name='".$name."' , patronymic='".$namepatr."' ";
+                   $query.= ", gender='".$gender."' , DATE_BIRTH='".$dt_bday."' , ADDRESS='".$address."' , ";
+                   $query.= "PASSPORT_SERIES='".$passport_series."' , PASSPORT_NUMBER='".$passport_number."' , PHONE='";
+                   $query.= $phone."' , EMAIL='".$email."' , LOGUSER='".mb_strtoupper(\Session::get('login'))."' , bill=bill+".$cost." where pid='".$pid."'";
+                   $stmt = $this->queryDB($query);
+                   if($stmt===false)
+                       return 'Ошибка сохранения пациента';
+               } else {
+                   $query = "INSERT INTO PATIENT (SURNAME, NAME, PATRONYMIC, GENDER, DATE_BIRTH, ADDRESS, PASSPORT_SERIES, PASSPORT_NUMBER, PHONE, EMAIL, LOGUSER, BILL) ";
+                   $query.= "VALUES('$surname', '$name', '$namepatr', '$gender', '$dt_bday', '$address', '$passport_series', '$passport_series', '$phone', '$email','".\Session::get('login')."', $cost)";
+                   $stmt = $this->queryDB($query);
+                   if($stmt===false)
+                       return 'Ошибка сохранения пациента';
+                   $query = "select first 1 pid from PATIENT order by logdate desc";
+                   $stmt = $this->queryDB($query);
+                   if($stmt===false)
+                       return 'Ошибка сохранения пациента';
+                   $res = $this->getResult($stmt);
+                   $pid = $res[0]['PID'];
+               }*/
             $query = "delete from pool rows 1 returning folderno ";
             $stmt = ibase_query($query);
             $res = ibase_fetch_assoc($stmt);
@@ -317,10 +319,10 @@ class MainController extends DB
                         $res = $this->queryDB($query);
                     }
                 }
-            if(isset($c) && $c=='OK'){
-                $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
-                $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes','$folderno')";
-                $this->queryDB($query);
+                if(isset($c) && $c=='OK'){
+                    $mes  = "Панели: ".substr(Input::get("panels"),0,-1);
+                    $query = "insert into history(pid, act, mes, folderno) VALUES ('$pid','Регистрация направления','$mes','$folderno')";
+                    $this->queryDB($query);
                     echo "<script>$('#folderno').html('" . $folderno . "');</script>";
                     echo "<img style=\"vertical-align: inherit; margin:0px; border:0\" src=\"images/ok.jpg\" /><b>Заявка была успешно сохранена под номером #" . $folderno . "</b>";
                 }
@@ -392,7 +394,7 @@ class MainController extends DB
             $a[$val['FOLDERNO']]['MAT'][] = $val['MATTYPE'];
         }
         return View::make('procedur')->with([
-           'proc' => $a,
+            'proc' => $a,
         ]);
     }
     //  Статистика
@@ -402,284 +404,284 @@ class MainController extends DB
         $pan = [];
         $sum = 0;
         if(Input::has('stat')) {
-                switch (Input::get('stat')){
-                    case 0:
-                        $b = [];
-                        $a = $this->getStatistic(0);
-                        $b['all'] = 0;
-                        foreach ($a as $val) {
-                            $key = isset($val['CODE']) ? $val['CODE'] : $val['CODE_01'];
-                            if (!array_key_exists($key, $pan)) {
-                                //$cost = isset($val['PRICE_01']) ? $val['PRICE_01'] : $val['PRICE'];
-                                $cost = $val['COST'];
-                                $b[$key] = $cost * (100 - $val['DISCOUNT']) / 100;
-                                $b['all'] += $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$key]['panel'] = isset($val['PANEL']) ? $val['PANEL'] : $val['NAME'];
-                                $pan[$key]['cost'] = $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$key]['nacff'] = $val['NACPH'];
-                                $pan[$key]['dis'] = $cost * ($val['DISCOUNT']) / 100;
-                                $pan[$key]['count'] = 1;
-                            } else {
-                                //$cost = isset($val['PRICE_01']) ? $val['PRICE_01'] : $val['PRICE'];
-                                $cost = $val['COST'];
-                                $b[$key] += $cost * (100 - $val['DISCOUNT']) / 100;
-                                $b['all'] += $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$key]['nacff'] += $val['NACPH'];
-                                $pan[$key]['cost'] += $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$key]['dis'] += $cost * ($val['DISCOUNT']) / 100;
-                                $pan[$key]['count'] ++;
-                            }
-                        }
-                        arsort($b);
-                        $i=0;
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable();
-                        $reasons->addStringColumn('Панель')
-                            ->addNumberColumn('Сумма');
-                        foreach($b as $k=>$v)
-                        {
-                            if($i<9 && $k!=='all'){
-                                $b['all']-=$v;
-                                $reasons->addRow(["$k", $v]);
-                                $i++;
-                            }
-                        }
-                        $reasons->addRow(["Остальные", $b['all']]);
-                        $lava->DonutChart('Dep', $reasons, [
-                            'title' => 'Статистика по исследованиям',
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan, $lava){
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
-                                    $sheet->loadView('excels.statPan')->with([
-                                        'pan'=>$pan,
-                                        'lava'=>$lava,
-                                    ]);
-                                });
-                            })->export('xls');
-                        }
-                    break;
-                    case 1:
-                        $a = $this->getStatistic(1);
-                        $pan['Первичные пациенты'] = 0;
-                        $pan['Повторные пациенты'] = 0;
-                        foreach ($a as $val) {
-                            if($val['PRIME']='Y')
-                                $pan['Первичные пациенты']++;
-                            else
-                                $pan['Повторные пациенты']++;
-                        }
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable();
-                        $reasons->addStringColumn('Обращение')
-                            ->addNumberColumn('Количество');
-                        foreach($pan as $k=>$v)
-                            $reasons->addRow(["$k", $v]);
-                        $lava->DonutChart('Dep', $reasons, [
-                            'title' => 'Первичные/повторные пациенты',
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan) {
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan) {
-                                    $sheet->loadView('excels.statPat')->with([
-                                        'pan' => $pan,
-                                    ]);
-                                });
-                            })->export('xls');
-                        }
-                        break;
-                    case 2:
-                        $a = $this->getStatistic(2);
-                        foreach ($a as $val) {
+            switch (Input::get('stat')){
+                case 0:
+                    $b = [];
+                    $a = $this->getStatistic(0);
+                    $b['all'] = 0;
+                    foreach ($a as $val) {
+                        $key = isset($val['CODE']) ? $val['CODE'] : $val['CODE_01'];
+                        if (!array_key_exists($key, $pan)) {
                             //$cost = isset($val['PRICE_01']) ? $val['PRICE_01'] : $val['PRICE'];
                             $cost = $val['COST'];
-                            if(isset($pan[$val['DEPT']])) {
-                                $pan[$val['DEPT']]['cost'] += $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$val['DEPT']]['nacpp'] += $val['NACPH'];
-                            }
-                            else {
-                                $pan[$val['DEPT']]['cost'] = $cost * (100 - $val['DISCOUNT']) / 100;
-                                $pan[$val['DEPT']]['nacpp'] = $val['NACPH'];
-                            }
-                            $sum+=$cost * (100 - $val['DISCOUNT']) / 100;
+                            $b[$key] = $cost * (100 - $val['DISCOUNT']) / 100;
+                            $b['all'] += $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$key]['panel'] = isset($val['PANEL']) ? $val['PANEL'] : $val['NAME'];
+                            $pan[$key]['cost'] = $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$key]['nacff'] = $val['NACPH'];
+                            $pan[$key]['dis'] = $cost * ($val['DISCOUNT']) / 100;
+                            $pan[$key]['count'] = 1;
+                        } else {
+                            //$cost = isset($val['PRICE_01']) ? $val['PRICE_01'] : $val['PRICE'];
+                            $cost = $val['COST'];
+                            $b[$key] += $cost * (100 - $val['DISCOUNT']) / 100;
+                            $b['all'] += $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$key]['nacff'] += $val['NACPH'];
+                            $pan[$key]['cost'] += $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$key]['dis'] += $cost * ($val['DISCOUNT']) / 100;
+                            $pan[$key]['count'] ++;
                         }
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable();
-                        $reasons->addStringColumn('Отделение')
-                            ->addNumberColumn('Сумма');
-                        foreach($pan as $k=>$v)
-                            $reasons->addRow(["$k", $v['cost']]);
-                        $lava->DonutChart('Dep', $reasons, [
-                            'title' => 'Количество направлений по ЛО',
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan, $lava){
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
-                                    $sheet->loadView('excels.statLO')->with([
-                                        'pan'=>$pan,
-                                        'lava'=>$lava,
-                                    ]);
-                                });
-                            })->export('xls');
+                    }
+                    arsort($b);
+                    $i=0;
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable();
+                    $reasons->addStringColumn('Панель')
+                        ->addNumberColumn('Сумма');
+                    foreach($b as $k=>$v)
+                    {
+                        if($i<9 && $k!=='all'){
+                            $b['all']-=$v;
+                            $reasons->addRow(["$k", $v]);
+                            $i++;
                         }
+                    }
+                    $reasons->addRow(["Остальные", $b['all']]);
+                    $lava->DonutChart('Dep', $reasons, [
+                        'title' => 'Статистика по исследованиям',
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan, $lava){
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
+                                $sheet->loadView('excels.statPan')->with([
+                                    'pan'=>$pan,
+                                    'lava'=>$lava,
+                                ]);
+                            });
+                        })->export('xls');
+                    }
                     break;
-                    case 3:
-                        $a = $this->getStatistic(3);
-                        foreach ($a as $val) {
-                            $cost = isset($val['COST']) ? $val['COST'] : $val['PRICE'];
-                            if(isset($val['DOCTOR']))
-                                if(isset($pan[$val['DOCTOR']])>0){
-                                    $pan[$val['DOCTOR']]+=$cost;
-                                } else
-                                    $pan[$val['DOCTOR']] =$cost;
+                case 1:
+                    $a = $this->getStatistic(1);
+                    $pan['Первичные пациенты'] = 0;
+                    $pan['Повторные пациенты'] = 0;
+                    foreach ($a as $val) {
+                        if($val['PRIME']='Y')
+                            $pan['Первичные пациенты']++;
+                        else
+                            $pan['Повторные пациенты']++;
+                    }
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable();
+                    $reasons->addStringColumn('Обращение')
+                        ->addNumberColumn('Количество');
+                    foreach($pan as $k=>$v)
+                        $reasons->addRow(["$k", $v]);
+                    $lava->DonutChart('Dep', $reasons, [
+                        'title' => 'Первичные/повторные пациенты',
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan) {
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan) {
+                                $sheet->loadView('excels.statPat')->with([
+                                    'pan' => $pan,
+                                ]);
+                            });
+                        })->export('xls');
+                    }
+                    break;
+                case 2:
+                    $a = $this->getStatistic(2);
+                    foreach ($a as $val) {
+                        //$cost = isset($val['PRICE_01']) ? $val['PRICE_01'] : $val['PRICE'];
+                        $cost = $val['COST'];
+                        if(isset($pan[$val['DEPT']])) {
+                            $pan[$val['DEPT']]['cost'] += $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$val['DEPT']]['nacpp'] += $val['NACPH'];
                         }
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable();
-                        $reasons->addStringColumn('Доктор')
-                            ->addNumberColumn('Сумма');
-                        foreach($pan as $k=>$v)
-                            $reasons->addRow(["$k", $v]);
-                        $lava->DonutChart('Dep', $reasons, [
-                            'title' => 'Количество направлений по ЛО',
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan, $lava){
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
-                                    $sheet->loadView('excels.statDoc')->with([
-                                        'pan'=>$pan,
-                                        'lava'=>$lava,
-                                    ]);
-                                });
-                            })->export('xls');
+                        else {
+                            $pan[$val['DEPT']]['cost'] = $cost * (100 - $val['DISCOUNT']) / 100;
+                            $pan[$val['DEPT']]['nacpp'] = $val['NACPH'];
                         }
-                        break;
-                    case 4:
-                        $depts = [];
-                        $a = $this->getStatistic(4);
-                        foreach ($a as $val) {
-                            if(!in_array($val['DEPT'], $depts))
-                                $depts[] = $val['DEPT'];
-                        }
-                        foreach ($a as $val) {
-                            if(isset($pan[date('d.m.Y',strtotime($val['LOGDATE']))])) {
-                                $pan[date('d.m.Y',strtotime($val['LOGDATE']))]['count']++;
-                                foreach($depts as $v){
-                                    if(isset($pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v]))
-                                        if($v==$val['DEPT'])
-                                            $pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v]++;
-                                }
+                        $sum+=$cost * (100 - $val['DISCOUNT']) / 100;
+                    }
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable();
+                    $reasons->addStringColumn('Отделение')
+                        ->addNumberColumn('Сумма');
+                    foreach($pan as $k=>$v)
+                        $reasons->addRow(["$k", $v['cost']]);
+                    $lava->DonutChart('Dep', $reasons, [
+                        'title' => 'Количество направлений по ЛО',
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan, $lava){
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
+                                $sheet->loadView('excels.statLO')->with([
+                                    'pan'=>$pan,
+                                    'lava'=>$lava,
+                                ]);
+                            });
+                        })->export('xls');
+                    }
+                    break;
+                case 3:
+                    $a = $this->getStatistic(3);
+                    foreach ($a as $val) {
+                        $cost = isset($val['COST']) ? $val['COST'] : $val['PRICE'];
+                        if(isset($val['DOCTOR']))
+                            if(isset($pan[$val['DOCTOR']])>0){
+                                $pan[$val['DOCTOR']]+=$cost;
+                            } else
+                                $pan[$val['DOCTOR']] =$cost;
+                    }
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable();
+                    $reasons->addStringColumn('Доктор')
+                        ->addNumberColumn('Сумма');
+                    foreach($pan as $k=>$v)
+                        $reasons->addRow(["$k", $v]);
+                    $lava->DonutChart('Dep', $reasons, [
+                        'title' => 'Количество направлений по ЛО',
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan, $lava){
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan, $lava) {
+                                $sheet->loadView('excels.statDoc')->with([
+                                    'pan'=>$pan,
+                                    'lava'=>$lava,
+                                ]);
+                            });
+                        })->export('xls');
+                    }
+                    break;
+                case 4:
+                    $depts = [];
+                    $a = $this->getStatistic(4);
+                    foreach ($a as $val) {
+                        if(!in_array($val['DEPT'], $depts))
+                            $depts[] = $val['DEPT'];
+                    }
+                    foreach ($a as $val) {
+                        if(isset($pan[date('d.m.Y',strtotime($val['LOGDATE']))])) {
+                            $pan[date('d.m.Y',strtotime($val['LOGDATE']))]['count']++;
+                            foreach($depts as $v){
+                                if(isset($pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v]))
+                                    if($v==$val['DEPT'])
+                                        $pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v]++;
+                            }
 
-                            }
-                            else {
-                                foreach($depts as $v)
-                                    $pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v] = 0;
-                                $pan[date('d.m.Y',strtotime($val['LOGDATE']))]['count'] = 0;
-                            }
                         }
-                        //dd($pan);
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable()
-                            ->addDateTimeColumn('Дата');
-                        foreach($depts as $val)
-                            $reasons->addNumberColumn("$val");
-                        $reasons->addNumberColumn('Всего');
-                        foreach($pan as $k=>$v)
-                        {
-                            array_unshift($v,$k);
-                            unset($a);
-                            foreach($v as $val)
-                                $a[]=$val;
-                            $reasons->addRow($a);
+                        else {
+                            foreach($depts as $v)
+                                $pan[date('d.m.Y',strtotime($val['LOGDATE']))][$v] = 0;
+                            $pan[date('d.m.Y',strtotime($val['LOGDATE']))]['count'] = 0;
                         }
-                        $lava->AreaChart('Dep', $reasons, [
-                            'title' => 'Количество проб по дням',
-                            'legend' => [
-                                'position' => 'in'
-                            ],
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan,$depts){
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan,$depts) {
-                                    $sheet->loadView('excels.statDay')->with([
-                                        'pan'=>$pan,
-                                        'depts'=>$depts
-                                    ]);
-                                });
-                            })->export('xls');
-                        }
-                        return View::make('stats')->with([
-                            'pan'=>$pan,
-                            'lava'=>$lava,
-                            'dept'=>$depts,
-                            'browser'=>Func::getBrowser(),
-                            'depts' => $this->getDepts()
-                        ]);
-                        break;
-                    case 5:
-                        $a = $this->getStatistic(5);
-                        foreach ($a as $val) {
-                            if(isset($val['BACK']))
-                                if(isset($pan[$val['BACK']])>0){
-                                    $pan[$val['BACK']]++;
-                                } else
-                                    $pan[$val['BACK']] =0;
-                        }
-                        $lava = new Lavacharts();
-                        $reasons = $lava->DataTable();
-                        $reasons->addStringColumn('Источник')
-                            ->addNumberColumn('Количество');
-                        foreach($pan as $k=>$v)
-                            $reasons->addRow(["$k", $v]);
-                        $lava->DonutChart('Dep', $reasons, [
-                            'title' => 'Откуда узнали',
-                            'width' => 800,
-                            'height' => 400,
-                            'titleTextStyle' => [
-                                'fontName' => 'Arial',
-                                'color' => 'black',
-                            ],
-                        ]);
-                        if(Input::has('excel') && Input::get('excel')==1) {
-                            Excel::create('newFile', function ($excel) use ($pan){
-                                $excel->sheet('firstSheet', function ($sheet) use ($pan) {
-                                    $sheet->loadView('excels.statBack')->with([
-                                        'pan'=>$pan,
-                                    ]);
-                                });
-                            })->export('xls');
-                        }
-                        break;
-                }
+                    }
+                    //dd($pan);
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable()
+                        ->addDateTimeColumn('Дата');
+                    foreach($depts as $val)
+                        $reasons->addNumberColumn("$val");
+                    $reasons->addNumberColumn('Всего');
+                    foreach($pan as $k=>$v)
+                    {
+                        array_unshift($v,$k);
+                        unset($a);
+                        foreach($v as $val)
+                            $a[]=$val;
+                        $reasons->addRow($a);
+                    }
+                    $lava->AreaChart('Dep', $reasons, [
+                        'title' => 'Количество проб по дням',
+                        'legend' => [
+                            'position' => 'in'
+                        ],
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan,$depts){
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan,$depts) {
+                                $sheet->loadView('excels.statDay')->with([
+                                    'pan'=>$pan,
+                                    'depts'=>$depts
+                                ]);
+                            });
+                        })->export('xls');
+                    }
+                    return View::make('stats')->with([
+                        'pan'=>$pan,
+                        'lava'=>$lava,
+                        'dept'=>$depts,
+                        'browser'=>Func::getBrowser(),
+                        'depts' => $this->getDepts()
+                    ]);
+                    break;
+                case 5:
+                    $a = $this->getStatistic(5);
+                    foreach ($a as $val) {
+                        if(isset($val['BACK']))
+                            if(isset($pan[$val['BACK']])>0){
+                                $pan[$val['BACK']]++;
+                            } else
+                                $pan[$val['BACK']] =0;
+                    }
+                    $lava = new Lavacharts();
+                    $reasons = $lava->DataTable();
+                    $reasons->addStringColumn('Источник')
+                        ->addNumberColumn('Количество');
+                    foreach($pan as $k=>$v)
+                        $reasons->addRow(["$k", $v]);
+                    $lava->DonutChart('Dep', $reasons, [
+                        'title' => 'Откуда узнали',
+                        'width' => 800,
+                        'height' => 400,
+                        'titleTextStyle' => [
+                            'fontName' => 'Arial',
+                            'color' => 'black',
+                        ],
+                    ]);
+                    if(Input::has('excel') && Input::get('excel')==1) {
+                        Excel::create('newFile', function ($excel) use ($pan){
+                            $excel->sheet('firstSheet', function ($sheet) use ($pan) {
+                                $sheet->loadView('excels.statBack')->with([
+                                    'pan'=>$pan,
+                                ]);
+                            });
+                        })->export('xls');
+                    }
+                    break;
+            }
             //dd($dep);
             return View::make('stats')->with([
                 'pan'=>$pan,
@@ -708,7 +710,7 @@ class MainController extends DB
         }
         $depts = $this->getDepts();
         return View::make('Accounting')->with([
-           'folders'=>$folders,
+            'folders'=>$folders,
             'depts' => $depts,
             'browser'=>Func::getBrowser(),
             's'=>$sum,

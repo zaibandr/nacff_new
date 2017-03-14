@@ -14,7 +14,7 @@
 //Route::get('404', function () {
 //    return View::make('errors.404');
 //});
-URL::forceRootUrl('https://nacpp.info/new'); // all your routes are declared below this point.
+//URL::forceRootUrl('https://nacpp.info/new'); // all your routes are declared below this point.
 Route::post('auth',['as'=>'auth', 'uses'=>'AuthController@check']);
 Route::get('auth',function(){
     return View::make('auth');
@@ -37,9 +37,7 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page74','PretenceController',['only'=>['index','edit','create','store','destroy']]);
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
-    Route::get('/', function () {
-        return View::make('main');
-    });
+    Route::get('/', 'MainController@index');
     $arr = [1,2,18,19,38,43,44,45,48,49,51,52,53,54,55,56,57,58,59,60,61,62,63];
     Route::get('/main', ['as' => 'main', 'uses' => 'MainController@index']);
     Route::resource('page47', 'DiscountController', array('except'=>['show', 'create']));

@@ -134,6 +134,7 @@ class LPU extends DBController
         $this->queryDB("delete from userdept where usernam='$id'");
         $this->queryDB("delete from userroles where usernam='$id'");
         $this->queryDB("delete from users where usernam='$id'");
+        $this->queryDB("delete from userpass where usernam='$id'");
         return Redirect('page66');
     }
 }
