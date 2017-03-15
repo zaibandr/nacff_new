@@ -41,7 +41,7 @@ class Authenticate
         $login = trim(strtoupper($request->get('login')));
         $password = trim($request->get('password'));
         if (empty($request->all()) || !$this->basic_validate($login, $password)) {
-            return redirect('messages');
+            return redirect('/');
         }
         return $next($request);
     }

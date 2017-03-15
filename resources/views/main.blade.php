@@ -1,7 +1,7 @@
 @extends('default')
 @section('content')
     <div id="pretence">
-        <h1 style="margin-bottom: 4%">Журнал ошибок и несоответствий</h1>
+        <h1 style="margin-bottom: 4%">Журнал ошибок</h1>
         @if(count($posts))
         {!! $posts->render() !!}
         <table class="table table-bordered">

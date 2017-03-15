@@ -16,7 +16,7 @@ class PrintController extends DBController
 {
     public function index($id)
     {
-        if (\Input::has('action')) {
+        if (\Input::has('action') && \Session::has('clientcode')) {
             $pdf = \App::make('dompdf.wrapper');
             switch (\Input::get('action')) {
                 case "label":
@@ -31,24 +31,11 @@ class PrintController extends DBController
                     break;
                 case 'act':
                     $act = $this->getAct($id);
-                    $res = [];
-                    foreach ($act as $val) {
-                        $res['NAME'] = $val['SURNAME'] . " " . $val['NAME'] . " " . $val['PATRONYMIC'];
-                        $res['GENDER'] = $val['GENDER'];
-                        $res['DEPT'] = $val['DEPT'];
-                        $res['LOGDATE'] = $val['LOGDATE'];
-                        $res['COMMENTS'] = $val['COMMENTS'];
-                        $res['DOCTOR'] = $val['DOCTOR'];
-                        $res['DATE_BIRTH'] = $val['DATE_BIRTH'];
-                        $res['panel'][] = $val['PANEL'];
-                        $res['pname'][] = $val['MEDAN'];
-                        $res['cont'][] = $val['CONTAINERNO'];
-                        $res['cgroup'][] = $val['CONTGROUP'];
-                        $res['due'][] = $val['DUE'];
-                    }
+                    $pdata = $this->getDraft($id);
                     $view = \View::make('pdfs.act')->with([
                         'id' => $id,
-                        'act' => $res
+                        'act' => $act,
+                        'pdata' => $pdata
                     ]);
                     $pdf->loadHTML("$view");
                     return $pdf->stream();

@@ -337,7 +337,7 @@ class DBController extends Controller
 
     public function getDraft($folderno)
     {
-        $query = "SELECT a.FOLDERNO, a.LOGDATE, a.LOGUSER, a.PID, a.SURNAME, a.NAME, a.PATRONYMIC, a.DATE_BIRTH, d.DOCTOR, dep.dept, a.COST, a.DISCOUNT FROM FOLDERS a left join doctors d on d.id=a.doctor inner join departments dep on dep.id = a.clientid where folderno='".$folderno."'";
+        $query = "SELECT a.FOLDERNO, a.LOGDATE, a.comments, a.PID, a.SURNAME, a.NAME,a.gender, a.PATRONYMIC, a.DATE_BIRTH, d.DOCTOR, dep.dept, a.COST, a.DISCOUNT FROM FOLDERS a left join doctors d on d.id=a.doctor inner join departments dep on dep.id = a.clientid where a.folderno='".$folderno."'";
         $stmt = $this->queryDB($query);
         $rw = ibase_fetch_assoc($stmt);
         return $rw;
@@ -376,16 +376,13 @@ class DBController extends Controller
 
     public function getAct($id)
     {
-        $query = " select distinct f.SURNAME, f.NAME, f.PATRONYMIC, d.DEPT, p.MEDAN, p.PANEL, p.DUE, fc.CONTAINERNO, cg.CONTGROUP, f.LOGDATE, f.DATE_BIRTH, f.COMMENTS, doc.DOCTOR, f.gender";
-        $query.= " from folders f";
-        $query.= " inner join foldercontainers fc on fc.FOLDERNO=f.FOLDERNO";
+        $query = " select distinct p.code, p.PANEL, p.DUE, fc.CONTAINERNO, cg.CONTGROUP";
+        $query.= " from foldercontainers fc";
         $query.= " inner join ordtask ot on ot.CONTAINERID=fc.ID";
         $query.= " inner join orders o on o.id = ot.ORDERSID";
-        $query.= " inner join PRICES p on p.PANEL = o.PANEL and p.pricelistid=f.pricelistid";
-        $query.= " left join doctors doc on doc.id=f.doctor";
+        $query.= " inner join panels p on p.code = o.PANEL";
         $query.= " inner join CONTGROUPS cg on cg.ID = fc.CONTAINERTYPEID";
-        $query.= " inner join DEPARTMENTS d on d.id = f.CLIENTID";
-        $query.= " where o.apprsts!='R' and f.folderno = '".$id."'";
+        $query.= " where o.apprsts!='R' and fc.folderno = '".$id."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
