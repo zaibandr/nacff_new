@@ -27,7 +27,7 @@ class DBController extends Controller
 
     function getUser($l, $p)
     {
-        $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid, u.password2 from users u ";
+        $query = "select u.fullname, u.usernam, d.deptcode, d.id, d.email_sender, ur.roleid, u.password2 from users u ";
         $query.="left join userdept ud on ud.usernam = u.usernam ";
         $query.="left join departments d on ud.dept = d.id ";
         $query.="inner join userroles ur on ur.usernam = u.usernam ";
@@ -184,7 +184,7 @@ class DBController extends Controller
             $query.= "left join doctors doc on doc.id=f.doctor ";
             $query.= "inner join departments d on d.id=f.clientid ";
             $query.= "inner join statuses a on a.status=f.apprsts ";
-            $query.= "inner join orders o on o.folderno=f.folderno";
+            $query.= "inner join orders o on o.folderno=f.folderno ";
             $query.= "where f.apprsts!='R' and f.clientid=".\Input::get('client');
         }
         else{
@@ -259,7 +259,7 @@ class DBController extends Controller
     }
     public function getDeptsAdmin()
     {
-        $query = "select d.id, d.dept, d.deptcode, d.description from departments d order by d.deptcode";
+        $query = "select d.id, d.dept, d.deptcode, d.description, d.net_id, d.email_sender from departments d order by d.deptcode";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -269,7 +269,7 @@ class DBController extends Controller
         if(\Session::has('isAdmin') && \Session::get('isAdmin'))
             $query = "select d.id, d.dept from departments d order by d.dept";
         else
-            $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
+            $query = "select d.id, d.dept from departments d inner join departments de on de.net_id = d.net_id where de.id='".\Session::get('dept')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;

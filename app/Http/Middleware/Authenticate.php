@@ -58,6 +58,7 @@ class Authenticate
             \Session::put('name',$a[0]['FULLNAME']);
             \Session::put('clientcode',$a[0]['DEPTCODE']);
             \Session::put('dept',$a[0]['ID']);
+            \Session::put('email',$a[0]['EMAIL_SENDER']);
             if($a[0]['ROLEID']==7)
                 \Session::put('isAdmin',1);
             $query = "SELECT DISTINCT mc.MENU, m.id, m.CAPTION FROM MENUCATEGORY mc ";

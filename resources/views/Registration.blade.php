@@ -246,14 +246,12 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <label for="s_sms">Отправлять смс</label>
-                                            <input type="checkbox" name="s_sms" id="s_sms" style="display: block; margin: auto; width: 20px; height: 20px;">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label for="s_email">Отправлять email</label>
-                                            <input type="checkbox" name="s_email" id="s_email" style="display: block; margin: auto; width: 20px; height: 20px;">
-                                        </div>
+                                        @if(\Session::get('email')=='Y')
+                                            <div class="col-md-3">
+                                                <label for="s_email">Отправлять email</label>
+                                                <input type="checkbox" name="s_email" id="s_email" style="display: block; margin: auto; width: 20px; height: 20px;">
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
