@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -32,6 +31,9 @@
             <img src="{{secure_url('images/logo.png')}}" alt="" width="90%">
         </div>
         <div class="col-xs-5" style="padding-top: 5%; ">
+            <div style="float: right; margin-top: -12%; margin-right: -15%">
+                <a href="https://nacpp.info/old"><b>Предыдущая версия</b></a>
+            </div>
             <div style="float: right">
                 <a href="{{secure_url('auth')}}"><div id="Login"><img src="{{secure_url('images/key.png')}}" alt=""><img src="{{secure_url('images/line.png')}}" alt="" style="margin-right: 10px; margin-left: 10px">Личный кабинет</div></a>
                 <a href="{{secure_url('logout')}}"><div id="out">Выйти</div></a>
@@ -99,8 +101,5 @@
     </div>
 </div>
 <div id="scrollup"><i class="fa fa-sort-asc fa-4x"></i></div>
-</body>
-
-
 </body>
 </html>

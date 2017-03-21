@@ -8,7 +8,11 @@
             <li><a href="#p2" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">2. Регистрация</a></li>
             <li><a href="#p3" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">3. Направления</a></li>
             <li><a href="#p4" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">4. Курьер</a></li>
-            <li><a href="#p5" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">5. Требования</a></li>
+            <li><a href="#p5" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">5. Статистика</a></li>
+            <li><a href="#p6" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">6. Кассовый отчет</a></li>
+            <li><a href="#p7" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">7. Детальный отчет</a></li>
+            <li><a href="#p8" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">8. Справочники</a></li>
+            <li><a href="#p6" style="color: #3c3c3c; font-size: 1.2em; font-weight: bold">6. Требования</a></li>
         </ul>
         <div class="row">
             <div class="col-lg-12 alert alert-success" id="p1">
@@ -106,6 +110,48 @@
             <div class="col-lg-5">
                 <a href="{{asset('images/help/image004.jpg')}}" target="_blank"><image src="{{asset('images/help/thumbs/image004.jpg')}}"></image></a>
                 <p style="text-align: center">рис.7</p>
+            </div>
+            <div class="col-lg-12 alert alert-success" id="p5">
+                <p style="font-size: 1.2em;">Статистика</p>
+            </div>
+            <div class="col-lg-12">
+                В данном разделе можно сформировать отчеты:"Статистика по панелям", "Первичные/повторные пациенты",
+                "Отчет по врачам","Отчет по дням","Откуда узнали". Также формируется диаграмма и можно выгрузить отчет в Excel
+            </div>
+            <div class="col-lg-12 alert alert-success" id="p6">
+                <p style="font-size: 1.2em;">Кассовый отчет</p>
+            </div>
+            <div class="col-lg-12">
+                Формируется кассовый отчет за указанный период
+            </div>
+            <div class="col-lg-12 alert alert-success" id="p7">
+                <p style="font-size: 1.2em;">Детальный отчет</p>
+            </div>
+            <div class="col-lg-12">
+                В данном разделе формируется детальный отчет по всем панелям и направлениям, которые были заказаны в данном центре
+                и за указанный период. Есть возможность выгрузки в Excel.
+            </div>
+            <div class="col-lg-12 alert alert-success" id="p8">
+                <p style="font-size: 1.2em;">Справочники</p>
+            </div>
+            <div class="col-lg-12">
+                Пункт меню "Справочники", разделен на 4 раздела:
+                <ul>
+                    <li style="list-style: square inside">
+                        Прайс-листы - отображен прайс центра с указанием цен, есть возможность редактировать панели, либо
+                        загрузку прайса в excel формате(код панели; название; цена).
+                    </li>
+                    <li style="list-style: square inside">
+                        Список пациентов
+                    </li>
+                    <li style="list-style: square inside">
+                        Услуги ЛПУ - в этом разделе есть возможность добавить собственные услуги, предоставляемые центром.
+                        Добавленные услуги будут отображены в регистрации направлений, в дереве панелей, в подменю "Услуги центра"
+                    </li>
+                    <li style="list-style: square inside">
+                        Справочники ЛИС
+                    </li>
+                </ul>
             </div>
             <div class="col-lg-12 alert alert-success" id="p4">
                 <p style="font-size: 1.2em;">Требования к работе</p>
