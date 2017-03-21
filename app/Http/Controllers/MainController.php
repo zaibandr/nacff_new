@@ -159,7 +159,7 @@ class MainController extends DB
     //  Направления
     public function page43(){
         $folders = $this->getFolders();
-        $depts = $this->getDepts();
+        $depts = $this->getNetDepts();
         if(Input::has('excel') && Input::get('excel')==1) {
             Excel::create('newFile', function ($excel) use ($folders) {
                 $excel->sheet('firstSheet', function ($sheet) use ($folders) {

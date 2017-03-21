@@ -269,7 +269,14 @@ class DBController extends Controller
         if(\Session::has('isAdmin') && \Session::get('isAdmin'))
             $query = "select d.id, d.dept from departments d order by d.dept";
         else
-            $query = "select d.id, d.dept from departments d inner join departments de on de.net_id = d.net_id where de.id='".\Session::get('dept')."'";
+            $query = "select d.id, d.dept from departments d left join departments de on de.net_id = d.net_id where d.id='".\Session::get('dept')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+    public function getNetDepts()
+    {
+        $query = "select d.id, d.dept from departments d inner join departments de on de.net_id = d.net_id where de.id='".\Session::get('dept')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
