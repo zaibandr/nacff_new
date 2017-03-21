@@ -43,7 +43,10 @@
 <div class="container-fluid wrapper">
             <?php //var_dump(Session::all()); ?>
     <div class="row" style="padding-left: 3%; padding-right: 3%;">
-        <div class="col-md-offset-3 col-md-8 xx">
+        <div class="col-md-3 xx">
+            <p style="float: left;"><i><b style="color: #00989e;">Тел.: +7&nbsp;(495)&nbsp;933&nbsp;-&nbsp;95&nbsp;-&nbsp;95&nbsp;(доб. 1022, 1010)</b></i></p>
+        </div>
+        <div class="col-md-8 xx">
             <p style="float: left;"><a href="https://www.nacpp.ru/">Главная</a>&nbsp;>&nbsp;<a href="https://nacpp.info/">Удаленная регистрация образцов</a></p>
             <p style="float: right;">Пользователь:  <i><b style="color: #00989e;">{{Session::get('login')}}/{{Session::get('clientcode')}}</b></i></p>
         </div>
@@ -90,7 +93,7 @@
         <div class="col-lg-12">
             <p>&copy; НАКФФ, 2007-{{date('Y')}} laboratory@nacpp.ru <br>
                 Россия, 115088, Москва, ул. Угрешская, д.2, стр. 8. <br>
-                +7 495  259-44-44<br> Тех.поддержка it@nacpp.ru
+                +7 495  933-95-95<br> Тех.поддержка it@nacpp.ru
             </p>
         </div>
     </div>
