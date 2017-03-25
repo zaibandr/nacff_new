@@ -27,11 +27,11 @@ class DBController extends Controller
 
     function getUser($l, $p)
     {
-        $query = "select u.fullname, u.usernam, d.deptcode, d.id, ur.roleid, u.password2 from users u ";
+        $query = "select u.fullname, u.usernam, d.deptcode, d.id, d.email_sender, ur.roleid, u.password2 from users u ";
         $query.="left join userdept ud on ud.usernam = u.usernam ";
         $query.="left join departments d on ud.dept = d.id ";
         $query.="inner join userroles ur on ur.usernam = u.usernam ";
-        $query.="where u.status='A' and u.usernam='".$l."'";
+        $query.="where u.status='A' and upper(u.usernam)='".$l."'";
         $result = $this->queryDB($query);
         $a =  $this->getResult($result);
         if(!empty($a))
@@ -134,9 +134,7 @@ class DBController extends Controller
         $query = "SELECT distinct a.LOGDATE, a.SURNAME, a.NAME, a.PATRONYMIC, a.GENDER, a.DATE_BIRTH, a.ADDRESS, a.PASSPORT_SERIES, a.PASSPORT_NUMBER, a.PHONE, a.EMAIL, a.pid ";
         $query .= "FROM PATIENT a ";
         $query .= "inner join FOLDERS f on f.PID=a.PID ";
-        $query .= "inner join DEPARTMENTS d on d.ID = f.CLIENTID ";
-        $query .= "inner join userdept u on u.dept = d.id ";
-        $query .= "where u.usernam='".\Session::get('login')."' order by a.surname";
+        $query .= "where f.clientid='".\Session::get('dept')."' order by a.surname";
         $res = $this->queryDB($query);
         //dd($this->getResult($res));
         return $this->getResult($res);
@@ -180,17 +178,15 @@ class DBController extends Controller
         else
             $date_en = date('Y-m-d 23:59:59');
         if(\Input::has('client') && \Input::get('client')!=='' && \Input::get('client')!=='all'){
-            $query = "select DISTINCT f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str,  f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cash, f.cito, f.discount, f.cost from folders f ";
+            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str,  f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cash, f.cito, f.discount, f.cost from folders f ";
             $query.= "left join doctors doc on doc.id=f.doctor ";
             $query.= "inner join departments d on d.id=f.clientid ";
             $query.= "inner join statuses a on a.status=f.apprsts ";
-            $query.= "inner join orders o on o.folderno=f.folderno";
             $query.= "where f.apprsts!='R' and f.clientid=".\Input::get('client');
         }
         else{
-            $query = "select DISTINCT f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str, f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
+            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str, f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
             $query.= "left join doctors doc on doc.id=f.doctor ";
-            $query.= "inner join orders o on o.folderno=f.folderno ";
             $query.= "inner join departments d on d.id=f.clientid ";
             $query.= "inner join statuses a on a.status=f.apprsts ";
             $query.= "inner join userdept u on u.dept = d.id ";
@@ -200,7 +196,7 @@ class DBController extends Controller
         if($positive!='')
             $query.=" and f.status='".$positive."'";
         if($panel!='')
-            $query.=" and o.panel like '%".$panel."%'";
+            $query.=" and exists(select o.id from orders o where o.folderno=f.folderno and o.panel like '%".$panel."%')";
         if($apprsts!='')
             $query.=" and f.apprsts='".$apprsts."'";
         $stmt = $this->queryDB($query);
@@ -259,7 +255,7 @@ class DBController extends Controller
     }
     public function getDeptsAdmin()
     {
-        $query = "select d.id, d.dept, d.deptcode, d.description from departments d order by d.deptcode";
+        $query = "select d.id, d.dept, d.deptcode, d.description, d.net_id, d.email_sender from departments d order by d.deptcode";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -269,7 +265,14 @@ class DBController extends Controller
         if(\Session::has('isAdmin') && \Session::get('isAdmin'))
             $query = "select d.id, d.dept from departments d order by d.dept";
         else
-            $query = "select d.id, d.dept from departments d inner join userdept u on u.dept = d.id where u.usernam='".\Session::get('login')."'";
+            $query = "select d.id, d.dept from departments d left join departments de on de.net_id = d.net_id where d.id='".\Session::get('dept')."'";
+        $stmt = $this->queryDB($query);
+        $res = $this->getResult($stmt);
+        return $res;
+    }
+    public function getNetDepts()
+    {
+        $query = "select d.id, d.dept from departments d inner join departments de on de.net_id = d.net_id where de.id='".\Session::get('dept')."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;
@@ -337,7 +340,7 @@ class DBController extends Controller
 
     public function getDraft($folderno)
     {
-        $query = "SELECT a.FOLDERNO, a.LOGDATE, a.LOGUSER, a.PID, a.SURNAME, a.NAME, a.PATRONYMIC, a.DATE_BIRTH, d.DOCTOR, dep.dept, a.COST, a.DISCOUNT FROM FOLDERS a left join doctors d on d.id=a.doctor inner join departments dep on dep.id = a.clientid where folderno='".$folderno."'";
+        $query = "SELECT a.FOLDERNO, a.LOGDATE, a.comments, a.PID, a.SURNAME, a.NAME,a.gender, a.PATRONYMIC, a.DATE_BIRTH, d.DOCTOR, dep.dept, a.COST, a.DISCOUNT FROM FOLDERS a left join doctors d on d.id=a.doctor inner join departments dep on dep.id = a.clientid where a.folderno='".$folderno."'";
         $stmt = $this->queryDB($query);
         $rw = ibase_fetch_assoc($stmt);
         return $rw;
@@ -376,16 +379,13 @@ class DBController extends Controller
 
     public function getAct($id)
     {
-        $query = " select distinct f.SURNAME, f.NAME, f.PATRONYMIC, d.DEPT, p.MEDAN, p.PANEL, p.DUE, fc.CONTAINERNO, cg.CONTGROUP, f.LOGDATE, f.DATE_BIRTH, f.COMMENTS, doc.DOCTOR, f.gender";
-        $query.= " from folders f";
-        $query.= " inner join foldercontainers fc on fc.FOLDERNO=f.FOLDERNO";
+        $query = " select distinct p.code, p.PANEL, p.DUE, fc.CONTAINERNO, cg.CONTGROUP";
+        $query.= " from foldercontainers fc";
         $query.= " inner join ordtask ot on ot.CONTAINERID=fc.ID";
         $query.= " inner join orders o on o.id = ot.ORDERSID";
-        $query.= " inner join PRICES p on p.PANEL = o.PANEL and p.pricelistid=f.pricelistid";
-        $query.= " left join doctors doc on doc.id=f.doctor";
+        $query.= " inner join panels p on p.code = o.PANEL";
         $query.= " inner join CONTGROUPS cg on cg.ID = fc.CONTAINERTYPEID";
-        $query.= " inner join DEPARTMENTS d on d.id = f.CLIENTID";
-        $query.= " where o.apprsts!='R' and f.folderno = '".$id."'";
+        $query.= " where o.apprsts!='R' and fc.folderno = '".$id."'";
         $stmt = $this->queryDB($query);
         $res = $this->getResult($stmt);
         return $res;

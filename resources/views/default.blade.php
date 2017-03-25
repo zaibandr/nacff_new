@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -32,6 +31,9 @@
             <img src="{{secure_url('images/logo.png')}}" alt="" width="90%">
         </div>
         <div class="col-xs-5" style="padding-top: 5%; ">
+            <div style="float: right; margin-top: -12%; margin-right: -15%">
+                <a href="https://nacpp.info/old"><b>Предыдущая версия</b></a>
+            </div>
             <div style="float: right">
                 <a href="{{secure_url('auth')}}"><div id="Login"><img src="{{secure_url('images/key.png')}}" alt=""><img src="{{secure_url('images/line.png')}}" alt="" style="margin-right: 10px; margin-left: 10px">Личный кабинет</div></a>
                 <a href="{{secure_url('logout')}}"><div id="out">Выйти</div></a>
@@ -43,7 +45,10 @@
 <div class="container-fluid wrapper">
             <?php //var_dump(Session::all()); ?>
     <div class="row" style="padding-left: 3%; padding-right: 3%;">
-        <div class="col-md-offset-3 col-md-8 xx">
+        <div class="col-md-3 xx">
+            <p style="float: left;"><i><b style="color: #00989e;">Тел.: +7&nbsp;(495)&nbsp;933&nbsp;-&nbsp;95&nbsp;-&nbsp;95&nbsp;(доб. 1022, 1010)</b></i></p>
+        </div>
+        <div class="col-md-8 xx">
             <p style="float: left;"><a href="https://www.nacpp.ru/">Главная</a>&nbsp;>&nbsp;<a href="https://nacpp.info/">Удаленная регистрация образцов</a></p>
             <p style="float: right;">Пользователь:  <i><b style="color: #00989e;">{{Session::get('login')}}/{{Session::get('clientcode')}}</b></i></p>
         </div>
@@ -90,14 +95,11 @@
         <div class="col-lg-12">
             <p>&copy; НАКФФ, 2007-{{date('Y')}} laboratory@nacpp.ru <br>
                 Россия, 115088, Москва, ул. Угрешская, д.2, стр. 8. <br>
-                +7 495  259-44-44<br> Тех.поддержка it@nacpp.ru
+                +7 495  933-95-95<br> Тех.поддержка it@nacpp.ru
             </p>
         </div>
     </div>
 </div>
 <div id="scrollup"><i class="fa fa-sort-asc fa-4x"></i></div>
-</body>
-
-
 </body>
 </html>

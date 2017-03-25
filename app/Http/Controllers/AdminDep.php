@@ -17,7 +17,8 @@ class AdminDep extends DBController
     public function index()
     {
         return \View::make('adminPanel.dep')->with([
-            'depts' => $this->getDeptsAdmin()
+            'depts' => $this->getDeptsAdmin(),
+            'nets'  => $this->getNets()
         ]);
     }
 
@@ -173,7 +174,19 @@ class AdminDep extends DBController
      */
     public function update(Request $request, $id)
     {
-        //
+        $name = (trim($request->name));
+        $desc = (trim($request->desc));
+        $net = $request->get('net',null);
+        $query  = "update departments set dept='$name', description='$desc'";
+        if($net)
+            $query .= ", net_id=$net";
+        if($request->email_send)
+            $query .= ", email_sender='Y'";
+        else
+            $query .= ", email_sender='N'";
+        $query .= " where id=$id";
+        $this->queryDB($query);
+        return \Redirect::route('page68.index');
     }
 
     /**

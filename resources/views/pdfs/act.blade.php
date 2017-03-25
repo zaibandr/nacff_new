@@ -35,11 +35,11 @@
     </tr>
 </table>
 <pre style="margin-top: 20px; margin-bottom: 20px; margin-left:40px; line-height: 16px; font-size: 11px">
-    Заказчик:  {{$act['DEPT']}}
-    Пациент:  {{$act['NAME']}}
-    Дата рождения:  {{date('d.m.Y', strtotime($act['DATE_BIRTH']))}}   Пол:  <? echo $act['GENDER']=='F'?'ЖЕН':'МУЖ'; ?>   Дата взятия биоматериала: {{date('d.m.Y', strtotime($act['LOGDATE']))}}
-    Комментарий:  {{$act['COMMENTS']}}
-    Врач:  {{$act['DOCTOR']}}
+    Заказчик:  {{$pdata['DEPT']}}
+    Пациент:  {{$pdata['SURNAME'].' '.$pdata['NAME'].' '.$pdata['PATRONYMIC']}}
+    Дата рождения:  {{date('d.m.Y', strtotime($pdata['DATE_BIRTH']))}}   Пол:  {{$pdata['GENDER']=='F'?'ЖЕН':'МУЖ'}}   Дата взятия биоматериала: {{date('d.m.Y', strtotime($pdata['LOGDATE']))}}
+    Комментарий:  {{$pdata['COMMENTS']}}
+    Врач:  {{$pdata['DOCTOR']}}
 </pre>
 <table class="tab" width="100%" cellpadding="5px">
     <tr>
@@ -49,15 +49,15 @@
         <th width="40%">Название панели</th>
         <th width="10%">Срок выполнения (дни)</th>
     </tr>
-    @for($i=0; $i<count($act['panel']); $i++)
+    @foreach($act as $val)
         <tr>
-        <td width="10%">{{$act['cont'][$i]}}</td>
-        <td width="30%">{{$act['cgroup'][$i]}}</td>
-        <td width="10%">{{$act['panel'][$i]}}</td>
-        <td width="40%">{{$act['pname'][$i]}}</td>
-        <td width="10%">{{$act['due'][$i]}}</td>
+        <td width="10%">{{$val['CONTAINERNO']}}</td>
+        <td width="30%">{{$val['CONTGROUP']}}</td>
+        <td width="10%">{{$val['CODE']}}</td>
+        <td width="40%">{{$val['PANEL']}}</td>
+        <td width="10%">{{$val['DUE']}}</td>
         </tr>
-        @endfor
+        @endforeach
 </table>
 <pre style="margin-top: 40px; margin-left:40px; line-height: 24px; font-size: 11px">
     Настоящим подтверждаю правильность указанных в настоящем бланке-заказе данных:

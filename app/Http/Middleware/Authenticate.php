@@ -41,7 +41,7 @@ class Authenticate
         $login = trim(strtoupper($request->get('login')));
         $password = trim($request->get('password'));
         if (empty($request->all()) || !$this->basic_validate($login, $password)) {
-            return redirect('messages');
+            return redirect('/');
         }
         return $next($request);
     }
@@ -58,6 +58,7 @@ class Authenticate
             \Session::put('name',$a[0]['FULLNAME']);
             \Session::put('clientcode',$a[0]['DEPTCODE']);
             \Session::put('dept',$a[0]['ID']);
+            \Session::put('email',$a[0]['EMAIL_SENDER']);
             if($a[0]['ROLEID']==7)
                 \Session::put('isAdmin',1);
             $query = "SELECT DISTINCT mc.MENU, m.id, m.CAPTION FROM MENUCATEGORY mc ";

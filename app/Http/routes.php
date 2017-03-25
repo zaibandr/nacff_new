@@ -22,7 +22,7 @@ Route::get('auth',function(){
 Route::get('phpinfo',function(){
     //return phpinfo();
 });
-Route::get('messages','InfoController@index');
+Route::get('/',['as'=>'/', 'uses'=>'InfoController@index']);
 Route::get('integration','IntegrationController@index');
 Route::get('help','HelpController@index');
 Route::group(['middleware' => 'auth'], function () {
@@ -37,11 +37,8 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page74','PretenceController',['only'=>['index','edit','create','store','destroy']]);
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
     });
-    Route::get('/', function () {
-        return View::make('main');
-    });
+    Route::get('messages', 'MainController@index');
     $arr = [1,2,18,19,38,43,44,45,48,49,51,52,53,54,55,56,57,58,59,60,61,62,63];
-    Route::get('/main', ['as' => 'main', 'uses' => 'MainController@index']);
     Route::resource('page47', 'DiscountController', array('except'=>['show', 'create']));
     Route::resource('page6', 'UserController', array('except'=>['show', 'create']));
     Route::resource('page20', 'DepController', array('except'=>['show', 'create']));
@@ -81,7 +78,7 @@ Route::any('/logout', function () {
     Session::forget('clientcode');
     Session::forget('dept');
     Session::forget('name');
-    return Redirect::route('main');
+    return Redirect::route('/');
 });
 Route::group(['middleware' => ['web']], function () {
     //

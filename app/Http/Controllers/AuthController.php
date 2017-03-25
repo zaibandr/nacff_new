@@ -37,6 +37,7 @@ class AuthController extends Controller
             \Session::put('name',$a[0]['FULLNAME']);
             \Session::put('clientcode',$a[0]['DEPTCODE']);
             \Session::put('dept',$a[0]['ID']);
+            \Session::put('email',$a[0]['EMAIL_SENDER']);
             if($a[0]['ROLEID']==17 or $a[0]['ROLEID']==16 or $a[0]['ROLEID']==19)
                 \Session::put('isAdmin',1);
             $query = "SELECT DISTINCT mc.MENU, m.id, m.CAPTION FROM MENUCATEGORY mc ";
@@ -51,7 +52,7 @@ class AuthController extends Controller
                 $a[$row[0]][$row[2]] = $row[1];
             }
             \Session::put('menu',$a);
-            return \Redirect::intended('/');
+            return \Redirect::intended('/messages');
         }
     }
 }

@@ -46,7 +46,7 @@ class CourierController extends DBController
     {
         if($request->has('send')) {
             $this->queryDB("insert into logs(log_time,theme, description) VALUES (CURRENT_TIMESTAMP ,'Передача курьеру','LPU-" . \Session::get('clientcode') . "')");
-            $this->queryDB("update folders set apprsts='P' where apprsts='K' and clientid=".\Session::get('dept'));
+            $this->queryDB("update folders set apprsts='P' where apprsts in ('K','D') and clientid=".\Session::get('dept'));
             return redirect(route('page73.index'));
         }
         $pdf = \App::make('dompdf.wrapper');

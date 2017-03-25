@@ -295,9 +295,9 @@ class Test extends DBController
             $query = "update panels set pgrp=".$row['PANELCATID']." where code ='".$row['CODE']."'";
             $this->queryDB($query);
         }*/
-        dd(crypt(trim(Input::get('password')),'$1$nacffnew'));
+/*        dd(crypt(trim(Input::get('password')),'$1$nacffnew'));
         return \View::make('test')->with([
 
-        ]);
+        ]);*/
     }
 }

@@ -1,8 +1,7 @@
 <script src="{{secure_asset('resources/assets/scripts/jquery.steps.js')}}"></script>
 <script src="{{secure_asset('resources/assets/scripts/jquery.validate.min.js')}}"></script>
 <script src="{{secure_asset('resources/assets/scripts/jQuery.DynaTree/jquery.dynatree.js')}}"></script>
-<script src="{{secure_asset('public/js/bootstrap-datepicker.js')}}"></script>
-<script src="{{secure_asset('public/js/bootstrap-datepicker.ru.min.js')}}"></script>
+<script src="{{secure_asset('resources/assets/scripts/jquery.maskedinput.js')}}"></script>
 <script>
     var max=0;
     var rules = [];
@@ -318,12 +317,7 @@
                 //alert("Submitted!");
             }
         });
-        $( ".datepicker" ).datepicker({
-            format: 'dd.mm.yyyy',
-            language: 'ru',
-            autoclose: true,
-            clearBtn: true
-        });
+        $( ".datepicker" ).mask("99.99.9999",{placeholder:" "});
         var projects = [<?=$patients?>];
         $( "#surname" ).autocomplete({
                     minLength: 3,
@@ -550,7 +544,7 @@
             type: "GET",
             url: $url,
             cache: false,
-            timeout : 10000,
+            timeout : 20000,
             error: function(jqXHR, textStatus, errorThrown){
                 $('#infoFrm').html('Ошибка: ' + textStatus + '. Тайм-аут операции. Повторите попытку сохранения чуть позже.');
                 $('#save').removeAttr('disabled','disabled');

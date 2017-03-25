@@ -1,6 +1,9 @@
 Options +FollowSymLinks -Indexes
 RewriteEngine on
 #RewriteRule ^aaa ./config [L]
+RewriteCond %{REQUEST_FILENAME} .env
+RewriteRule ^(.*)$ index.php [L,QSA]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [L,QSA]

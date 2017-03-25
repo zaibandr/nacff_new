@@ -17,7 +17,7 @@ class PretenceController extends Controller
      */
     public function index()
     {
-        $posts = RegitrationJournal::orderBy('id','desc')->paginate(10);
+        $posts = RegitrationJournal::shown()->orderBy('id','desc')->paginate(10);
         //dd($posts);
         return view('pretence', [
             'posts' => $posts
