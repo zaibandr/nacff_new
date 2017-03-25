@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
+use App\RegitrationJournal;
 
 class PretenceController extends Controller
 {
@@ -16,7 +17,11 @@ class PretenceController extends Controller
      */
     public function index()
     {
-        return view('pretence');
+        $posts = RegitrationJournal::orderBy('id','desc')->paginate(10);
+        //dd($posts);
+        return view('pretence', [
+            'posts' => $posts
+        ]);
     }
 
     /**
