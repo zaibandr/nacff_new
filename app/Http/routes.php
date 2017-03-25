@@ -22,7 +22,7 @@ Route::get('auth',function(){
 Route::get('phpinfo',function(){
     //return phpinfo();
 });
-Route::get('/','InfoController@index');
+Route::get('/',['as'=>'/', 'uses'=>'InfoController@index']);
 Route::get('integration','IntegrationController@index');
 Route::get('help','HelpController@index');
 Route::group(['middleware' => 'auth'], function () {
@@ -78,7 +78,7 @@ Route::any('/logout', function () {
     Session::forget('clientcode');
     Session::forget('dept');
     Session::forget('name');
-    return Redirect::route('main');
+    return Redirect::route('/');
 });
 Route::group(['middleware' => ['web']], function () {
     //

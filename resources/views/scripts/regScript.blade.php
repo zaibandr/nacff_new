@@ -544,7 +544,7 @@
             type: "GET",
             url: $url,
             cache: false,
-            timeout : 10000,
+            timeout : 20000,
             error: function(jqXHR, textStatus, errorThrown){
                 $('#infoFrm').html('Ошибка: ' + textStatus + '. Тайм-аут операции. Повторите попытку сохранения чуть позже.');
                 $('#save').removeAttr('disabled','disabled');
