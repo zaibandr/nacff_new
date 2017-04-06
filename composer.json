@@ -18,7 +18,8 @@
         "sngrl/sphinxsearch": "dev-master",
         "mews/captcha": "~2.0",
         "jacquestvanzuydam/laravel-firebird": "dev-5.1-support",
-        "guzzlehttp/guzzle": "6.2.2"
+        "guzzlehttp/guzzle": "6.2.2",
+        "predis/predis": "v1.1.1"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

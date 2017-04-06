@@ -14,6 +14,6 @@ class DeleteController extends DBController
     public function index($id)
     {
         $res = $this->queryDB("update folders set apprsts='R' where folderno='$id'");
-        return redirect()->route('main');
+        return redirect()->route('page43');
     }
 }

@@ -285,11 +285,11 @@ class MainController extends DB
             $stmt = ibase_query($query);
             $res = ibase_fetch_assoc($stmt);
             $folderno = $res['FOLDERNO']==''?'null':$res['FOLDERNO'];
-            $query = "INSERT INTO FOLDERS (FOLDERNO, LOGUSER, PID, SURNAME, NAME, PATRONYMIC, DATE_BIRTH, ";
+            $query = "INSERT INTO FOLDERS (FOLDERNO, REGDATE, LOGUSER, PID, SURNAME, NAME, PATRONYMIC, DATE_BIRTH, ";
             $query.= "ADDRESS, PASSPORT_SERIES, PASSPORT_NUMBER, PHONE, EMAIL, GENDER, CLIENTID, DOCTOR, COMMENTS, ";
             $query.= "PREGNANCY, AGE, PRICELISTID, S_SMS, S_EMAIL, COST, PRIME,NACPH, PRICE, DISCOUNT, CASH, DOC, ";
             $query.= "ISSUED, CARDNO, BACKREF, rn1, rn2, rn3, AIS, ORG, STR, CITO, HEIGHT, WEIGHT, POLIS, ANTIBIOT, ANTIBIOTIC, BIOSTART, BIOEND, KCODE)";
-            $query.= " VALUES ('$folderno','".\Session::get('login')."', '$pid', '$surname', '$name', '$namepatr', ";
+            $query.= " VALUES ('$folderno', CURRENT_TIMESTAMP, '".\Session::get('login')."', '$pid', '$surname', '$name', '$namepatr', ";
             $query.= "'$dt_bday', '$address', '$passport_series', '$passport_number', '$phone', '$email', '$gender', ";
             $query.= "$department, $doctor, '$comments', $pregnancy, $age, $priceid,'$s_sms', '$s_email', $cost, '$prime', ";
             $query.= "$ncost, $fullcost, $dis2, '$cash', '$docc', '$issued', '$card', $backref, '$diuresis', '$diagnosis', ";

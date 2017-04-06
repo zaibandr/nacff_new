@@ -1,20 +1,91 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: 1
- * Date: 11.01.2016
- * Time: 11:43
- */
+
 
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Redis;
 
 class Test extends DBController
 {
     public function index(){
+
+	//Redis::set('test',123);
+	var_dump(Redis::command('keys',['panel:10.1*']));
+	if(Input::has('panel')){
+		$query = "select distinct pan.panel, pan.code, pan.mats, pr.description, pan.img, pan.pgrp from panels pan ";
+                $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
+                $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";            
+                $stmt = $this->queryDB($query);
+                while ($row = ibase_fetch_row($stmt)) {
+                    $row[0] = str_replace('  ',' ',$row[0]);
+                    $mats = '';
+                    $id = str_replace('.', '', $row[1]);
+                    if ($row[2] != null) {
+                        $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
+                            "<table class='bio'>" .
+                            "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
+                            "</table>" .
+                            "</span>";
+                        $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[1] . "' onchange='setBio( this.value , " . $id . " )' >";
+                        $mat1 .= "<option value='70'></option>";
+                        $arr = explode(";", $row[2]);
+                        $string = "'" . $arr[0] . "'";
+                        for ($j = 1; $j < count($arr); $j++)
+                            $string .= ",'" . $arr[$j] . "'";
+                        $rs2 = $this->queryDB("SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
+                        try {
+                            while ($row2 = ibase_fetch_assoc($rs2)) {
+                                $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
+                            }
+                        } catch (Exception $e){
+
+                        };
+                        $mat1 .= "</select>";
+                        $mats = sprintf($mat, $id, $mat1);
+                    }
+                    $img ='';
+                    $imgCont = 'Контейнеры: ';
+                    if(isset($row[4])){
+                        $imgs = explode(";",$row[4]);
+                        foreach($imgs as $iVal){
+                            $img.="<img src='images/".$iVal."' />";
+                        }
+                    }
+                    $a = json_encode(['prean'=>$row[3], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[1] . ']  ' . $row[0] . $mats, 'id' => $id, 'code' => $row[1]],JSON_UNESCAPED_UNICODE);
+			Redis::set('panel:'.$row[1].';group:'.$row[5].';name:'.mb_strtoupper(str_replace(' ','_',$row[0])), $a);	 
+//			Redis::del('panel:'.$row[1].';group:'.$row[5].';name:'.mb_strtoupper(str_replace(' ','_',$row[0])));
+		}
+	} 
+	if(Input::has('code')){
+		var_dump(Redis::command('keys',['*panel*'.Input::get('code').'*']));
+	}
+	if(Input::has('pricelist')){
+		$query = "select id from pricelists where status='A'";
+		$res = $this->getResult($this->queryDB($query));
+		foreach($res as $val){
+			$query = "select panel from prices where pricelistid=".$val['ID'];
+			$res2  = $this->getResult($this->queryDB($query));
+			Redis::del('pricelist:'.$val['ID']);
+			foreach($res2 as $val2){
+				Redis::rpush('pricelist:'.$val['ID'],$val2['PANEL']);	
+			}
+		}	
+	}
+	if(Input::has('p') && Input::has('dept')){
+		$keys   = Redis::command('keys',['*group:'.$_GET['p'].'*']);
+		$price  = Redis::lrange('pricelist:'.$_GET['dept'],0,-1);
+		foreach($keys as $key){
+			$panel = substr($key,6,6);
+			if(in_array($panel,$price)){
+				$a[] = Redis::get($key);
+			}
+		}
+	var_dump(json_encode($a,JSON_UNESCAPED_UNICODE));
+	}	
+/*        if(Input::hasFile('excel')){
+            $excel = [];
 /*        if(Input::hasFile('excel')){
             $excel = [];
             $e = Excel::load(Input::file('excel'), function($reader) use ($excel) {});
@@ -299,5 +370,5 @@ class Test extends DBController
         return \View::make('test')->with([
 
         ]);*/
-    }
+	}
 }

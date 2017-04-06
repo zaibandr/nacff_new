@@ -470,7 +470,7 @@
                     var obj = jQuery.parseJSON(data);
                     var title = obj.label;
                     if (!findDuplicate(obj.id)) {
-                        $("#tree-dest").dynatree("getRoot").addChild({"icon":obj.icon, "prean":obj.prean, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.value});
+                        $("#tree-dest").dynatree("getRoot").addChild({"icon":obj.icon, "prean":obj.prean, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.code});
                         checkCito();
                         $("#searchp").val('');
                         var a = parseInt(obj.cost);
@@ -544,7 +544,7 @@
             type: "GET",
             url: $url,
             cache: false,
-            timeout : 10000,
+            timeout : 20000,
             error: function(jqXHR, textStatus, errorThrown){
                 $('#infoFrm').html('Ошибка: ' + textStatus + '. Тайм-аут операции. Повторите попытку сохранения чуть позже.');
                 $('#save').removeAttr('disabled','disabled');

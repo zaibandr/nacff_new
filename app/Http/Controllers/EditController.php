@@ -108,7 +108,7 @@ class EditController extends DBController
         $query.= $phone."' , EMAIL='".$email."' , LOGUSER='".mb_strtoupper(\Session::get('login'))."' , bill=bill+".$cost."-".$oldcost." where pid='".$pid."'";
         $a = $this->queryDB($query) or die(ibase_errmsg());
         $query = "update FOLDERS set LOGUSER='".\Session::get('login')."', SURNAME='".$surname."', NAME='".$name."', PATRONYMIC='".$namepatr."', DATE_BIRTH='".$dt_bday."', ADDRESS='".$address;
-        $query.= "', S_SMS='".$s_sms."', S_EMAIL='".$s_email."', PRIME='".$prime."', AIS=".$ais.", ORG='".$org;
+        $query.= "', REGDATE=CURRENT_TIMESTAMP, S_SMS='".$s_sms."', S_EMAIL='".$s_email."', PRIME='".$prime."', AIS=".$ais.", ORG='".$org;
         $query.= "', BACKREF=".$backref.", ISSUED='".$issued."', DOC='".$docc."', CARDNO='".$card."', CASH='".$cash;
         $query.= "', LOGDATE='".$dt_take."', POLIS=".$policy.", CITO='".$cito."', STR='".$insurer."', ANTIBIOT='".$antibiot;
         $query.= "', ANTIBIOTIC='".$antibiotics."', BIOSTART=".$dt_biostart.", BIOEND=".$dt_bioend.", HEIGHT=".$height.", WEIGHT=".$weight;
