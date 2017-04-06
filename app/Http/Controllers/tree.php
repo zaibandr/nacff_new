@@ -1,223 +1,372 @@
 <?php
-function tree(array &$a, array $b){
+namespace App\Http\Controllers;
 
-    foreach($a as &$val){
-        if($val['id']==$b['PARENT']){
-            $val['children'][] = ['id'=>$b['ID'], 'parent'=>$b['PARENT'], 'title' => $b['PGRP'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-        }
-        else {
-            if(!empty($val['children'])){
-                tree($val['children'],$b);
+use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\Facades\Excel;
+use Redis;
+
+class Test extends DBController
+{
+    public function index(){
+
+        //Redis::set('test',123);
+        //Redis::expire('test',5);
+        if(Input::has('panel')){
+            $query = "select distinct pan.panel, pan.code, pan.mats, pr.description, pan.img, pan.pgrp from panels pan ";
+            $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
+            $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
+            $stmt = $this->queryDB($query);
+            while ($row = ibase_fetch_row($stmt)) {
+                $row[0] = str_replace('  ',' ',$row[0]);
+                $mats = '';
+                $id = str_replace('.', '', $row[1]);
+                if ($row[2] != null) {
+                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
+                        "<table class='bio'>" .
+                        "<tr><td colspan='2'>Р‘РРћРњРђРўР•Р РРђР›:<br/>%s </td></tr>" .
+                        "</table>" .
+                        "</span>";
+                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[1] . "' onchange='setBio( this.value , " . $id . " )' >";
+                    $mat1 .= "<option value='70'></option>";
+                    $arr = explode(";", $row[2]);
+                    $string = "'" . $arr[0] . "'";
+                    for ($j = 1; $j < count($arr); $j++)
+                        $string .= ",'" . $arr[$j] . "'";
+                    $rs2 = $this->queryDB("SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
+                    try {
+                        while ($row2 = ibase_fetch_assoc($rs2)) {
+                            $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
+                        }
+                    } catch (Exception $e){
+
+                    };
+                    $mat1 .= "</select>";
+                    $mats = sprintf($mat, $id, $mat1);
+                }
+                $img ='';
+                $imgCont = 'РљРѕРЅС‚РµР№РЅРµСЂС‹: ';
+                if(isset($row[4])){
+                    $imgs = explode(";",$row[4]);
+                    foreach($imgs as $iVal){
+                        $img.="<img src='images/".$iVal."' />";
+                    }
+                }
+                $a = json_encode(['prean'=>$row[3], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[1] . ']  ' . $row[0] . $mats, 'id' => $id, 'code' => $row[1]],JSON_UNESCAPED_UNICODE);
+                Redis::set('panel:'.$row[1].';group:'.$row[5].';name:'.mb_strtoupper(str_replace(' ','_',$row[0])), $a);
+//			Redis::del('panel:'.$row[1].';group:'.$row[5].';name:'.mb_strtoupper(str_replace(' ','_',$row[0])));
             }
         }
-        unset($val);
-    }
-}
-if(isset($_GET['dept']) && $_GET['clientcode'])
-{
-    $host="192.168.0.249:rc";
-    $username="SYSDBA";
-    $password="cdrecord";
-    $db = ibase_pconnect($host, $username, $password)
-    or die("Ошибка подключения к БД! ". ibase_error());
-    if(isset($_GET['t'])) {
-        if (isset($_GET['p']) && isset($_GET['g'])) {
-            if($_GET['g']=='a'){
-                $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and s.parent=".$_GET['p']." and p.id=".$_GET['dept'];
-                $stmt = ibase_query($db,$query);
-                while ($row = ibase_fetch_assoc($stmt)){
-                    $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                    $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'] . '  (' . $row['PRICE'] . ')' , 'id' => $row['SORTER'], 'code' => $row['CODE'], 'cost' => $row['PRICE']];
+        if(Input::has('code')){
+            var_dump(Redis::command('keys',['*panel*'.Input::get('code').'*']));
+        }
+        if(Input::has('pricelist')){
+            $query = "select id from pricelists where status='A'";
+            $res = $this->getResult($this->queryDB($query));
+            foreach($res as $val){
+                $query = "select panel from prices where pricelistid=".$val['ID'];
+                $res2  = $this->getResult($this->queryDB($query));
+                Redis::del('pricelist:'.$val['ID']);
+                foreach($res2 as $val2){
+                    Redis::rpush('pricelist:'.$val['ID'],$val2['PANEL']);
                 }
-            } else {
-                $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-                $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-                $query .= "inner join PRICELISTS pl on pl.id=p.pricelistid ";
-                $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
-                $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
-                $query .= "where pl.status='A' and pan.pgrp=" . $_GET['p'] . " and p.pricelistid=" . $_GET['dept'];
-                $stmt = ibase_query($db, $query);
-                while ($row = ibase_fetch_row($stmt)) {
-                    $row[3] = str_replace('  ',' ',$row[3]);
-                    $mats = '';
-                    $id = str_replace('.', '', $row[0]);
-                    if ($row[4] != null) {
-                        $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                            "<table class='bio'>" .
-                            "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                            "</table>" .
-                            "</span>";
-                        $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                        $mat1 .= "<option value='70'></option>";
-                        $arr = explode(";", $row[4]);
-                        $string = "'" . $arr[0] . "'";
-                        for ($j = 1; $j < count($arr); $j++)
-                            $string .= ",'" . $arr[$j] . "'";
-                        $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                        try {
-                            while ($row2 = ibase_fetch_assoc($rs2)) {
-                                $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                            }
-                        } catch (Exception $e){
+            }
+        }
+        if(Input::has('p') && Input::has('dept')){
+            $keys   = Redis::command('keys',['*group:'.$_GET['p'].'*']);
+            $price  = Redis::lrange('pricelist:'.$_GET['dept'],0,-1);
+            foreach($keys as $key){
+                $panel = substr($key,6,6);
+                if(in_array($panel,$price)){
+                    $a[] = Redis::get($key);
+                }
+            }
+            var_dump(json_encode($a,JSON_UNESCAPED_UNICODE));
+        }
+        /*        if(Input::hasFile('excel')){
+                    $excel = [];
+        /*        if(Input::hasFile('excel')){
+                    $excel = [];
+                    $e = Excel::load(Input::file('excel'), function($reader) use ($excel) {});
+                    $objExcel = $e->getExcel();
+                    $sheet = $objExcel->getSheet(0);
+                    $highestRow = $sheet->getHighestRow();
+                    $highestColumn = $sheet->getHighestColumn();
+                    //  Loop through each row of the worksheet in turn
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        //  Read a row of data into an array
+                        $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+                            NULL, TRUE, FALSE);
+                        $excel = $rowData[0];
+                        if (!empty($excel[0])) {
+                            //dd($rowData);
+                            $panel = trim(str_replace(",", ".", $excel[0]));
+                            if(!empty($excel[4]))
+                                $prean = trim($excel[4]);
 
-                        };
-                        $mat1 .= "</select>";
-                        $mats = sprintf($mat, $id, $mat1);
-                    }
-                    $img ='';
-                    $imgCont = 'Контейнеры: ';
-                    if(isset($row[6])){
-                        $imgs = explode(";",$row[6]);
-                        foreach($imgs as $iVal){
-                            $img.="<img src='images/".$iVal."' />";
+                            $query = "select id from preanalytics where description='$prean'";
+                            $id = $this->getResult($this->queryDB($query));
+                            if (empty($id)) {
+                                $query = "insert into preanalytics(description) VALUES ('$prean') returning id";
+                                $id = $this->getResult($this->queryDB($query));
+                            }
+                            $query = "select id from samplingrules where samplingrule='MICRO'";
+                            $Sid = $this->getResult($this->queryDB($query));
+                            if (empty($Sid)) {
+                                $query = "insert into samplingrules(samplingrule) VALUES ('MICRO') returning id";
+                                $Sid = $this->getResult($this->queryDB($query));
+                            }
+                            $query = "update panel_containers set preanalitic_id=" . $id[0]['ID'] . ",samplingsrules_id=".$Sid[0]['ID']." where panel='$panel'";
+                            $res2 = $this->queryDB($query);
                         }
                     }
-                    $ncost = isset($row[2])?$row[2]:0;
-                    $cost = isset($row[1])?$row[1]:0;
-                    $a[] = ['prean'=>$row[5], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . '  (' . $cost . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $cost, 'ncost'=>$ncost];
                 }
-            }
-        } else {
-           //$query = "select distinct pc.PCAT, pg.PGRP from PRICES p ";
-           //$query .= "inner join PANEL_CATEGORIES pc on pc.ID=p.PCAT ";
-           //$query .= "inner join PANEL_GROUPS pg on pg.ID = p.PGRP ";
-           //$query .= "inner join PRICELISTS pr on pr.id=p.PRICELISTID ";
-           //$query .= "where pr.status = 'A' and pr.id=".$_GET['dept'];
-            $query = "select distinct pc.PCAT, pc.id from PANEL_CATEGORIES pc order by pc.id";
-            $stmt = ibase_query($query);
-            $s = 'Группы панелей';
-            $a = [['id' => 0, 'parent' => '', 'title' => 'Группы панелей', 'isLazy' => true, 'isFolder' => true, 'children' => []],
-                  ['id' => 'a', 'parent' => '', 'title' => 'Услуги центра', 'isLazy' => true, 'isFolder' => true, 'children' => []]];
-            while ($row = ibase_fetch_assoc($stmt)) {
-                $a[0]['children'][] = ['id'=>$row['ID'], 'parent'=>0, 'title' => $row['PCAT'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-            }
-            $query = "select pgrp, parent, id from panel_groups order by sorter";
-            $stmt = ibase_query($query);
-            while ($row = ibase_fetch_assoc($stmt)){
-                tree($a, $row);
-            }
-            $query = "select s.name, s.parent, s.id from services s inner join pricelists p on p.dept = s.deptid where s.price is NULL and p.status='A' and p.id =".$_GET['dept'];
-            $stmt = ibase_query($db, $query);
-            while($res = ibase_fetch_assoc($stmt))
-            {
-                    $a[1]['children'][] = ['id' => $res['ID'], 'parent' => 'a', 'title' => $res['NAME'], 'isLazy' => true, 'isFolder' => true, 'children' => []];
-            }
-            if(count($a[1]['children'])==0)
-                $a[1]['children'][] = [ "icon"=> "false", "title"=> "<i>Нет данных | N/A</i>", "id"=> 'none'];
-            //print_r($a);
+                if(Input::hasFile('img')){
+                    $img = [];
+                    $e = Excel::load(Input::file('img'), function($reader) use ($img) {});
+                    $objExcel = $e->getExcel();
+                    $sheet = $objExcel->getSheet(0);
+                    $highestRow = $sheet->getHighestRow();
+                    $highestColumn = $sheet->getHighestColumn();
+                    $a = [];
+                    //  Loop through each row of the worksheet in turn
+                    for ($row = 1; $row <= $highestRow; $row++)
+                    {
+                        //  Read a row of data into an array
+                        $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row,
+                            NULL, TRUE, FALSE);
+                        $img = $rowData[0];
+                        if (!empty($img[0])) {
+                            $panel = trim(str_replace(",",".",$img[0]));
+                            while(strlen($panel)!==6){
+                                $panel.="0";
+                            }
+                            //dd($panel);
+                            $query = "update panels set img='".trim($img[1])."' where code = '$panel'";
+                            $this->queryDB($query);
+                        }
+                    }
+                }
+        */
+        /*if(Input::hasFile('preanPlusRules')){
+             $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
+            $a = '';
+             $query = "select p.CODE,pc.ID, pc.CONTAINERTYPE_ID, pc.MATTYPE_ID, pc.CONTAINERNO from PANELS p inner join PANEL_CONTAINERS pc on pc.PANEL_ID=p.ID where p.status='A' and p.code='49.132'";
+             $stmt = ibase_query($lims,$query); $panel = '';
+             while($row = ibase_fetch_assoc($stmt)){
+                 if($panel!=$row['CODE']) {
+                     $panel = $row['CODE'];
+                     //$query = "delete from panel_containers where panel='$panel'";
+                     //$this->queryDB($query);
+                 }
+                 $query = "select code from panels where code='$panel'";
+                 $res = $this->getResult($this->queryDB($query));
+                 if(!isset($res[0]['CODE'])){
+                     $a.= ",".$panel;
+                     $query = "select p.panelcatid, p.due2, p.mat_types, p.img_src, p.panel, p.id from panels p where p.code='$panel'";
+                     $stmt2 = ibase_query($lims,$query);
+                     while($row2 = ibase_fetch_assoc($stmt2)){
+                         $this->queryDB("insert into panels(mats,img,panel,code,modify_time) VALUES ('".$row2['MAT_TYPES']."','".$row2['IMG_SRC']."','".$row2['PANEL']."','$panel', current_timestamp)");
+                         $this->queryDB("insert into prices(pricelistid, panel, pgrp) VALUES (49,'$panel',".$row2['PANELCATID'].")");
+                         $stmt3 = ibase_query($lims,"select pc.id,pc.mattype_id,pc.containertype_id,pc.containerno,t.test_id from panel_containers pc inner join panel_tests t on t.container_id=pc.id where pc.panel_id='".$row['ID']."'");
+                         while($row3 = ibase_fetch_assoc($stmt3)){
+                             $this->queryDB("insert into panel_containers(id,MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO) VALUES (" . $row3['ID'] . "," . $row3['MATTYPE_ID'] . "," . $row3['CONTAINERTYPE_ID'] . ",'" . $row['CODE'] . "'," . $row3['CONTAINERNO'] . ")");
+                             $this->queryDB("insert into panel_tests(testcode, containerid) values(".$row3['TEST_ID'].",".$row3['ID'].")");
+                         }
+                     }
+                 }
+                 else {
+                     //$query = "insert into panel_containers(ID, MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO) values (" . $row['ID'] . "," . $row['MATTYPE_ID'] . "," . $row['CONTAINERTYPE_ID'] . ",'" . $row['CODE'] . "'," . $row['CONTAINERNO'] . ")";
+                     //$this->queryDB($query);
+                 }
+             }
+             //Excel::selectSheetsByIndex(0)->load(Input::file('preanPlusRules')
+             //    , function($sheet) {
+             //        $sheet->each(function($row){
+             //            $columns = $row->all();
+             //            $prean = ($columns['prean']!='[null]')?$columns['prean']:260;
+             //            $samp = ($columns['samp']!='[null]')?$columns['samp']:28;
+             //            $query = "update panel_containers set PREANALITIC_ID=$prean, SAMPLINGSRULES_ID=$samp where panel='".$columns['panel']."'";
+             //            $this->queryDB($query);
+             //        });
+             //    });
+         }*/
+        /*
+        if(Input::hasFile('groups')){
+            Excel::load(Input::file('groups'), function($reader) {
+                foreach($reader->all() as $sheet) {
+                    foreach ($sheet as $row) {
+                        $items = $row->all();
+                        //dd($items);
+                        if($items['img'])
+                            $img = "'".$items['img']."'";
+                        else $img = null;
+                        if($items['mat'])
+                            $mat = "'".$items['mat']."'";
+                        else $mat=null;
+                        $query = "select code from panels where code = '".$items['code']."'";
+                        $id = $this->getResult($this->queryDB($query));
+                        if (empty($id)) {
+                            $query = "insert into panels(code,panel,mats,img) VALUES ('".$items['code']."','" . $items['panel'] . "',".$mat.",".$img.")";
+                            $this->queryDB($query);
+                        } else {
+                            $query = "update panels set mats=".$mat.", img=".$img." where code = '".$items['code']."'";
+                            $this->queryDB($query);
+                        }
+                    }
+                }
+            });
         }
-        if(isset($a))
-        echo(json_encode($a, JSON_UNESCAPED_UNICODE));
-        else echo json_encode(['title'=>'<i>Нет панелей</i>']);
-    }
-    if(isset($_GET['s'])) {
-        if (isset($_GET['term'])) {
-            $query = "select distinct p.panel,p.nacph, p.COST, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-            $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-            $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' and pl.id=".$_GET['dept']." ";
-            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
-            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
-            $query .= "where p.panel like '%".$_GET['term']."%' or upper(COALESCE (p.medan, pan.PANEL)) like '%".mb_strtoupper($_GET['term'])."%'";
-            $stmt = ibase_query($db, $query);
-            while ($row = ibase_fetch_row($stmt)) {
-                $row[3] = str_replace('  ',' ',$row[3]);
-                $mats = '';
-                $id = str_replace('.', '', $row[0]);
-                if ($row[4] !== null) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                        "<table class='bio'>" .
-                        "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                        "</table>" .
-                        "</span>";
-                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                    $mat1 .= "<option value='70'></option>";
-                    $arr = explode(";", $row[4]);
-                    $string = "'" . $arr[0] . "'";
-                    for ($j = 1; $j < count($arr); $j++)
-                        $string .= ",'" . $arr[$j] . "'";
-                    $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                    while ($row2 = ibase_fetch_assoc($rs2)) {
-                        $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                    }
-                    $mat1 .= "</select>";
-                    $mats = sprintf($mat, $id, $mat1);
-                }
-                $img ='';
-                $imgCont = 'Контейнеры: ';
-                if(isset($row[6])){
-                    $imgs = explode(";",$row[6]);
-                    foreach($imgs as $iVal){
-                        $img.="<img src='/nacff_new/images/".$iVal."' />";
+        if(Input::hasFile('panels')){
+            Excel::load(Input::file('panels'), function($reader) {
+                foreach($reader->all() as $sheet) {
+                    foreach ($sheet as $row) {
+                        $items = $row->all();
+                        //dd($items);
+                        $code = $items['code'];
+                        while(strlen($code)<6)
+                            $code.='0';
+                        $query = "select code from panels where code = '".$code."'";
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)){
+                            $query = "insert into panels(code,panel,mats,img) ";
+                            $query.= "VALUES ('$code','".trim($items['panel'])."', '".$items['mattypes']."', '".$items['img']."')";
+                            $this->queryDB($query);
+                        }
+                        $query = "select pc.panel from panel_containers pc where ";
+                        $query.= "pc.panel='$code' and pc.contgroupid=".$items['cont']." and pc.mattype_id=".$items['matt']." and pc.containerno=".$items['no'];
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)){
+                            $query = "insert into panel_containers(panel,mattype_id,contgroupid,containerno) values";
+                            $query.= "('$code',".trim($items['matt']).", ".$items['cont'].", ".$items['no'].")";
+                            $this->queryDB($query);
+                        }
+                        $query = "select panel from prices where panel='$code' and pricelistid=49";
+                        $id = $this->getResult($this->queryDB($query));
+                        if(empty($id)) {
+                            if ($items['catid'] == '[null]') {
+                                $query = "insert into prices(pricelistid, panel, due, pgrp) VALUES ";
+                                $query .= "(49, '$code'," . $items['dur'] . ", 1)";
+                            } else {
+                                $query = "insert into prices(pricelistid, panel, due, pgrp) VALUES ";
+                                $query .= "(49, '$code'," . $items['dur'] . "," . $items['catid'] . ")";
+                            }
+                            $this->queryDB($query);
+                        }
                     }
                 }
-                $cost = isset($row[2])?$row[2]:0;
-                $ncost = isset($row[1])?$row[1]:0;
-                $a[] = ['prean'=>$row[5], 'color'=>'','cost' => $cost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$ncost ];
+            });
+        }*/
+        /**
+         * Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ СЃРІСЏР·РµР№ РІ P_C СЃ С‚Р°Р±Р»РёС†С‹ LOGS
+         */
+        /*        $query = "select description from logs where LOG_TIME>'2016-10-11 11:52:58.801' and LOG_TIME<'2016-10-11 11:52:58.803' and theme='DELETE pc'";
+        $rows = $this->getResult($this->queryDB($query));
+        $contno = 1;
+        foreach($rows as $val){
+            if($val['DESCRIPTION']){
+                if(isset($panel) && $panel==substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6))
+                    $contno++;
+                else $contno = 1;
+                $panel = substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6);
+                $cid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'c_id=')+5,3);
+                $mid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'m_id=')+5,3);
+                $sid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'s_id=')+5,3);
+                $pid = (int)substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'p_id=')+5,3);
+                $pid = ($pid==0)?'null':$pid;
+                $sid = ($sid==0)?'null':$sid;
+                //$query = "update panel_containers set mattype_id=$mid,contgroupid=$cid,preanalitic_id=$pid,samplingsrules_id=$sid where panel='$panel'";
+                $query = "insert into panel_containers(containerno,mattype_id,contgroupid,preanalitic_id,samplingsrules_id,panel) values ($contno,$mid,$cid,$pid,$sid,'$panel')";
+                $this->queryDB($query);
             }
-            $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where p.status='A' and s.status='A' and p.id=".$_GET['dept']." and s.code like '%".$_GET['term']."%'";
-            $stmt = ibase_query($db,$query);
-            while ($row = ibase_fetch_assoc($stmt)){
-                $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                $a[] = ['color'=>'','cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => '['.$row['CODE'].']'.$row['NAME'], 'code' => $row['CODE'] ];
+        }*/
+        /**
+         * Р’РѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РєРѕРЅС‚РµР№РЅРµСЂРѕРІ РІ P_C
+         */
+        /*$query = "select description, theme from logs where log_time > '2016-09-15 15:55' and log_time < '2016-10-01 15:55'";
+        $rows = $this->getResult($this->queryDB($query));
+        $panel = '';
+        $del = 0;
+        $ins = 0;
+        $a = [];
+        foreach($rows as $val){
+            if($panel==substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6)){
+                if($val['THEME']=='DELETE pc')
+                    $del++;
+                elseif($val['THEME']=='insert pc')
+                    $ins++;
+            } else {
+                if($val['THEME']=='DELETE pc' && $panel!='')
+                    $del++;
+                elseif($val['THEME']=='insert pc' && $panel!='')
+                    $ins++;
+                if($del!=$ins)
+                    $a[$panel] = ['del'=>$del,'ins'=>$ins];
+                $panel = substr($val['DESCRIPTION'],strpos($val['DESCRIPTION'],'panel=')+6,6);
+                $del = 0;
+                $ins = 0;
             }
-            //print_r($a);
-            echo(json_encode($a));
         }
-    }
-    if(isset($_GET['a'])) {
-        if (isset($_GET['term'])) {
-            $query = "select distinct pan.CODE, p.COST,p.nacph, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-            $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-            $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' ";
-            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
-            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
-            $query .= "where p.panel ='".$_GET['term']."' and p.pricelistid=".$_GET['dept'];
-            $stmt = ibase_query($db, $query);
-            while ($row = ibase_fetch_row($stmt)) {
-                $row[3] = str_replace('  ',' ',$row[3]);
-                $mats = '';
-                $id = str_replace('.', '', $row[0]);
-                if ($row[4] != null) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                        "<table class='bio'>" .
-                        "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                        "</table>" .
-                        "</span>";
-                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                    $mat1 .= "<option value='70'></option>";
-                    $arr = explode(";", $row[4]);
-                    $string = "'" . $arr[0] . "'";
-                    for ($j = 1; $j < count($arr); $j++)
-                        $string .= ",'" . $arr[$j] . "'";
-                    $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                    while ($row2 = ibase_fetch_assoc($rs2)) {
-                        $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                    }
-                    $mat1 .= "</select>";
-                    $mats = sprintf($mat, $id, $mat1);
-                }
-                $img ='';
-                $imgCont = 'Контейнеры: ';
-                if(isset($row[6])){
-                    $imgs = explode(";",$row[6]);
-                    foreach($imgs as $iVal){
-                        $img.="<img src='/nacff_new/images/".$iVal."' />";
-                    }
-                }
-                $ncost = isset($row[2])?$row[2]:0;
-                $cost = isset($row[1])?$row[1]:0;
-                $a = ['prean'=>$row[5],'color'=>'','cost' => $cost, 'ncost'=>$ncost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] .'  ('.$cost.' руб.)'.$mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
+        //
+        foreach($a as $k=>$val){
+            $query = "select PREANALITIC_ID, SAMPLINGSRULES_ID from panel_containers where panel='$k'";
+            $res = $this->getResult($this->queryDB($query));
+            if(isset($res[0])) {
+                $p = ($res[0]);
+                $pId = $p['PREANALITIC_ID'];
+                $sId = $p['SAMPLINGSRULES_ID'];
             }
-            if(empty($a)) {
-                $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and p.id=".$_GET['dept']." and s.code ='".$_GET['term']."'";
-                $stmt = ibase_query($db, $query);
-                while ($row = ibase_fetch_assoc($stmt)) {
-                    $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                    $a = ['color' => '', 'cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => $row['CODE'], 'code' => $row['CODE']];
+            $query = "delete from panel_containers where panel='$k'";
+            $this->queryDB($query);
+            $query = "select description,theme from logs where description like '%$k%'";
+            $rows = $this->getResult($this->queryDB($query));
+            $i = 1;
+            foreach ($rows as $row) {
+                if($row['THEME']=='DELETE pc'){
+                    $cid = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'c_id=')+5,3);
+                    $mid = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'m_id=')+5,3);
+                    if(!isset($pId)){
+                        $sId = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'s_id=')+5,3);
+                        $pId = (int)substr($row['DESCRIPTION'],strpos($row['DESCRIPTION'],'p_id=')+5,3);
+                    }
+                    $query = "insert into panel_containers(MATTYPE_ID, CONTGROUPID, PANEL, CONTAINERNO, PREANALITIC_ID, SAMPLINGSRULES_ID) values($mid,$cid,'$k',$i,$pId,$sId)";
+                    $this->queryDB($query);
+                    $i++;
+                } elseif($row['THEME']=='insert pc') {
+                    $i = 1;
+                    break;
                 }
             }
-            //print_r($a);
-            echo(json_encode($a));
-        }
+            ibase_commit();
+        }*/
+        /**
+         * Р’С‹РІРѕРґ С‚РµСЃС‚РѕРІ РІ excel
+         */
+        /*                Excel::create('tests', function ($excel){
+                   $excel->sheet('first', function ($sheet){
+                       $tests = $this->getResult($this->queryDB("SELECT a.ID, a.TESTNAME, a.QUANTITY FROM tests a where a.OUTSOURCE='N' and a.QUANTITY is null order by a.id"));
+                       $sheet->setOrientation('landscape');
+                       $sheet->setPageMargin(0.25);
+                       $sheet->setWidth(['A'=>20,'B'=>150]);
+                       $sheet->row(1,['ID','РќР°Р·РІР°РЅРёРµ','РљРѕР»РёС‡РµСЃС‚РІРѕ, РјРєР»']);
+                       $sheet->rows($tests);
+                   });
+                })->export('xls'); */
+        /**
+         * РљРѕРїРёСЂРѕРІР°РЅРёРµ РєРѕР»РѕРЅРєРё Р°СѓС‚СЃРѕСЂСЃ РёР· lims.tests -> rc.tests
+         */
+        /*          $lims = ibase_connect('192.168.0.8:lims','sysdba','cdrecord');
+                $query = "select code,panelcatid from panels";
+                $stmt = ibase_query($lims,$query);
+                while($row = ibase_fetch_assoc($stmt)){
+                    if(is_null($row['PANELCATID']))
+                        $row['PANELCATID'] = 'null';
+                    $query = "update panels set pgrp=".$row['PANELCATID']." where code ='".$row['CODE']."'";
+                    $this->queryDB($query);
+                }*/
+        /*        dd(crypt(trim(Input::get('password')),'$1$nacffnew'));
+                return \View::make('test')->with([
+
+                ]);*/
     }
-} else echo"Ошибка авторизации!";
+}
