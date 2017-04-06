@@ -84,23 +84,19 @@
                         $("#Rsex").val('Ж');
                     else $("#Rsex").val('М');
                     $('input#discount').val($('#cost').val());
-                    var pan = $("#tree-dest").text();
-                        if(pan!='') {
-                            $("#orderP table tr").remove();
-                            b = pan.split('  ');
-                            tabl = "<tr><th>Код панели</th><th>Наименование</th><th>Цена</th></tr>";
-                            $("#orderP table").append(tabl);
-                            for (var i = 1; i < (b.length - 2); i += 3) {
-                                if(kpMas.indexOf($.trim(b[i]))!==-1) {
-                                    kp = 1;
-                                }
-                                tabl = "<tr><td>" + b[i] + "</td><td>" + b[i + 1] + "</td><td>" + b[i + 2] + "</td></tr>";
-                                $("#orderP table").append(tabl);
-                            }
-                            tabl = "<tr><td></td><td style='text-align: right; color: darkred;'><b>Стоимость с учетом скидки</b></td><td><b>" + $('#cost').val() + "</b></td></tr>";
+			$("#orderP table tr").remove();
+                        tabl = "<tr><th>Панель</th><th>Цена</th></tr>";
+			$("#orderP table").append(tabl);
+	        $("#tree-dest").dynatree("getRoot").visit(function(node){ 
+			if(typeof node.data === "object" && node.data!== null){ console.log(node.data);     
+                                tabl = "<tr><td>"+node.data.value+"</td><td>" + node.data.cost + "</td></tr>";
+				$("#orderP table").append(tabl);
+			}	
+       		});
+                            tabl = "<tr><td style='text-align: right; color: darkred;'><b>Стоимость с учетом скидки</b></td><td><b>" + $('#cost').val() + "</b></td></tr>";
                             $("#orderP table").append(tabl);
                             //console.log(kp);
-                        }
+                        
                     Rshow('phone');
                     Rshow('namepatr');
                     Rshow('email');
@@ -279,6 +275,7 @@
                                     "id": ui.item.id,
                                     "color": ui.item.color,
                                     "code": ui.item.code,
+				    "value": ui.item.value,
                                     "cost": ui.item.cost,
                                     "prean": ui.item.prean
                                 });
@@ -467,10 +464,10 @@
         if (event.keyCode == 13 && o.value!='') {
             $.get("app/Http/Controllers/tree.php?dept=" + dept + "&clientcode="+deptid+"&a=1", {"term":o.value.replace(",",".") }, function(data) {
                 if (data!="") {
-                    var obj = jQuery.parseJSON(data);
-                    var title = obj.label;
+                    var obj = jQuery.parseJSON(data)[0];
+                    var title = "<font style='background:" + obj.color + "'></font> " + obj.title + "  (" + obj.cost + "руб.)";
                     if (!findDuplicate(obj.id)) {
-                        $("#tree-dest").dynatree("getRoot").addChild({"icon":obj.icon, "prean":obj.prean, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.value});
+                        $("#tree-dest").dynatree("getRoot").addChild({"cost":obj.cost,"value":obj.value, "icon":obj.icon, "prean":obj.prean, "bioset":obj.bioset, "biodef":obj.biodef, "title": title, "id":obj.id, "color":obj.color, "code":obj.code});
                         checkCito();
                         $("#searchp").val('');
                         var a = parseInt(obj.cost);

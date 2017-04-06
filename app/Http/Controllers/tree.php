@@ -1,4 +1,12 @@
-<?php
+<?php 
+require '/var/www/html/site/vendor/predis/predis/autoload.php';
+
+try {
+	$redis = new Predis\Client();
+} catch (Exception $e){
+	die($e->getMessage());
+}
+//var_dump($redis->keys('panel*'));die;
 function tree(array &$a, array $b){
 
     foreach($a as &$val){
@@ -22,61 +30,30 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
     or die("Ошибка подключения к БД! ". ibase_error());
     if(isset($_GET['t'])) {
         if (isset($_GET['p']) && isset($_GET['g'])) {
-            if($_GET['g']=='a'){
+            $a = '[';
+	    if($_GET['g']=='a'){
                 $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and s.parent=".$_GET['p']." and p.id=".$_GET['dept'];
                 $stmt = ibase_query($db,$query);
                 while ($row = ibase_fetch_assoc($stmt)){
                     $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                    $a[] = ['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'] . '  (' . $row['PRICE'] . ')' , 'id' => $row['SORTER'], 'code' => $row['CODE'], 'cost' => $row['PRICE']];
+                    $a .= json_encode(['bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'] . '  (' . $row['PRICE'] . ')' , 'id' => $row['SORTER'], 'code' => $row['CODE'], 'cost' => $row['PRICE']],JSON_UNESCAPED_UNICODE).',';
                 }
             } else {
-                $query = "select distinct p.panel, p.COST, p.nacph, COALESCE (p.medan,pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-                $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-                $query .= "inner join PRICELISTS pl on pl.id=p.pricelistid ";
-                $query .= "inner join PANEL_CONTAINERS pcn on pan.CODE=pcn.PANEL ";
-                $query .= "left join PREANALYTICS pr on pcn.PREANALITIC_ID=pr.ID ";
-                $query .= "where pl.status='A' and pan.pgrp=" . $_GET['p'] . " and p.pricelistid=" . $_GET['dept'];
-                $stmt = ibase_query($db, $query);
-                while ($row = ibase_fetch_row($stmt)) {
-                    $row[3] = str_replace('  ',' ',$row[3]);
-                    $mats = '';
-                    $id = str_replace('.', '', $row[0]);
-                    if ($row[4] != null) {
-                        $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                            "<table class='bio'>" .
-                            "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                            "</table>" .
-                            "</span>";
-                        $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                        $mat1 .= "<option value='70'></option>";
-                        $arr = explode(";", $row[4]);
-                        $string = "'" . $arr[0] . "'";
-                        for ($j = 1; $j < count($arr); $j++)
-                            $string .= ",'" . $arr[$j] . "'";
-                        $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                        try {
-                            while ($row2 = ibase_fetch_assoc($rs2)) {
-                                $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                            }
-                        } catch (Exception $e){
-
-                        };
-                        $mat1 .= "</select>";
-                        $mats = sprintf($mat, $id, $mat1);
-                    }
-                    $img ='';
-                    $imgCont = 'Контейнеры: ';
-                    if(isset($row[6])){
-                        $imgs = explode(";",$row[6]);
-                        foreach($imgs as $iVal){
-                            $img.="<img src='images/".$iVal."' />";
-                        }
-                    }
-                    $ncost = isset($row[2])?$row[2]:0;
-                    $cost = isset($row[1])?$row[1]:0;
-                    $a[] = ['prean'=>$row[5], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . '  (' . $cost . ')' . $mats, 'id' => $id, 'code' => $row[0], 'cost' => $cost, 'ncost'=>$ncost];
-                }
+		$keys   = $redis->keys('*group:'.$_GET['p'].'*'); 
+		foreach($keys as $key){
+			$panel = substr($key,6,6);
+			if($redis->hexists('pricelists:'.$_GET['dept'], $panel)){
+				$cost = $redis->hget('pricelists:'.$_GET['dept'],$panel);
+				$cost = $cost==''?0:$cost;
+				$a .= substr($redis->get($key),0,-1).',"cost":"'.$cost.'"},';
+				//$a .= $redis->get($key).',';
+			}
+		}
             }
+	if($a=='[')
+		echo "<i>Нет панелей</i>";
+	else
+		echo substr($a,0,-1).']';	  
         } else {
            //$query = "select distinct pc.PCAT, pg.PGRP from PRICES p ";
            //$query .= "inner join PANEL_CATEGORIES pc on pc.ID=p.PCAT ";
@@ -105,119 +82,58 @@ if(isset($_GET['dept']) && $_GET['clientcode'])
             if(count($a[1]['children'])==0)
                 $a[1]['children'][] = [ "icon"=> "false", "title"=> "<i>Нет данных | N/A</i>", "id"=> 'none'];
             //print_r($a);
+		echo(json_encode($a, JSON_UNESCAPED_UNICODE));
+
         }
-        if(isset($a))
-        echo(json_encode($a, JSON_UNESCAPED_UNICODE));
-        else echo json_encode(['title'=>'<i>Нет панелей</i>']);
     }
     if(isset($_GET['s'])) {
         if (isset($_GET['term'])) {
-            $query = "select distinct p.panel,p.nacph, p.COST, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-            $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-            $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' and pl.id=".$_GET['dept']." ";
-            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
-            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
-            $query .= "where p.panel like '%".$_GET['term']."%' or upper(COALESCE (p.medan, pan.PANEL)) like '%".mb_strtoupper($_GET['term'])."%'";
-            $stmt = ibase_query($db, $query);
-            while ($row = ibase_fetch_row($stmt)) {
-                $row[3] = str_replace('  ',' ',$row[3]);
-                $mats = '';
-                $id = str_replace('.', '', $row[0]);
-                if ($row[4] !== null) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                        "<table class='bio'>" .
-                        "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                        "</table>" .
-                        "</span>";
-                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                    $mat1 .= "<option value='70'></option>";
-                    $arr = explode(";", $row[4]);
-                    $string = "'" . $arr[0] . "'";
-                    for ($j = 1; $j < count($arr); $j++)
-                        $string .= ",'" . $arr[$j] . "'";
-                    $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                    while ($row2 = ibase_fetch_assoc($rs2)) {
-                        $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                    }
-                    $mat1 .= "</select>";
-                    $mats = sprintf($mat, $id, $mat1);
-                }
-                $img ='';
-                $imgCont = 'Контейнеры: ';
-                if(isset($row[6])){
-                    $imgs = explode(";",$row[6]);
-                    foreach($imgs as $iVal){
-                        $img.="<img src='/nacff_new/images/".$iVal."' />";
-                    }
-                }
-                $cost = isset($row[2])?$row[2]:0;
-                $ncost = isset($row[1])?$row[1]:0;
-                $a[] = ['prean'=>$row[5], 'color'=>'','cost' => $cost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] . $mats, 'id' => $id, 'value' => '['.$row[0].'] '.$row[3], 'code' => $row[0], 'ncost'=>$ncost ];
-            }
+		$a = '[';
+		$keys   = array_merge($redis->keys('panel:'.$_GET['term'].'*'),$redis->keys('*name:*'.mb_strtoupper($_GET['term'].'*')));  
+		foreach($keys as $key){
+			$panel = substr($key,6,6);
+			if($redis->hexists('pricelists:'.$_GET['dept'],$panel)){
+				$cost = $redis->hget('pricelists:'.$_GET['dept'],$panel);
+				$cost = $cost==''?0:$cost;
+				$a .= substr($redis->get($key),0,-1).',"cost":"'.$cost.'"},';
+				//$a .= $redis->get($key).',';
+			}
+           	 }	
             $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where p.status='A' and s.status='A' and p.id=".$_GET['dept']." and s.code like '%".$_GET['term']."%'";
             $stmt = ibase_query($db,$query);
             while ($row = ibase_fetch_assoc($stmt)){
                 $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                $a[] = ['color'=>'','cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => '['.$row['CODE'].']'.$row['NAME'], 'code' => $row['CODE'] ];
+                $a.= json_encode(['color'=>'','cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => '['.$row['CODE'].']'.$row['NAME'], 'code' => $row['CODE'] ],JSON_UNESCAPED_UNICODE).',';
             }
             //print_r($a);
-            echo(json_encode($a));
-        }
+            echo substr($a,0,-1).']';
+         }
     }
     if(isset($_GET['a'])) {
         if (isset($_GET['term'])) {
-            $query = "select distinct pan.CODE, p.COST,p.nacph, COALESCE (p.medan, pan.PANEL), pan.mats, pr.description, pan.img from PRICES p ";
-            $query .= "inner join PANELS pan on pan.CODE=p.PANEL ";
-            $query .= "inner join pricelists pl on p.pricelistid=pl.id and pl.status='A' ";
-            $query .= "inner join PANEL_CONTAINERS pc on pan.CODE=pc.PANEL ";
-            $query .= "left join PREANALYTICS pr on pc.PREANALITIC_ID=pr.ID ";
-            $query .= "where p.panel ='".$_GET['term']."' and p.pricelistid=".$_GET['dept'];
-            $stmt = ibase_query($db, $query);
-            while ($row = ibase_fetch_row($stmt)) {
-                $row[3] = str_replace('  ',' ',$row[3]);
-                $mats = '';
-                $id = str_replace('.', '', $row[0]);
-                if ($row[4] != null) {
-                    $mat = "<span id='additional%s' style='margin-left:35px; display:none'>" .
-                        "<table class='bio'>" .
-                        "<tr><td colspan='2'>БИОМАТЕРИАЛ:<br/>%s </td></tr>" .
-                        "</table>" .
-                        "</span>";
-                    $mat1 = "<select disabled='disabled' style='width:300px;' id='m" . $id . "' name='" . $row[0] . "' onchange='setBio( this.value , " . $id . " )' >";
-                    $mat1 .= "<option value='70'></option>";
-                    $arr = explode(";", $row[4]);
-                    $string = "'" . $arr[0] . "'";
-                    for ($j = 1; $j < count($arr); $j++)
-                        $string .= ",'" . $arr[$j] . "'";
-                    $rs2 = ibase_query($db, "SELECT ID, MATTYPE FROM MATTYPES WHERE ID IN (" . $string . ")");
-                    while ($row2 = ibase_fetch_assoc($rs2)) {
-                        $mat1 .= "<option value='" . $row2["ID"] . "'>" . $row2["MATTYPE"] . "</option>";
-                    }
-                    $mat1 .= "</select>";
-                    $mats = sprintf($mat, $id, $mat1);
-                }
-                $img ='';
-                $imgCont = 'Контейнеры: ';
-                if(isset($row[6])){
-                    $imgs = explode(";",$row[6]);
-                    foreach($imgs as $iVal){
-                        $img.="<img src='/nacff_new/images/".$iVal."' />";
-                    }
-                }
-                $ncost = isset($row[2])?$row[2]:0;
-                $cost = isset($row[1])?$row[1]:0;
-                $a = ['prean'=>$row[5],'color'=>'','cost' => $cost, 'ncost'=>$ncost, 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  '.$img.'[' . $row[0] . ']  ' . $row[3] .'  ('.$cost.' руб.)'.$mats, 'id' => $id, 'value' => $row[0], 'code' => $row[0]];
-            }
-            if(empty($a)) {
+		$a = '[';
+		$keys   = $redis->keys('panel:'.$_GET['term'].'*');  
+		foreach($keys as $key){
+			$panel = substr($key,6,6);
+			if($redis->hexists('pricelists:'.$_GET['dept'],$panel)){
+				$cost = $redis->hget('pricelists:'.$_GET['dept'],$panel);
+				$cost = $cost==''?0:$cost;
+				$a .= substr($redis->get($key),0,-1).',"cost":"'.$cost.'"},';
+				//$a .= $redis->get($key).',';
+			}
+           	 }	
+            if($a=='[') {
                 $query = "select s.price, s.code, s.name, s.sorter from services s inner join pricelists p on p.dept=s.deptid where s.status='A' and p.status='A' and p.id=".$_GET['dept']." and s.code ='".$_GET['term']."'";
                 $stmt = ibase_query($db, $query);
                 while ($row = ibase_fetch_assoc($stmt)) {
                     $row['NAME'] = str_replace('  ',' ',$row['NAME']);
-                    $a = ['color' => '', 'cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'label' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => $row['CODE'], 'code' => $row['CODE']];
+                    $a = json_encode(['color' => '', 'cost' => $row['PRICE'], 'bioset' => '', 'biodef' => '', 'icon' => '', 'title' => '  [' . $row['CODE'] . ']  ' . $row['NAME'], 'id' => $row['SORTER'], 'value' => $row['CODE'], 'code' => $row['CODE']],JSON_UNESCAPED_UNICODE);
                 }
-            }
-            //print_r($a);
-            echo(json_encode($a));
+		echo $a;
+            } else {
+            echo substr($a,0,-1).']';
+		}
         }
     }
 } else echo"Ошибка авторизации!";
+
