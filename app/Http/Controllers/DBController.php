@@ -135,7 +135,8 @@ class DBController extends Controller
         $query .= "FROM PATIENT a ";
         $query .= "inner join FOLDERS f on f.PID=a.PID ";
         $query .= "where f.clientid='".\Session::get('dept')."' order by a.surname";
-        $res = $this->queryDB($query);;
+        $res = $this->queryDB($query);
+        //dd($this->getResult($res));
         return $this->getResult($res);
     }
     function getPatientInfo($id){

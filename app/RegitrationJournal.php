@@ -13,7 +13,6 @@ class RegitrationJournal extends Model
     {
         return $query->where('clientcode',$value);
     }
-
     public function scopeShown($query)
     {
         return $query->where('is_show','Y');

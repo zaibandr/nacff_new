@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -102,8 +101,5 @@
     </div>
 </div>
 <div id="scrollup"><i class="fa fa-sort-asc fa-4x"></i></div>
-</body>
-
-
 </body>
 </html>
