@@ -14,7 +14,7 @@
     <!-- Fonts -->
     <link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
     <link href='{{secure_asset('resources/assets/css/MyriadPro.css')}}' rel='stylesheet' type='text/css'>
-
+    @yield('style')
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -101,5 +101,6 @@
     </div>
 </div>
 <div id="scrollup"><i class="fa fa-sort-asc fa-4x"></i></div>
+@yield('script')
 </body>
 </html>

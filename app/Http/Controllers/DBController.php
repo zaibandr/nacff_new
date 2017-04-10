@@ -149,40 +149,33 @@ class DBController extends Controller
         //dd($this->getResult($res));
         return $this->getResult($res);
     }
-    function getFolders(){
-        $apprsts    = \Input::get('status','');
-        $positive   = \Input::get('positive','');
-        $panel      = str_replace(',','.',\Input::get('panel',''));
-        $date_st    = \Input::get('date_st',date('Y-m-d', strtotime("-3 days")));
-        if (\Input::has('date_en'))
-            $date_en = date('Y-m-d 23:59:59', strtotime(\Input::get('date_en')));
-        else
-            $date_en = date('Y-m-d 23:59:59');
-        if(\Input::has('client') && \Input::get('client')!=='' && \Input::get('client')!=='all'){
-            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str,  f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cash, f.cito, f.discount, f.cost from folders f ";
-            $query.= "left join doctors doc on doc.id=f.doctor ";
-            $query.= "inner join departments d on d.id=f.clientid ";
-            $query.= "inner join statuses a on a.status=f.apprsts ";
-            $query.= "where f.apprsts!='R' and f.clientid=".\Input::get('client');
-        }
-        else{
-            $query = "select f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.PHONE, f.org, f.str, f.EMAIL, f.GENDER, doc.DOCTOR, f.COMMENTS, f.APPRSTS, f.clientid, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
-            $query.= "left join doctors doc on doc.id=f.doctor ";
-            $query.= "inner join departments d on d.id=f.clientid ";
-            $query.= "inner join statuses a on a.status=f.apprsts ";
-            $query.= "inner join userdept u on u.dept = d.id ";
-            $query.= "where u.usernam='".\Session::get('login')."' and f.apprsts!='R'";
-        }
-        $query.= " and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
-        if($positive!='')
-            $query.=" and f.status='".$positive."'";
-        if($panel!='')
-            $query.=" and exists(select o.id from orders o where o.folderno=f.folderno and o.panel like '%".$panel."%')";
-        if($apprsts!='')
-            $query.=" and f.apprsts='".$apprsts."'";
-        $stmt = $this->queryDB($query);
+    function getFolders($request){
+        $date_st        = $request->input('date_st',date('Y-m-d', strtotime("-1 days")));
+        $date_en        = $request->input('date_en',date('Y-m-d 23:59:59'));
+        $step           = $request->input('step',0);
+        $step_length    = $request->input('step_length',10);
+        $panel          = str_replace(',','.',\Input::get('panel',''));
+        $skip           = $step_length*$step;
+        $query          = "select first $step_length skip $skip distinct f.folderno, f.str, doc.doctor, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.org, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
+        $query2         = "select count(distinct(f.folderno)) from folders f ";
+        $query_st       = "inner join doctors doc on doc.id=f.doctor ";
+        $query_st      .= "inner join departments d on d.id=f.clientid ";
+        $query_st      .= "inner join statuses a on a.status=f.apprsts ";
+        $query_st      .= "where f.apprsts!='R' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        if ($request->has('status'))
+            $query_st.=" and f.apprsts='".$request->get('status')."'";
+        if ($request->has('positive'))
+            $query_st.=" and f.status='".$request->get('positive')."'";
+        if ($request->has('lpu'))
+            $query_st.=" and d.deptcode=".$request->get('lpu');
+        if ($panel!='')
+            $query.=" and exists(select o.id from orders o where o.folderno=f.folderno and o.panel like '".$panel."%')";
+        $query_st.=" and f.clientid = '".trim($request->get('client', \Session::get('dept')))."'";
+        $stmt = $this->queryDB($query.$query_st);
         $res = $this->getResult($stmt);
-        return $res;
+        $stmt = $this->queryDB($query2.$query_st);
+        $count = $this->getResult($stmt)[0]['COUNT'];
+        return [$res,$count];
 
     }
 
@@ -191,7 +184,7 @@ class DBController extends Controller
         $date_en        = $request->input('date_en',date('Y-m-d 23:59:59'));
         $step           = $request->input('step',0);
         $step_length    = $request->input('step_length',10);
-        $panel          = $request->input('panel','');
+        $panel      = str_replace(',','.',\Input::get('panel',''));
         $skip           = $step_length*$step;
         $query          = "select first $step_length skip $skip distinct f.folderno, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
         $query2         = "select count(distinct(f.folderno)) from folders f ";
@@ -205,9 +198,9 @@ class DBController extends Controller
         if ($request->has('lpu'))
             $query_st.=" and d.deptcode=".$request->get('lpu');
         if ($panel!='')
-            $query.=" and exists(select o.id from orders o where o.folderno=f.folderno and o.panel like '%".$panel."%')";
+            $query.=" and exists(select o.id from orders o where o.folderno=f.folderno and o.panel like '".$panel."%')";
         if ($request->has('client'))
-            $query_st.=" and d.dept like '%".trim($request->get('client'))."%'";
+            $query_st.=" and d.dept = '".trim($request->get('client'))."'";
         $stmt = $this->queryDB($query.$query_st);
         $res = $this->getResult($stmt);
         $stmt = $this->queryDB($query2.$query_st);

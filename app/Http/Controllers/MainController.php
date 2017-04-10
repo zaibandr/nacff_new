@@ -16,6 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Khill\Lavacharts\Lavacharts;
 use sngrl\SphinxSearch\SphinxSearch;
 use App\RegitrationJournal;
+use Illuminate\Http\Request;
 
 class MainController extends DB
 {
@@ -157,23 +158,25 @@ class MainController extends DB
             ]);
     }
     //  Направления
-    public function page43(){
-        $folders = $this->getFolders();
+    public function page43(Request $request){
+        $folders = $this->getFolders($request);
         $depts = $this->getNetDepts();
         if(Input::has('excel') && Input::get('excel')==1) {
             Excel::create('newFile', function ($excel) use ($folders) {
                 $excel->sheet('firstSheet', function ($sheet) use ($folders) {
                     $sheet->loadView('excels.folders')->with([
-                        'folders' => $folders
+                        'folders' => $folders[0]
                     ]);
                 });
             })->export('xls');
             Input::merge(['excel'=>0]);
         }
         return View::make('Requests')->with([
-            'folders' => $folders,
-            'depts' => $depts,
-            'browser' => Func::getBrowser()
+            'folders'   => $folders[0],
+            'count'     => $folders[1],
+            'depts'     => $depts,
+            'browser'   => Func::getBrowser(),
+            'request'   => $request
         ]);
     }
     //  Регистратура
