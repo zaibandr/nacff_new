@@ -19,9 +19,6 @@ Route::post('auth',['as'=>'auth', 'uses'=>'AuthController@check']);
 Route::get('auth',function(){
     return View::make('auth');
 });
-Route::get('phpinfo',function(){
-    //return phpinfo();
-});
 Route::get('/',['as'=>'/', 'uses'=>'InfoController@index']);
 Route::get('integration','IntegrationController@index');
 Route::get('help','HelpController@index');
@@ -36,6 +33,9 @@ Route::group(['middleware' => 'auth'], function () {
         Route::resource('page72','NetController',['only'=>['index','edit','create','store','destroy']]);
         Route::resource('page74','PretenceController',['only'=>['index','edit','create','store','destroy']]);
         Route::any('/test', ['as' => 'test', 'uses' => 'test@index']);
+        Route::get('phpinfo',function(){
+            return phpinfo();
+        });
     });
     Route::get('messages', 'MainController@index');
     $arr = [1,2,18,19,38,43,44,45,48,49,51,52,53,54,55,56,57,58,59,60,61,62,63];

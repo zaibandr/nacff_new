@@ -1,7 +1,5 @@
 @extends('default')
 @section('content')
-    <link href="{{secure_asset('resources/assets/css/tablesorter.css')}}" rel="stylesheet">
-    <link href="{{secure_asset('resources/assets/css/theme.dropbox.css')}}" rel="stylesheet">
     <link href="{{secure_asset('public/css/bootstrap-datepicker3.css')}}" rel="stylesheet">
     <link href="{{secure_asset('resources/assets/css/requests.css')}}" rel="stylesheet">
     @include('scripts.requestScript')
@@ -113,11 +111,11 @@
                     </div>
                 </div>
                 <div class="col-lg-8" style="text-align: left">
-                    <button class="btn btn-default btn-lg" id="print" onclick="printAll()"><span class="glyphicon glyphicon-print" style="margin-right: 5px"></span>Печать</button>
-                    <button class="btn btn-default btn-lg" data-toggle="modal" data-target="#excel"><span class="glyphicon glyphicon-floppy-save" style="margin-right: 5px"></span>Скачать в Excel</button>
-                    <div class="hidden">
-                        <div id="popover-target"></div>
-                    </div>
+                    <button type="button" class="btn btn-default btn-lg" id="print" onclick="printAll()"><span class="glyphicon glyphicon-print" style="margin-right: 5px"></span>Печать</button>
+                    <button type="button" class="btn btn-default btn-lg" data-toggle="modal" data-target="#excel"><span class="glyphicon glyphicon-floppy-save" style="margin-right: 5px"></span>Скачать в Excel</button>
+                    <button type="button" class="btn btn-default btn-lg" id="popover" data-toggle="popover">
+                        <i class="glyphicon glyphicon-cogs" style="margin-right: 5px"></i>Фильтр столбцов
+                    </button>
                 </div>
                 <div class="col-lg-12 form-inline" style="text-align: center">
                     @if(isset($folders))
@@ -145,20 +143,20 @@
                 <table class="table table-striped ">
                     <thead>
                     <tr>
-                        <th>Статус</th>
-                        <th>Направление</th>
-                        <th>ФИО</th>
+                        <th class="sortable">Статус</th>
+                        <th class="sortable">Направление</th>
+                        <th class="sortable">ФИО</th>
                         <th>Пол</th>
-                        <th>Дата регистрации</th>
-                        <th>Дата рождения</th>
-                        <th>ЛПУ</th>
-                        <th>Организация</th>
-                        <th>Доктор</th>
-                        <th>Страховая компания</th>
-                        <th>Комментарий</th>
-                        <th>Цена по прайсу</th>
-                        <th>Цена с учетом скидки</th>
-                        <th>Скидка</th>
+                        <th class="sortable">Дата регистрации</th>
+                        <th style="display: {{ (!isset($_COOKIE["birth_column"       ]) || $_COOKIE["birth_column"       ]==1)?'table-cell':'none' }}" class="birth_column"          >Дата рождения</th>
+                        <th style="display: {{ (!isset($_COOKIE["sortable lpu_column"]) || $_COOKIE["sortable lpu_column"]==1)?'table-cell':'none' }}" class="sortable lpu_column"   >ЛПУ</th>
+                        <th style="display: {{ (!isset($_COOKIE["org_column"         ]) || $_COOKIE["org_column"         ]==1)?'table-cell':'none' }}" class="org_column"            >Организация</th>
+                        <th style="display: {{ (!isset($_COOKIE["doctor_column"      ]) || $_COOKIE["doctor_column"      ]==1)?'table-cell':'none' }}" class="doctor_column"         >Доктор</th>
+                        <th style="display: {{ (!isset($_COOKIE["policy_column"      ]) || $_COOKIE["policy_column"      ]==1)?'table-cell':'none' }}" class="policy_column"         >Страховая компания</th>
+                        <th style="display: {{ (!isset($_COOKIE["comment_column"     ]) || $_COOKIE["comment_column"     ]==1)?'table-cell':'none' }}" class="comment_column"        >Комментарий</th>
+                        <th style="display: {{ (!isset($_COOKIE["price_column"       ]) || $_COOKIE["price_column"       ]==1)?'table-cell':'none' }}" class="price_column"          >Цена по прайсу</th>
+                        <th style="display: {{ (!isset($_COOKIE["cost_column"        ]) || $_COOKIE["cost_column"        ]==1)?'table-cell':'none' }}" class="cost_column"           >Цена с учетом скидки</th>
+                        <th style="display: {{ (!isset($_COOKIE["procent_column"     ]) || $_COOKIE["procent_column"     ]==1)?'table-cell':'none' }}" class="procent_column"        >Скидка</th>
                         <th><span id='printAll' class='glyphicon glyphicon-print' onclick="printSel(); return false;"></span></th>
                     </tr>
                     </thead>
@@ -170,15 +168,15 @@
                             <td>{{$val['SURNAME']." ".$val['NAME']." ".$val['PATRONYMIC']}}</td>
                             <td>{{$val['GENDER']=='F' ? 'Ж' : 'М'}}</td>
                             <td>{{date('d.m.Y',strtotime($val['LOGDATE']))}}</td>
-                            <td>{{date('d.m.Y',strtotime($val['DATE_BIRTH']))}}</td>
-                            <td>{{stripslashes($val['DEPT'])}}</td>
-                            <td>{{$val['ORG']}}</td>
-                            <td>{{$val['DOCTOR']}}</td>
-                            <td>{{$val['STR']}}</td>
-                            <td>{{$val['COMMENTS']}}</td>
-                            <td>{{$val['PRICE']}}</td>
-                            <td>{{$val['COST']}}</td>
-                            <td>{{$val['DISCOUNT']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["birth_column"       ]) || $_COOKIE["birth_column"       ]==1)?'table-cell':'none' }}" >{{date('d.m.Y',strtotime($val['DATE_BIRTH']))}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["sortable lpu_column"]) || $_COOKIE["sortable lpu_column"]==1)?'table-cell':'none' }}" >{{stripslashes($val['DEPT'])}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["org_column"         ]) || $_COOKIE["org_column"         ]==1)?'table-cell':'none' }}" >{{$val['ORG']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["doctor_column"      ]) || $_COOKIE["doctor_column"      ]==1)?'table-cell':'none' }}" >{{$val['DOCTOR']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["policy_column"      ]) || $_COOKIE["policy_column"      ]==1)?'table-cell':'none' }}" >{{$val['STR']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["comment_column"     ]) || $_COOKIE["comment_column"     ]==1)?'table-cell':'none' }}" >{{$val['COMMENTS']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["price_column"       ]) || $_COOKIE["price_column"       ]==1)?'table-cell':'none' }}" >{{$val['PRICE']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["cost_column"        ]) || $_COOKIE["cost_column"        ]==1)?'table-cell':'none' }}" >{{$val['COST']}}</td>
+                            <td style="display: {{ (!isset($_COOKIE["procent_column"     ]) || $_COOKIE["procent_column"     ]==1)?'table-cell':'none' }}" >{{$val['DISCOUNT']}}</td>
                             <td><input type='checkbox' id='{{$val['FOLDERNO']}}' class='prn-cbox' /></td>
                         </tr>
                     @endforeach
@@ -218,7 +216,55 @@
                                 $(this).closest('form').submit();
                             });
                     @endif
+                    var f_sl = 1;
+                    $(".sortable").click(function(){
+                        f_sl *= -1;
+                        if($(this).find('i.fa.fa-caret-up').length){
+                            $(this).find('i').remove();
+                            $(this).append('<i class="fa fa-caret-down" aria-hidden="true"></i>')
+                        }
+                        else if($(this).find('i.fa.fa-caret-down').length){
+                            $(this).find('i').remove();
+                            $(this).append('<i class="fa fa-caret-up" aria-hidden="true"></i>')
+                        } else {
+                            $(this).append('<i class="fa fa-caret-down" aria-hidden="true"></i>');
+                            $(this).siblings().find('i.fa.fa-caret-up').remove();
+                            $(this).siblings().find('i.fa.fa-caret-down').remove();
+                        }
+                        var n = $(this).prevAll().length;
+                        sortTable(f_sl,n);
+                    });
                 });
+                function sortTable(f,n){
+                    var rows = $('.table tbody  tr').get();
+
+                    rows.sort(function(a, b) {
+
+                        var A = getVal(a);
+                        var B = getVal(b);
+
+                        if(A < B) {
+                            return -1*f;
+                        }
+                        if(A > B) {
+                            return 1*f;
+                        }
+
+                        return 0;
+                    });
+
+                    function getVal(elm){
+                        var v = $(elm).children('td').eq(n).text().toUpperCase();
+                        if($.isNumeric(v)){
+                            v = parseInt(v,10);
+                        }
+                        return v;
+                    }
+
+                    $.each(rows, function(index, row) {
+                        $('.table').children('tbody').append(row);
+                    });
+                }
             </script>
         @endif
         @stop
