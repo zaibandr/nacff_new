@@ -14,9 +14,11 @@ class AdminFolders extends DBController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return \View::make('adminPanel.folders');
+        return \View::make('adminPanel.folders')->with([
+            'request'   => $request
+        ]);
     }
 
     /**
@@ -40,6 +42,7 @@ class AdminFolders extends DBController
         return \View::make('adminPanel.folders')->with([
             'folders'   => $this->getFoldersAdmin($request)[0],
             'count'     => $this->getFoldersAdmin($request)[1],
+            'request'   => $request
         ]);
     }
 

@@ -7,62 +7,67 @@
     @include('scripts.requestScript')
     <div id="requests">
         <h1 style="margin-bottom: 2%">СПИСОК НАПРАВЛЕНИЙ</h1>
-        <div class="row">
-            <div class="col-lg-offset-1 col-lg-10">
                 <form action="" method="post" class="form-inline">
                     {{csrf_field()}}
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="input-daterange input-group datepicker" >
-                                <span class="input-group-addon">за период с </span>
-                                <input type="text" class="form-control" name="date_st" value="{{Input::get('date_st',date('d.m.Y',strtotime("-3 days")))}}"/>
-                                <span class="input-group-addon">по</span>
-                                <input type="text" class="form-control" name="date_en" value="{{Input::get('date_en',date('d.m.Y'))}}"/>
+                        <div class="col-lg-12" style="margin-top: 3%">
+                            <div class="row">
+                                {{ csrf_field() }}
+                                <div class="col-md-4">
+                                    <div class="form-inline">
+                                        <label for="input-date-start">Период: </label>
+                                        <input id="input-date-start" name="date_st" type="text" class="form-control datepicker" value="{{ $request->input('date_st',date('d.m.Y',strtotime('-3 days'))) }}">
+                                        <label for="input-date-end">-</label>
+                                        <input id="input-date-end" name="date_en" type="text" class="form-control datepicker" value="{{ $request->input('date_en',date('d.m.Y')) }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-inline">
+                                        <label for="status">Статус направления:</label>
+                                        <select name="status" id="status" class="form-control">
+                                            <option selected></option>
+                                            <option value="T" {{ $request->input('status','NONE')=='T'?'selected':'' }}>Завершен</option>
+                                            <option value="L" {{ $request->input('status','NONE')=='L'?'selected':'' }}>Зарегистрирован</option>
+                                            <option value="D" {{ $request->input('status','NONE')=='D'?'selected':'' }}>Черновик</option>
+                                            <option value="K" {{ $request->input('status','NONE')=='K'?'selected':'' }}>Курьер</option>
+                                            <option value="A" {{ $request->input('status','NONE')=='A'?'selected':'' }}>Выполняется</option>
+                                            <option value="P" {{ $request->input('status','NONE')=='P'?'selected':'' }}>Отправлен</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-inline">
+                                        <label for="search">Запрос:</label>
+                                        <input id="search" name="search" type="text" class="form-control" value="{{ $request->input('search','') }}" placeholder="ФИО, номер направления, и т.д.">
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin: 1% 0">
+                                    <div class="form-group">
+                                        <label for="positive"> Фильтр по результатам</label>
+                                        <select name="positive" id="positive" class="form-control">
+                                            <option selected></option>
+                                            <option value="O" {{(Input::get('positive')=='O')?"selected":''}}>с патологией</option>
+                                            <option value="E" {{(Input::get('positive')=='E')?"selected":''}}> в норме</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4" style="margin: 1% 0">
+                                    <div class="form-group">
+                                        <label for="panel">С панелью</label>
+                                        <input type="text" name="panel" class="form-control" value="{{Input::get('panel','')}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" style="margin-left: 5%">
+                                        <label for="lpu">ЛПУ</label>
+                                        <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-12 pull-right">
+                                    <button type="submit" class="btn btn-default">Применить</button>
+                                    <button type="button" class="btn btn-danger" onclick="formReset()">Сброс</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <label for="client">Отделение</label>
-                                <input type="text" name="client" class="form-control" value="{{Input::get('client','')}}">
-                            </div>
-                            <div class="form-group" style="margin-left: 5%">
-                                <label for="lpu">ЛПУ</label>
-                                <input type="number" name="lpu" class="form-control" value="{{Input::get('lpu','')}}">
-                            </div>
-                        </div>
-                        <div class="col-lg-3" style="margin-top: 2%;">
-                            <div class="form-group">
-                                <label for="positive"> Фильтр по результатам:</label>
-                                <select name="positive" id="positive" class="form-control">
-                                    <option selected></option>
-                                    <option value="O" {{(Input::get('positive')=='O')?"selected":''}}>с патологией</option>
-                                    <option value="E" {{(Input::get('positive')=='E')?"selected":''}}> в норме</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-3" style="margin-top: 2%;">
-                            <div class="form-group">
-                                <label for="status">Фильтр по статусу выполнения:</label>
-                                <select name="status" id="status" class="form-control">
-                                    <option selected></option>
-                                    <option value="T" @if(Input::has('status') && Input::get('status')=='T') {{'selected'}} @endif>Выполнен</option>
-                                    <option value="L" @if(Input::has('status') && Input::get('status')=='L') {{'selected'}} @endif>Зарегистрирован</option>
-                                    <option value="D" @if(Input::has('status') && Input::get('status')=='D') {{'selected'}} @endif>Черновик</option>
-                                    <option value="R" @if(Input::has('status') && Input::get('status')=='R') {{'selected'}} @endif>Отменен</option>
-                                    <option value="K" @if(Input::has('status') && Input::get('status')=='K') {{'selected'}} @endif>Курьер</option>
-                                    <option value="A" @if(Input::has('status') && Input::get('status')=='A') {{'selected'}} @endif>Выполняется</option>
-                                    <option value="P" @if(Input::has('status') && Input::get('status')=='P') {{'selected'}} @endif>Отправлен</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-lg-3" style="margin-top: 2%;">
-                            <div class="form-group">
-                                <label for="panel"> С панелью:</label>
-                                <input type="text" name="panel" id="panel" class="form-control">
-                            </div>
-                        </div>
-                        <div class="col-lg-12">
-                            <button type="submit" class="btn btn-primary">Обновить</button>
                         </div>
                         @if(isset($folders))
                         <div class="col-lg-6 col-lg-offset-3">
@@ -112,24 +117,23 @@
                     </div>
                 </form>
             </div>
-        </div>
         @if(isset($error)) <b style="color: red">Error</b> @endif
         @if(isset($folders))
-        <table class="tablesorter bootstrap-popup">
+        <table class="table table-striped">
             <thead>
             <tr>
-                <th data-priority="critical">Статус</th>
-                <th data-priority="critical">Направление</th>
-                <th data-priority="critical">ФИО</th>
-                <th data-priority="5">Пол</th>
-                <th data-priority="critical">Дата регистрации</th>
-                <th data-priority="5">Дата рождения</th>
-                <th data-priority="4">ЛПУ</th>
-                <th data-priority="1">Комментарий</th>
-                <th data-priority="1">Цена по прайсу</th>
-                <th data-priority="1">Цена с учетом скидки</th>
-                <th data-priority="1">Скидка</th>
-                <th data-priority="critical" class="filter-false"><span id='printAll' class='glyphicon glyphicon-print' onclick="printSel(); return false;"></span></th>
+                <th >Статус</th>
+                <th >Направление</th>
+                <th >ФИО</th>
+                <th >Пол</th>
+                <th >Дата регистрации</th>
+                <th >Дата рождения</th>
+                <th >ЛПУ</th>
+                <th >Комментарий</th>
+                <th >Цена по прайсу</th>
+                <th >Цена с учетом скидки</th>
+                <th >Скидка</th>
+                <th class="filter-false"><span id='printAll' class='glyphicon glyphicon-print' onclick="printSel(); return false;"></span></th>
             </tr>
             </thead>
             <tbody>
@@ -152,5 +156,4 @@
             </tbody>
         </table>
             @endif
-    </div>
     @stop

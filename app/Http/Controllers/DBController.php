@@ -154,6 +154,7 @@ class DBController extends Controller
         $date_en        = $request->input('date_en',date('Y-m-d 23:59:59'));
         $step           = $request->input('step',0);
         $step_length    = $request->input('step_length',10);
+        $search         = $request->input('search','');
         $panel          = str_replace(',','.',\Input::get('panel',''));
         $skip           = $step_length*$step;
         $query          = "select first $step_length skip $skip distinct f.folderno, f.str, doc.doctor, a.STATUSNAME, a.STATUSCOLOR, d.dept, f.org, f.LOGDATE, f.SURNAME, f.NAME, f.PATRONYMIC, f.DATE_BIRTH, f.EMAIL, f.GENDER, f.COMMENTS, f.APPRSTS, f.loguser, f.price, f.cito, f.cash, f.discount, f.cost from folders f ";
@@ -161,7 +162,7 @@ class DBController extends Controller
         $query_st       = "inner join doctors doc on doc.id=f.doctor ";
         $query_st      .= "inner join departments d on d.id=f.clientid ";
         $query_st      .= "inner join statuses a on a.status=f.apprsts ";
-        $query_st      .= "where f.apprsts!='R' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        $query_st      .= "where (f.folderno like '".$search."%' or f.surname like '".$search."%') and f.apprsts!='R' and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
         if ($request->has('status'))
             $query_st.=" and f.apprsts='".$request->get('status')."'";
         if ($request->has('positive'))
@@ -182,6 +183,7 @@ class DBController extends Controller
     public function getFoldersAdmin($request){
         $date_st        = $request->input('date_st',date('Y-m-d', strtotime("-1 days")));
         $date_en        = $request->input('date_en',date('Y-m-d 23:59:59'));
+        $search         = $request->input('search','');
         $step           = $request->input('step',0);
         $step_length    = $request->input('step_length',10);
         $panel      = str_replace(',','.',\Input::get('panel',''));
@@ -190,7 +192,7 @@ class DBController extends Controller
         $query2         = "select count(distinct(f.folderno)) from folders f ";
         $query_st       = "inner join departments d on d.id=f.clientid ";
         $query_st      .= "inner join statuses a on a.status=f.apprsts ";
-        $query_st      .= "where f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
+        $query_st      .= "where (f.folderno like '".$search."%' or f.surname like '".$search."%') and f.logdate >= '".$date_st."' and f.logdate <= '".$date_en."'";
         if ($request->has('status'))
             $query_st.=" and f.apprsts='".$request->get('status')."'";
         if ($request->has('positive'))
